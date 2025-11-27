@@ -13,6 +13,8 @@ import { ModeToggle } from '@/components/ui/mode-toggle'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { useLanguage } from '@/contexts/language-context'
 
+import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
+
 // Animation variants
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -36,9 +38,14 @@ export default function HomePage() {
     const { t } = useLanguage()
     const { isInstallable, promptInstall } = useInstallPrompt()
     const [mounted, setMounted] = useState(false)
+    const [isPwa, setIsPwa] = useState(false)
 
     useEffect(() => {
         setMounted(true)
+        // Check if running in standalone mode (PWA)
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            setIsPwa(true)
+        }
     }, [])
 
     if (!mounted) {
@@ -96,6 +103,71 @@ export default function HomePage() {
                     </div>
                 </nav>
 
+                {/* Hero Section - Only show if NOT in PWA mode */}
+                {!isPwa && (
+                    <div className="grid gap-12 lg:grid-cols-2 lg:items-center mb-24">
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            variants={staggerContainer}
+                            className="text-center lg:text-left"
+                        >
+                            <motion.div variants={fadeInUp} className="mb-6 flex justify-center lg:justify-start">
+                                <span className="rounded-full border border-gold-200 bg-gold-50 px-4 py-1.5 text-sm font-medium text-gold-800 dark:border-gold-800 dark:bg-gold-950/30 dark:text-gold-300">
+                                    {t.home.hero.badge}
+                                </span>
+                            </motion.div>
+
+                            <motion.h1
+                                variants={fadeInUp}
+                                className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl"
+                            >
+                                {t.home.hero.title}
+                                <span className="block text-3xl font-light text-muted-foreground md:text-5xl lg:text-6xl mt-2">
+                                    {t.home.hero.subtitle}
+                                </span>
+                            </motion.h1>
+
+                            <motion.p
+                                variants={fadeInUp}
+                                className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl leading-relaxed lg:mx-0"
+                            >
+                                {t.home.hero.description}
+                            </motion.p>
+
+                            <motion.div variants={fadeInUp} className="flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
+                                <Button size="lg" className="h-12 rounded-full px-8 text-base bg-gold-600 hover:bg-gold-700 text-white shadow-lg shadow-gold-500/20">
+                                    {t.home.hero.getStarted}
+                                    <ChevronRight className="ml-2 h-4 w-4" />
+                                </Button>
+                                <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base">
+                                    {t.home.hero.viewFeatures}
+                                </Button>
+                            </motion.div>
+                        </motion.div>
+
+                        {/* Hero Image / App Screenshot */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, x: 20 }}
+                            animate={{ opacity: 1, scale: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="relative mx-auto max-w-[300px] lg:max-w-md"
+                        >
+                            <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-r from-gold-500 to-sand-500 opacity-20 blur-3xl" />
+                            <div className="relative rounded-[2.5rem] border-8 border-white bg-black shadow-2xl dark:border-gray-800 overflow-hidden">
+                                <Image
+                                    src="/icons/qalbuApp.png"
+                                    alt="Qalbu App Interface"
+                                    width={400}
+                                    height={800}
+                                    className="h-auto w-full"
+                                    priority
+                                />
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+
                 {/* Prayer Times Widget */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -104,6 +176,16 @@ export default function HomePage() {
                     className="mb-8"
                 >
                     <PrayerTimesWidget variant="horizontal" />
+                </motion.div>
+
+                {/* Daily Hadith Widget */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-12"
+                >
+                    <DailyHadithWidget />
                 </motion.div>
 
                 {/* Main Features Grid */}
@@ -239,12 +321,69 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                {/* Simple Footer */}
-                <div className="text-center py-8 border-t border-border/40">
-                    <p className="text-xs text-muted-foreground">
-                        {t.home.footer.copyright}
-                    </p>
-                </div>
+                {/* Rich Footer - Only show if NOT in PWA mode */}
+                {!isPwa && (
+                    <div className="mt-24">
+                        {/* Features Grid */}
+                        <div className="grid gap-8 md:grid-cols-3 mb-24">
+                            <div className="bg-card rounded-3xl p-8 border border-border/50">
+                                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+                                    <Smartphone className="h-6 w-6 text-foreground" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Stay Connected</h3>
+                                <p className="text-muted-foreground leading-relaxed">
+                                    Keep your heart connected to your Creator with daily reminders and easy access to worship tools.
+                                </p>
+                            </div>
+                            <div className="bg-card rounded-3xl p-8 border border-border/50">
+                                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+                                    <Shield className="h-6 w-6 text-foreground" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Stay Private</h3>
+                                <p className="text-muted-foreground leading-relaxed">
+                                    Your spiritual journey is personal. We respect your privacy with no tracking or data selling.
+                                </p>
+                            </div>
+                            <div className="bg-card rounded-3xl p-8 border border-border/50">
+                                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+                                    <Heart className="h-6 w-6 text-foreground" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Stay Faithful</h3>
+                                <p className="text-muted-foreground leading-relaxed">
+                                    Nurture your iman with a companion that understands and supports your Islamic lifestyle.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Main Footer */}
+                        <div className="rounded-[3rem] bg-black text-white p-12 md:p-24 text-center">
+                            <h2 className="text-4xl md:text-5xl font-bold mb-6">Qalbu</h2>
+                            <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
+                                Your indispensable companion for embracing an Islamic lifestyle.
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                                <Button className="h-12 rounded-full bg-white text-black hover:bg-gray-200 px-8">
+                                    Download for iOS
+                                </Button>
+                                <Button variant="outline" className="h-12 rounded-full border-gray-700 text-white hover:bg-gray-900 px-8 bg-transparent">
+                                    Download for Android
+                                </Button>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                                {t.home.footer.copyright}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Simple Footer - Only show in PWA mode */}
+                {isPwa && (
+                    <div className="text-center py-8 border-t border-border/40">
+                        <p className="text-xs text-muted-foreground">
+                            {t.home.footer.copyright}
+                        </p>
+                    </div>
+                )}
             </div>
         </main>
     )

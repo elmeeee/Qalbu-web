@@ -1,27 +1,35 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowLeft, Search, BookOpen } from 'lucide-react'
+import { ArrowLeft, Search, BookOpen, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
-import { doas } from '@/lib/data/doas'
+import { getDoas, type DoaItem } from '@/lib/api/doa'
 
 export default function DoaPage() {
     const { t, language } = useLanguage()
     const [searchQuery, setSearchQuery] = useState('')
+    const [doas, setDoas] = useState<DoaItem[]>([])
+    const [loading, setLoading] = useState(true)
 
-    // Filter doas based on search query and current language
+    useEffect(() => {
+        getDoas()
+            .then(setDoas)
+            .catch(console.error)
+            .finally(() => setLoading(false))
+    }, [])
+
+    // Filter doas based on search query
     const filteredDoas = doas.filter((doa) => {
-        const title = doa.title[language as keyof typeof doa.title] || doa.title.en
-        const translation = doa.translation[language as keyof typeof doa.translation] || doa.translation.en
         const query = searchQuery.toLowerCase()
         return (
-            title.toLowerCase().includes(query) ||
-            translation.toLowerCase().includes(query)
+            doa.judul.toLowerCase().includes(query) ||
+            doa.terjemah.toLowerCase().includes(query) ||
+            doa.latin.toLowerCase().includes(query)
         )
     })
 
@@ -66,46 +74,48 @@ export default function DoaPage() {
                     </div>
                 </motion.div>
 
-                {/* Doa List */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredDoas.map((doa, index) => (
-                        <motion.div
-                            key={doa.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                        >
-                            <Card className="premium-card h-full flex flex-col">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <BookOpen className="h-5 w-5 text-gold-600" />
-                                        {doa.title[language as keyof typeof doa.title] || doa.title.en}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col gap-4">
-                                    <div className="text-right">
-                                        <p className="arabic-text text-2xl leading-loose">{doa.arabic}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-gold-600 mb-1">Transliteration</p>
-                                        <p className="text-sm italic text-muted-foreground">{doa.transliteration}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-gold-600 mb-1">Translation</p>
-                                        <p className="text-sm">
-                                            {doa.translation[language as keyof typeof doa.translation] || doa.translation.en}
-                                        </p>
-                                    </div>
-                                    <div className="mt-auto pt-4 border-t border-border/50">
-                                        <p className="text-xs text-muted-foreground">
-                                            {t.doas.source}: {doa.source}
-                                        </p>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </div>
+                {/* Loading State */}
+                {loading ? (
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                    </div>
+                ) : (
+                    /* Doa List */
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {filteredDoas.map((doa, index) => (
+                            <motion.div
+                                key={doa.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                            >
+                                <Card className="premium-card h-full flex flex-col hover:shadow-md transition-all">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-start gap-2 text-lg leading-tight">
+                                            <BookOpen className="h-5 w-5 text-gold-600 shrink-0 mt-1" />
+                                            <span>{doa.judul}</span>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex-1 flex flex-col gap-4">
+                                        <div className="text-right bg-sand-50/50 dark:bg-gray-900/50 p-4 rounded-xl">
+                                            <p className="arabic-text text-2xl leading-loose" dir="rtl">{doa.arab}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold text-gold-600 mb-1 uppercase tracking-wider">Transliteration</p>
+                                            <p className="text-sm italic text-muted-foreground">{doa.latin}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold text-gold-600 mb-1 uppercase tracking-wider">Translation</p>
+                                            <p className="text-sm leading-relaxed">
+                                                {doa.terjemah}
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
         </main>
     )
