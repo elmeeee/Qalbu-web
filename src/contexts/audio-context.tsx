@@ -1,0 +1,206 @@
+'use client'
+
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react'
+import { SurahDetail, Ayah, getSurahWithAudio } from '@/lib/api/quran'
+
+interface AudioContextType {
+    isPlaying: boolean
+    currentSurah: SurahDetail | null
+    currentAyah: Ayah | null
+    progress: number
+    duration: number
+    isLoading: boolean
+    playAyah: (surah: SurahDetail, ayah: Ayah) => void
+    togglePlay: () => void
+    playNext: () => void
+    playPrevious: () => void
+    seek: (time: number) => void
+}
+
+const AudioContext = createContext<AudioContextType | undefined>(undefined)
+
+export function AudioProvider({ children }: { children: React.ReactNode }) {
+    const [isPlaying, setIsPlaying] = useState(false)
+    const [currentSurah, setCurrentSurah] = useState<SurahDetail | null>(null)
+    const [currentAyah, setCurrentAyah] = useState<Ayah | null>(null)
+    const [progress, setProgress] = useState(0)
+    const [duration, setDuration] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+
+    // Initialize audio element
+    useEffect(() => {
+        audioRef.current = new Audio()
+
+        const audio = audioRef.current
+
+        const handleTimeUpdate = () => setProgress(audio.currentTime)
+        const handleLoadedMetadata = () => setDuration(audio.duration)
+        const handleEnded = () => {
+            setIsPlaying(false)
+            playNext()
+        }
+        const handleCanPlay = () => setIsLoading(false)
+        const handleWaiting = () => setIsLoading(true)
+
+        audio.addEventListener('timeupdate', handleTimeUpdate)
+        audio.addEventListener('loadedmetadata', handleLoadedMetadata)
+        audio.addEventListener('ended', handleEnded)
+        audio.addEventListener('canplay', handleCanPlay)
+        audio.addEventListener('waiting', handleWaiting)
+
+        return () => {
+            audio.removeEventListener('timeupdate', handleTimeUpdate)
+            audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
+            audio.removeEventListener('ended', handleEnded)
+            audio.removeEventListener('canplay', handleCanPlay)
+            audio.removeEventListener('waiting', handleWaiting)
+            audio.pause()
+        }
+    }, []) // Empty dependency array is intentional, we use refs for state access if needed, but here playNext needs to be stable or accessed via ref/callback
+
+    const playAyah = useCallback(async (surah: SurahDetail, ayah: Ayah) => {
+        if (!audioRef.current) return
+
+        try {
+            setIsLoading(true)
+            setCurrentSurah(surah)
+            setCurrentAyah(ayah)
+
+            audioRef.current.src = ayah.audio
+            await audioRef.current.play()
+            setIsPlaying(true)
+        } catch (error) {
+            console.error('Failed to play audio:', error)
+            setIsPlaying(false)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
+
+    const togglePlay = useCallback(() => {
+        if (!audioRef.current || !currentAyah) return
+
+        if (isPlaying) {
+            audioRef.current.pause()
+            setIsPlaying(false)
+        } else {
+            audioRef.current.play()
+            setIsPlaying(true)
+        }
+    }, [isPlaying, currentAyah])
+
+    const playNext = useCallback(async () => {
+        // We need the latest state here. Since this is called from event listener, 
+        // we rely on the state updates or refs. 
+        // Actually, the closure might capture old state if not careful.
+        // Let's use a ref to track current surah/ayah for the event listener logic if needed,
+        // but since playNext is called from handleEnded which is defined in useEffect,
+        // we need to make sure playNext is fresh or uses refs.
+        // A better approach for the useEffect is to not define handleEnded there, 
+        // or use a ref for the callback.
+
+        // However, let's implement the logic first.
+
+        // This implementation relies on the fact that we will fix the closure issue 
+        // by using a ref for the "next" logic or putting this in a useEffect that updates the listener.
+        // For simplicity in this step, I will use a ref to access current state inside the closure if I were writing raw JS,
+        // but with React, I'll use a separate effect to bind the 'ended' listener to the current `playNext`.
+    }, [])
+
+    // We need to implement playNext properly with access to state
+    const playNextRef = useRef<() => void>(() => { })
+
+    useEffect(() => {
+        playNextRef.current = async () => {
+            if (!currentSurah || !currentAyah) return
+
+            const currentIndex = currentSurah.ayahs.findIndex(a => a.number === currentAyah.number)
+
+            // 1. Next Ayah in same Surah
+            if (currentIndex !== -1 && currentIndex < currentSurah.ayahs.length - 1) {
+                const nextAyah = currentSurah.ayahs[currentIndex + 1]
+                playAyah(currentSurah, nextAyah)
+                return
+            }
+
+            // 2. Next Surah
+            if (currentIndex === currentSurah.ayahs.length - 1) {
+                const nextSurahNumber = currentSurah.number + 1
+                if (nextSurahNumber <= 114) {
+                    try {
+                        setIsLoading(true)
+                        const nextSurah = await getSurahWithAudio(nextSurahNumber)
+                        if (nextSurah && nextSurah.ayahs.length > 0) {
+                            playAyah(nextSurah, nextSurah.ayahs[0])
+                        }
+                    } catch (error) {
+                        console.error('Failed to load next surah:', error)
+                    } finally {
+                        setIsLoading(false)
+                    }
+                }
+            }
+        }
+    }, [currentSurah, currentAyah, playAyah])
+
+    const playPrevious = useCallback(() => {
+        if (!currentSurah || !currentAyah) return
+
+        const currentIndex = currentSurah.ayahs.findIndex(a => a.number === currentAyah.number)
+
+        if (currentIndex > 0) {
+            const prevAyah = currentSurah.ayahs[currentIndex - 1]
+            playAyah(currentSurah, prevAyah)
+        }
+    }, [currentSurah, currentAyah, playAyah])
+
+    const seek = useCallback((time: number) => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = time
+            setProgress(time)
+        }
+    }, [])
+
+    // Re-bind ended listener when playNext changes
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
+
+        const handleEnded = () => {
+            playNextRef.current()
+        }
+
+        audio.addEventListener('ended', handleEnded)
+        return () => audio.removeEventListener('ended', handleEnded)
+    }, [currentSurah, currentAyah]) // Re-bind when state changes so playNextRef is fresh? 
+    // Actually playNextRef.current is always fresh. We just need to bind it once?
+    // No, playNextRef.current is a mutable ref, so the function inside it changes.
+    // The listener calls the function stored in ref.
+
+    return (
+        <AudioContext.Provider value={{
+            isPlaying,
+            currentSurah,
+            currentAyah,
+            progress,
+            duration,
+            isLoading,
+            playAyah,
+            togglePlay,
+            playNext: () => playNextRef.current(),
+            playPrevious,
+            seek
+        }}>
+            {children}
+        </AudioContext.Provider>
+    )
+}
+
+export function useAudio() {
+    const context = useContext(AudioContext)
+    if (context === undefined) {
+        throw new Error('useAudio must be used within an AudioProvider')
+    }
+    return context
+}
