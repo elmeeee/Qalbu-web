@@ -1,15 +1,25 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
-import { prayerSteps } from '@/lib/data/prayer-guide'
+import { getPrayerGuide, type PrayerGuideItem } from '@/lib/api/islamic-content'
 
 export default function PrayerGuidePage() {
     const { t, language } = useLanguage()
+    const [guide, setGuide] = useState<PrayerGuideItem[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        getPrayerGuide()
+            .then(setGuide)
+            .catch(console.error)
+            .finally(() => setLoading(false))
+    }, [])
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
@@ -34,56 +44,53 @@ export default function PrayerGuidePage() {
                     <p className="text-lg text-muted-foreground">{t.prayerGuide.subtitle}</p>
                 </motion.div>
 
-                {/* Steps List */}
-                <div className="max-w-3xl mx-auto space-y-8">
-                    {prayerSteps.map((step, index) => (
-                        <motion.div
-                            key={step.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                        >
-                            <div className="flex gap-4">
-                                <div className="flex flex-col items-center">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-600 text-white font-bold shadow-lg z-10">
-                                        {step.id}
-                                    </div>
-                                    {index !== prayerSteps.length - 1 && (
-                                        <div className="w-0.5 flex-1 bg-border/50 my-2" />
-                                    )}
-                                </div>
-                                <Card className="premium-card flex-1 mb-4">
-                                    <CardHeader>
-                                        <CardTitle className="text-xl">
-                                            {step.title[language as keyof typeof step.title] || step.title.en}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <p className="text-muted-foreground">
-                                            {step.description[language as keyof typeof step.description] || step.description.en}
-                                        </p>
-
-                                        {step.arabic && (
-                                            <div className="bg-muted/30 p-4 rounded-lg border border-border/50">
-                                                <p className="arabic-text text-2xl text-center mb-4">{step.arabic}</p>
-                                                {step.transliteration && (
-                                                    <p className="text-sm text-center italic text-muted-foreground mb-2">
-                                                        {step.transliteration}
-                                                    </p>
-                                                )}
-                                                {step.translation && (
-                                                    <p className="text-sm text-center font-medium">
-                                                        {step.translation[language as keyof typeof step.translation] || step.translation.en}
-                                                    </p>
-                                                )}
-                                            </div>
+                {/* Loading State */}
+                {loading ? (
+                    <div className="flex justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                    </div>
+                ) : (
+                    /* Steps List */
+                    <div className="max-w-3xl mx-auto space-y-8">
+                        {guide.map((step, index) => (
+                            <motion.div
+                                key={step.id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                            >
+                                <div className="flex gap-4">
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-600 text-white font-bold shadow-lg z-10">
+                                            {index + 1}
+                                        </div>
+                                        {index !== guide.length - 1 && (
+                                            <div className="w-0.5 flex-1 bg-border/50 my-2" />
                                         )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                                    </div>
+                                    <Card className="premium-card flex-1 mb-4">
+                                        <CardHeader>
+                                            <CardTitle className="text-xl">
+                                                {step.name}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="bg-muted/30 p-4 rounded-lg border border-border/50">
+                                                <p className="arabic-text text-2xl text-center mb-4 leading-loose">{step.arabic}</p>
+                                                <p className="text-sm text-center italic text-muted-foreground mb-2">
+                                                    {step.latin}
+                                                </p>
+                                                <p className="text-sm text-center font-medium">
+                                                    {step.terjemah}
+                                                </p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
         </main>
     )
