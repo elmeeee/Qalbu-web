@@ -1,74 +1,21 @@
 {
-    "name": "Qalbu - Your Islamic Companion",
+    "name": "Qalbu - Islamic Companion",
     "short_name": "Qalbu",
-    "description": "A modern, elegant Islamic application featuring prayer times, full Quran with audio, Qibla direction, and more.",
+    "description": "Your daily Islamic companion for prayer times, Quran, and more.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#e9a84a",
-    "orientation": "portrait-primary",
+    "theme_color": "#d97706",
     "icons": [
         {
-            "src": "/icon-192.png",
+            "src": "/icons/qalbuIcon.png",
             "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/icon-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ],
-    "categories": [
-        "lifestyle",
-        "education",
-        "utilities"
-    ],
-    "screenshots": [
-        {
-            "src": "/screenshot-1.png",
-            "sizes": "540x720",
             "type": "image/png"
-        }
-    ],
-    "shortcuts": [
-        {
-            "name": "Prayer Times",
-            "short_name": "Prayer",
-            "description": "View today's prayer times",
-            "url": "/#prayer-times",
-            "icons": [
-                {
-                    "src": "/icon-192.png",
-                    "sizes": "192x192"
-                }
-            ]
         },
         {
-            "name": "Quran",
-            "short_name": "Quran",
-            "description": "Read the Holy Quran",
-            "url": "/quran",
-            "icons": [
-                {
-                    "src": "/icon-192.png",
-                    "sizes": "192x192"
-                }
-            ]
-        },
-        {
-            "name": "Qibla",
-            "short_name": "Qibla",
-            "description": "Find Qibla direction",
-            "url": "/qibla",
-            "icons": [
-                {
-                    "src": "/icon-192.png",
-                    "sizes": "192x192"
-                }
-            ]
+            "src": "/icons/qalbuIcon.png",
+            "sizes": "512x512",
+            "type": "image/png"
         }
     ]
 }
