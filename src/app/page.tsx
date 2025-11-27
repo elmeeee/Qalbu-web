@@ -52,11 +52,19 @@ export default function HomePage() {
             <div className="container mx-auto px-4 py-8 md:py-16">
                 {/* Navigation / Header */}
                 <nav className="mb-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 text-white">
-                            <span className="text-lg">🕌</span>
+                    <div className="flex items-center gap-3">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-sm">
+                            <Image
+                                src="/icons/qalbuIcon.png"
+                                alt="Qalbu Logo"
+                                width={40}
+                                height={40}
+                                className="h-full w-full object-cover"
+                            />
                         </div>
-                        <span className="text-xl font-bold tracking-tight">Qalbu</span>
+                        <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-gold-600 to-gold-500 bg-clip-text text-transparent dark:from-gold-400 dark:to-gold-300">
+                            Qalbu
+                        </span>
                     </div>
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher />
@@ -70,62 +78,82 @@ export default function HomePage() {
                 </nav>
 
                 {/* Hero Section */}
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={staggerContainer}
-                    className="mx-auto mb-24 max-w-4xl text-center"
-                >
-                    <motion.div variants={fadeInUp} className="mb-6 flex justify-center">
-                        <span className="rounded-full border border-gold-200 bg-gold-50 px-4 py-1.5 text-sm font-medium text-gold-800 dark:border-gold-800 dark:bg-gold-950/30 dark:text-gold-300">
-                            {t.home.hero.badge}
-                        </span>
+                <div className="grid gap-12 lg:grid-cols-2 lg:items-center mb-24">
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={staggerContainer}
+                        className="text-center lg:text-left"
+                    >
+                        <motion.div variants={fadeInUp} className="mb-6 flex justify-center lg:justify-start">
+                            <span className="rounded-full border border-gold-200 bg-gold-50 px-4 py-1.5 text-sm font-medium text-gold-800 dark:border-gold-800 dark:bg-gold-950/30 dark:text-gold-300">
+                                {t.home.hero.badge}
+                            </span>
+                        </motion.div>
+
+                        <motion.h1
+                            variants={fadeInUp}
+                            className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl"
+                        >
+                            {t.home.hero.title}
+                            <span className="block text-3xl font-light text-muted-foreground md:text-5xl lg:text-6xl mt-2">
+                                {t.home.hero.subtitle}
+                            </span>
+                        </motion.h1>
+
+                        <motion.p
+                            variants={fadeInUp}
+                            className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl leading-relaxed lg:mx-0"
+                        >
+                            {t.home.hero.description}
+                        </motion.p>
+
+                        <motion.div variants={fadeInUp} className="flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
+                            <Button size="lg" className="h-12 rounded-full px-8 text-base bg-gold-600 hover:bg-gold-700 text-white shadow-lg shadow-gold-500/20">
+                                {t.home.hero.getStarted}
+                                <ChevronRight className="ml-2 h-4 w-4" />
+                            </Button>
+                            <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base">
+                                {t.home.hero.viewFeatures}
+                            </Button>
+                        </motion.div>
                     </motion.div>
 
-                    <motion.h1
-                        variants={fadeInUp}
-                        className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl"
+                    {/* Hero Image / App Screenshot */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, x: 20 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="relative mx-auto max-w-[300px] lg:max-w-md"
                     >
-                        {t.home.hero.title}
-                        <span className="block text-3xl font-light text-muted-foreground md:text-5xl lg:text-6xl mt-2">
-                            {t.home.hero.subtitle}
-                        </span>
-                    </motion.h1>
+                        <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-r from-gold-500 to-sand-500 opacity-20 blur-3xl" />
+                        <div className="relative rounded-[2.5rem] border-8 border-white bg-black shadow-2xl dark:border-gray-800 overflow-hidden">
+                            <Image
+                                src="/icons/qalbuApp.png"
+                                alt="Qalbu App Interface"
+                                width={400}
+                                height={800}
+                                className="h-auto w-full"
+                                priority
+                            />
+                        </div>
 
-                    <motion.p
-                        variants={fadeInUp}
-                        className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl leading-relaxed"
-                    >
-                        {t.home.hero.description}
-                    </motion.p>
 
-                    <motion.div variants={fadeInUp} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <Button size="lg" className="h-12 rounded-full px-8 text-base bg-gold-600 hover:bg-gold-700 text-white shadow-lg shadow-gold-500/20">
-                            {t.home.hero.getStarted}
-                            <ChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
-                        <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base">
-                            {t.home.hero.viewFeatures}
-                        </Button>
                     </motion.div>
-                </motion.div>
-
-                {/* Live Widget Section */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="mx-auto mb-32 max-w-lg"
-                >
-                    <div className="relative">
-                        <div className="absolute -inset-1 rounded-[2rem] bg-gradient-to-r from-gold-500 to-sand-500 opacity-20 blur-2xl" />
-                        <PrayerTimesWidget />
-                    </div>
-                </motion.div>
+                </div>
 
                 {/* Bento Grid Features */}
                 <div className="mb-32">
+                    {/* Prayer Times Widget - Horizontal */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-16"
+                    >
+                        <PrayerTimesWidget variant="horizontal" />
+                    </motion.div>
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -144,22 +172,30 @@ export default function HomePage() {
                             viewport={{ once: true }}
                             className="group relative overflow-hidden rounded-3xl bg-sand-50 p-8 dark:bg-gray-900 md:col-span-2 md:row-span-2"
                         >
-                            <div className="relative z-10">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-gold-600 shadow-sm dark:bg-gray-800">
-                                    <BookOpen className="h-6 w-6" />
+                            <div className="relative z-10 h-full flex flex-col justify-between">
+                                <div>
+                                    <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm text-gold-600 shadow-sm dark:bg-gray-800/80">
+                                        <Image
+                                            src="/icons/Quran.svg"
+                                            alt="Quran"
+                                            width={40}
+                                            height={40}
+                                            className="h-10 w-10"
+                                        />
+                                    </div>
+                                    <h3 className="mb-3 text-3xl font-bold">{t.home.features.quran.title}</h3>
+                                    <p className="max-w-md text-lg text-muted-foreground leading-relaxed">
+                                        {t.home.features.quran.description}
+                                    </p>
                                 </div>
-                                <h3 className="mb-2 text-2xl font-bold">{t.home.features.quran.title}</h3>
-                                <p className="max-w-md text-muted-foreground">
-                                    {t.home.features.quran.description}
-                                </p>
-                                <Link href="/quran">
-                                    <Button variant="link" className="mt-4 h-auto p-0 text-gold-600 hover:text-gold-700">
-                                        {t.home.features.quran.action} <ChevronRight className="ml-1 h-4 w-4" />
+                                <Link href="/quran" className="mt-8 inline-block">
+                                    <Button variant="link" className="h-auto p-0 text-lg font-semibold text-gold-600 hover:text-gold-700">
+                                        {t.home.features.quran.action} <ChevronRight className="ml-1 h-5 w-5" />
                                     </Button>
                                 </Link>
                             </div>
-                            <div className="absolute -bottom-10 -right-10 h-64 w-64 opacity-10 grayscale transition-all duration-500 group-hover:scale-110 group-hover:opacity-20">
-                                <Image src="/icon-512.png" alt="Quran" width={512} height={512} className="h-full w-full object-contain" />
+                            <div className="absolute -bottom-12 -right-12 h-80 w-80 opacity-10 grayscale transition-all duration-500 group-hover:scale-110 group-hover:opacity-20 rotate-12">
+                                <Image src="/icons/Quran.svg" alt="Quran Background" width={512} height={512} className="h-full w-full object-contain" />
                             </div>
                         </motion.div>
 

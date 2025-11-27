@@ -6,6 +6,7 @@ import { QueryProvider } from '@/components/providers/query-provider'
 import { AudioProvider } from '@/contexts/audio-context'
 import { LanguageProvider } from '@/contexts/language-context'
 import { MiniPlayer } from '@/components/audio/mini-player'
+import { NotificationManager } from '@/components/prayer/notification-manager'
 import { Suspense } from 'react'
 
 const inter = Inter({
@@ -92,11 +93,11 @@ export const metadata: Metadata = {
     },
     icons: {
         icon: [
-            { url: '/favicon.ico' },
-            { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-            { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+            { url: '/icons/qalbuIcon.png' },
+            { url: '/icons/qalbuIcon.png', sizes: '192x192', type: 'image/png' },
+            { url: '/icons/qalbuIcon.png', sizes: '512x512', type: 'image/png' },
         ],
-        apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+        apple: [{ url: '/icons/qalbuIcon.png', sizes: '180x180', type: 'image/png' }],
     },
     manifest: '/manifest.json',
     appleWebApp: {
@@ -132,6 +133,7 @@ export default function RootLayout({
                                 <AudioProvider>
                                     {children}
                                     <MiniPlayer />
+                                    <NotificationManager />
                                 </AudioProvider>
                             </LanguageProvider>
                         </Suspense>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Clock, MapPin, Loader2, Calendar } from 'lucide-react'
+import Image from 'next/image'
 import { formatTime, getTimeUntil } from '@/lib/utils'
 import { getNextPrayer } from '@/lib/api/prayer-times'
 import { useEffect, useState } from 'react'
@@ -11,7 +12,7 @@ import { useLanguage } from '@/contexts/language-context'
 
 const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']
 
-export function PrayerTimesWidget() {
+export function PrayerTimesWidget({ variant = 'default' }: { variant?: 'default' | 'horizontal' }) {
     const { prayerTimes, isLoading, error, coordinates, locationName } = usePrayerTimes()
     const [currentTime, setCurrentTime] = useState(new Date())
     const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string } | null>(null)
@@ -85,6 +86,73 @@ export function PrayerTimesWidget() {
         month: 'long',
         day: 'numeric',
     })
+
+    if (variant === 'horizontal') {
+        return (
+            <Card className="premium-card overflow-hidden">
+                <CardContent className="p-6">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                        {/* Header Info */}
+                        <div className="flex flex-col gap-2 relative">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <MapPin className="h-4 w-4 text-gold-600" />
+                                <span className="text-sm font-medium">{displayLocation}</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div>
+                                    <h3 className="text-2xl font-bold text-foreground">{t.common.prayerTimes}</h3>
+                                    <p className="text-sm text-muted-foreground">{formattedHijri}</p>
+                                </div>
+                                <motion.div
+                                    className="hidden sm:block h-24 w-24 relative opacity-90"
+                                    animate={{
+                                        scale: [1, 1.1, 1],
+                                        rotate: [0, -5, 5, 0]
+                                    }}
+                                    transition={{
+                                        duration: 0.5,
+                                        repeat: Infinity,
+                                        repeatDelay: 1,
+                                        ease: "easeInOut"
+                                    }}
+                                >
+                                    <Image
+                                        src="/icons/bedug.svg"
+                                        alt="Bedug"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </motion.div>
+                            </div>
+                        </div>
+
+                        {/* Prayer Grid */}
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 lg:flex-1 lg:justify-end lg:gap-4">
+                            {prayers.map((prayer) => {
+                                const isNext = nextPrayer?.name === prayer.name
+                                return (
+                                    <div
+                                        key={prayer.name}
+                                        className={`flex flex-col items-center justify-center rounded-xl p-3 text-center transition-all ${isNext
+                                            ? 'bg-gold-600 text-white shadow-lg shadow-gold-500/20 scale-105'
+                                            : 'bg-muted/50 hover:bg-muted'
+                                            }`}
+                                    >
+                                        <span className={`text-xs font-medium mb-1 ${isNext ? 'text-white/90' : 'text-muted-foreground'}`}>
+                                            {getTranslatedPrayerName(prayer.name)}
+                                        </span>
+                                        <span className={`text-lg font-bold ${isNext ? 'text-white' : 'text-foreground'}`}>
+                                            {prayer.time}
+                                        </span>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="premium-card overflow-hidden">
