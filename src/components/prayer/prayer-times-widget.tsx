@@ -7,6 +7,7 @@ import { Clock, MapPin, Loader2 } from 'lucide-react'
 import { formatTime, getTimeUntil } from '@/lib/utils'
 import { getNextPrayer } from '@/lib/api/prayer-times'
 import { useEffect, useState } from 'react'
+import { useLanguage } from '@/contexts/language-context'
 
 const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']
 
@@ -14,6 +15,7 @@ export function PrayerTimesWidget() {
     const { prayerTimes, isLoading, error, coordinates } = usePrayerTimes()
     const [currentTime, setCurrentTime] = useState(new Date())
     const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string } | null>(null)
+    const { t } = useLanguage()
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -44,7 +46,7 @@ export function PrayerTimesWidget() {
         return (
             <Card className="premium-card border-destructive/50">
                 <CardContent className="p-8 text-center">
-                    <p className="text-destructive">Failed to load prayer times</p>
+                    <p className="text-destructive">{t.common.error}</p>
                     <p className="mt-2 text-sm text-muted-foreground">{error.toString()}</p>
                 </CardContent>
             </Card>
@@ -58,17 +60,22 @@ export function PrayerTimesWidget() {
         time: prayerTimes.timings[name as keyof typeof prayerTimes.timings],
     }))
 
+    const getTranslatedPrayerName = (name: string) => {
+        const key = name.toLowerCase() as keyof typeof t.prayer
+        return t.prayer[key] || name
+    }
+
     return (
         <Card className="premium-card overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-gold-500 to-gold-600 text-white">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-2xl font-bold">Prayer Times</CardTitle>
+                    <CardTitle className="text-2xl font-bold">{t.common.prayerTimes}</CardTitle>
                     <div className="flex items-center gap-2 text-sm">
                         <MapPin className="h-4 w-4" />
                         <span>
                             {coordinates
                                 ? `${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)}`
-                                : 'Unknown'}
+                                : t.prayer.unknown}
                         </span>
                     </div>
                 </div>
@@ -90,13 +97,13 @@ export function PrayerTimesWidget() {
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium opacity-90">Next Prayer</p>
-                                <p className="text-2xl font-bold">{nextPrayer.name}</p>
+                                <p className="text-sm font-medium opacity-90">{t.prayer.nextPrayer}</p>
+                                <p className="text-2xl font-bold">{getTranslatedPrayerName(nextPrayer.name)}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-3xl font-bold">{nextPrayer.time}</p>
                                 <p className="text-sm opacity-90">
-                                    in{' '}
+                                    {t.prayer.in}{' '}
                                     {getTimeUntil(
                                         new Date(
                                             new Date().setHours(
@@ -122,8 +129,8 @@ export function PrayerTimesWidget() {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.1 }}
                                 className={`flex items-center justify-between rounded-lg p-4 transition-all ${isNext
-                                        ? 'bg-gold-100 dark:bg-gold-900/20'
-                                        : 'bg-muted/50 hover:bg-muted'
+                                    ? 'bg-gold-100 dark:bg-gold-900/20'
+                                    : 'bg-muted/50 hover:bg-muted'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
@@ -131,7 +138,7 @@ export function PrayerTimesWidget() {
                                         className={`h-5 w-5 ${isNext ? 'text-gold-600' : 'text-muted-foreground'}`}
                                     />
                                     <span className={`font-medium ${isNext ? 'text-gold-700 dark:text-gold-400' : ''}`}>
-                                        {prayer.name}
+                                        {getTranslatedPrayerName(prayer.name)}
                                     </span>
                                 </div>
                                 <span className={`text-lg font-semibold ${isNext ? 'text-gold-700 dark:text-gold-400' : ''}`}>

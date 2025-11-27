@@ -69,12 +69,16 @@ export async function getSurahById(
     return data.data
 }
 
-export async function getSurahWithAudio(id: number): Promise<SurahDetail> {
+import { Language, quranEditions } from '@/lib/i18n'
+
+export async function getSurahWithAudio(id: number, language: Language = 'en'): Promise<SurahDetail> {
+    const edition = quranEditions[language]
+
     const [arabicResponse, audioResponse, translationResponse, transliterationResponse] = await Promise.all([
         fetch(`${BASE_URL}/surah/${id}`),
         fetch(`${BASE_URL}/surah/${id}/ar.alafasy`),
-        fetch(`${BASE_URL}/surah/${id}/en.asad`),
-        fetch(`${BASE_URL}/surah/${id}/en.transliteration`),
+        fetch(`${BASE_URL}/surah/${id}/${edition}`),
+        fetch(`${BASE_URL}/surah/${id}/en.transliteration`), // Transliteration usually stays English/Latin
     ])
 
     if (!arabicResponse.ok || !audioResponse.ok || !translationResponse.ok || !transliterationResponse.ok) {

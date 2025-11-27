@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, SkipBack, SkipForward, X, Loader2 } from 'lucide-react'
 import { useAudio } from '@/contexts/audio-context'
+import { useLanguage } from '@/contexts/language-context'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useEffect, useState } from 'react'
@@ -21,6 +22,7 @@ export function MiniPlayer() {
         seek,
         isLoading
     } = useAudio()
+    const { t } = useLanguage()
 
     const [isVisible, setIsVisible] = useState(false)
 
@@ -60,7 +62,7 @@ export function MiniPlayer() {
                                     {currentSurah.englishName}
                                 </h4>
                                 <p className="truncate text-xs text-muted-foreground">
-                                    Ayah {currentAyah.numberInSurah}
+                                    {t.common.ayah} {currentAyah.numberInSurah}
                                 </p>
                             </div>
                         </div>

@@ -7,10 +7,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Loader2, BookOpen, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
+import { useLanguage } from '@/contexts/language-context'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 export default function QuranPage() {
     const { data: surahs, isLoading, error } = useAllSurahs()
     const [searchQuery, setSearchQuery] = useState('')
+    const { t, language } = useLanguage()
 
     const filteredSurahs = surahs?.filter(
         (surah) =>
@@ -28,19 +31,26 @@ export default function QuranPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8 text-center relative"
                 >
-                    <div className="absolute left-0 top-0 md:left-4">
-                        <Link href="/">
+                    <div className="absolute left-0 top-0 md:left-4 flex items-center gap-2">
+                        <Link href={`/?lang=${language}`}>
                             <Button variant="ghost" size="sm" className="gap-2">
                                 <ArrowLeft className="h-4 w-4" />
-                                <span className="hidden sm:inline">Home</span>
+                                <span className="hidden sm:inline">{t.common.home}</span>
                             </Button>
                         </Link>
                     </div>
+                    <div className="absolute right-0 top-0 md:right-4">
+                        <LanguageSwitcher />
+                    </div>
+
                     <h1 className="mb-4 text-4xl font-bold md:text-5xl pt-8 md:pt-0">
-                        <span className="gradient-text">The Holy Quran</span>
+                        <span className="gradient-text">{t.common.quran}</span>
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                        Read and listen to all 114 Surahs with beautiful recitation
+                        {language === 'en' ? 'Read and listen to all 114 Surahs with beautiful recitation' :
+                            language === 'ms' ? 'Baca dan dengar semua 114 Surah dengan bacaan yang indah' :
+                                language === 'id' ? 'Baca dan dengarkan semua 114 Surah dengan bacaan yang indah' :
+                                    'اقرأ واستمع إلى جميع السور الـ 114 بتلاوة جميلة'}
                     </p>
                 </motion.div>
 
@@ -55,7 +65,7 @@ export default function QuranPage() {
                         <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
-                            placeholder="Search by surah name or number..."
+                            placeholder={`${t.common.search}...`}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full rounded-2xl border border-border bg-background px-12 py-4 text-lg shadow-sm transition-all focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20"
@@ -74,7 +84,7 @@ export default function QuranPage() {
                 {error && (
                     <Card className="border-destructive/50">
                         <CardContent className="p-8 text-center">
-                            <p className="text-destructive">Failed to load Quran data</p>
+                            <p className="text-destructive">{t.common.error}</p>
                             <p className="mt-2 text-sm text-muted-foreground">{error.toString()}</p>
                         </CardContent>
                     </Card>
@@ -95,7 +105,7 @@ export default function QuranPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.02 }}
                             >
-                                <Link href={`/quran/${surah.number}`}>
+                                <Link href={`/quran/${surah.number}?lang=${language}`}>
                                     <Card className="group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
                                         <CardContent className="p-6">
                                             <div className="flex items-start gap-4">
@@ -117,7 +127,7 @@ export default function QuranPage() {
                                                     </p>
                                                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                                                         <span>{surah.revelationType}</span>
-                                                        <span>{surah.numberOfAyahs} Ayahs</span>
+                                                        <span>{surah.numberOfAyahs} {t.common.ayah}</span>
                                                     </div>
                                                 </div>
                                             </div>

@@ -4,7 +4,9 @@ import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { AudioProvider } from '@/contexts/audio-context'
+import { LanguageProvider } from '@/contexts/language-context'
 import { MiniPlayer } from '@/components/audio/mini-player'
+import { Suspense } from 'react'
 
 const inter = Inter({
     subsets: ['latin'],
@@ -125,10 +127,14 @@ export default function RootLayout({
             <body className={`${inter.variable} font-sans antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                     <QueryProvider>
-                        <AudioProvider>
-                            {children}
-                            <MiniPlayer />
-                        </AudioProvider>
+                        <Suspense fallback={null}>
+                            <LanguageProvider>
+                                <AudioProvider>
+                                    {children}
+                                    <MiniPlayer />
+                                </AudioProvider>
+                            </LanguageProvider>
+                        </Suspense>
                     </QueryProvider>
                 </ThemeProvider>
             </body>
