@@ -5,6 +5,6 @@ export default function robots() {
             allow: '/',
             disallow: '/private/',
         },
-        sitemap: 'https://qalbu.app/sitemap.xml',
+        sitemap: 'https://qalbu.ai/sitemap.xml',
     }
 }

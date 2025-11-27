@@ -9,6 +9,7 @@ import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight
 import { PrayerTimesWidget } from '@/components/prayer/prayer-times-widget'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { ModeToggle } from '@/components/ui/mode-toggle'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { useLanguage } from '@/contexts/language-context'
 
@@ -52,21 +53,31 @@ export default function HomePage() {
             <div className="container mx-auto px-4 py-8 md:py-16">
                 {/* Navigation / Header */}
                 <nav className="mb-16 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-sm">
+                    <div className="flex flex-col items-center gap-0.5">
+                        <div className="relative h-[40px] w-[56px] overflow-hidden rounded-xl shadow-sm">
+                            <Image
+                                src="/icons/qalbuIconBlack.png"
+                                alt="Qalbu Logo"
+                                width={56}
+                                height={40}
+                                className="h-full w-full object-contain block dark:hidden"
+                                priority
+                            />
                             <Image
                                 src="/icons/qalbuIcon.png"
                                 alt="Qalbu Logo"
-                                width={40}
+                                width={56}
                                 height={40}
-                                className="h-full w-full object-cover"
+                                className="h-full w-full object-contain hidden dark:block"
+                                priority
                             />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-gold-600 to-gold-500 bg-clip-text text-transparent dark:from-gold-400 dark:to-gold-300">
-                            Qalbu
+                        <span className="text-[8px] font-medium tracking-wider text-black dark:text-white text-center uppercase opacity-60 leading-none mt-0.5">
+                            For nurturing your faith
                         </span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <ModeToggle />
                         <LanguageSwitcher />
                         <Button variant="ghost" size="sm" className="hidden md:flex">
                             Sign In

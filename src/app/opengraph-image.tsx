@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
 
-export const alt = 'Qalbu - Your Islamic Companion'
+export const alt = 'Qalbu - For nurturing your faith'
 export const size = {
     width: 1200,
     height: 630,
