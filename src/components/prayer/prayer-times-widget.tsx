@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Clock, MapPin, Loader2 } from 'lucide-react'
+import { Clock, MapPin, Loader2, Calendar } from 'lucide-react'
 import { formatTime, getTimeUntil } from '@/lib/utils'
 import { getNextPrayer } from '@/lib/api/prayer-times'
 import { useEffect, useState } from 'react'
@@ -12,10 +12,10 @@ import { useLanguage } from '@/contexts/language-context'
 const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']
 
 export function PrayerTimesWidget() {
-    const { prayerTimes, isLoading, error, coordinates } = usePrayerTimes()
+    const { prayerTimes, isLoading, error, coordinates, locationName } = usePrayerTimes()
     const [currentTime, setCurrentTime] = useState(new Date())
     const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string } | null>(null)
-    const { t } = useLanguage()
+    const { t, language } = useLanguage()
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -65,6 +65,27 @@ export function PrayerTimesWidget() {
         return t.prayer[key] || name
     }
 
+    // Format Location
+    const displayLocation = locationName
+        ? [locationName.city, locationName.country].filter(Boolean).join(', ')
+        : coordinates
+            ? `${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)}`
+            : t.prayer.unknown
+
+    // Format Dates
+    const hijriDate = prayerTimes.date.hijri
+    const isArabic = language === 'ar'
+    const weekday = isArabic ? hijriDate.weekday.ar : hijriDate.weekday.en
+    const month = isArabic ? hijriDate.month.ar : hijriDate.month.en
+    const formattedHijri = `${weekday}, ${hijriDate.date} ${month} ${hijriDate.year}`
+
+    const gregorianDate = new Date().toLocaleDateString(language, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    })
+
     return (
         <Card className="premium-card overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-gold-500 to-gold-600 text-white">
@@ -72,19 +93,20 @@ export function PrayerTimesWidget() {
                     <CardTitle className="text-2xl font-bold">{t.common.prayerTimes}</CardTitle>
                     <div className="flex items-center gap-2 text-sm">
                         <MapPin className="h-4 w-4" />
-                        <span>
-                            {coordinates
-                                ? `${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)}`
-                                : t.prayer.unknown}
+                        <span className="max-w-[150px] truncate" title={locationName?.formatted || ''}>
+                            {displayLocation}
                         </span>
                     </div>
                 </div>
-                {prayerTimes.date && (
-                    <p className="mt-2 text-sm text-white/90">
-                        {prayerTimes.date.hijri.weekday.en}, {prayerTimes.date.hijri.date}{' '}
-                        {prayerTimes.date.hijri.month.en} {prayerTimes.date.hijri.year}
+                <div className="mt-4 space-y-1">
+                    <p className="text-sm font-medium text-white/90 flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {formattedHijri}
                     </p>
-                )}
+                    <p className="text-xs text-white/75 pl-6">
+                        {gregorianDate}
+                    </p>
+                </div>
             </CardHeader>
 
             <CardContent className="p-6">
