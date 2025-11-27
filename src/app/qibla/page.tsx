@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Compass, Camera, MapPin, Loader2, AlertCircle, ArrowLeft } from 'lucide-react'
 import { useQibla, useCameraStream } from '@/hooks/use-qibla'
+import { useLanguage } from '@/contexts/language-context'
 
 type Mode = 'compass' | 'camera'
 
 export default function QiblaPage() {
     const [mode, setMode] = useState<Mode>('compass')
+    const { t } = useLanguage()
     const {
         qiblaDirection,
         deviceHeading,
@@ -60,14 +62,14 @@ export default function QiblaPage() {
                         <Link href="/">
                             <Button variant="ghost" size="sm" className="gap-2">
                                 <ArrowLeft className="h-4 w-4" />
-                                <span className="hidden sm:inline">Home</span>
+                                <span className="hidden sm:inline">{t.common.home}</span>
                             </Button>
                         </Link>
                     </div>
                     <h1 className="mb-4 text-4xl font-bold md:text-5xl pt-8 md:pt-0">
-                        <span className="gradient-text">Qibla Direction</span>
+                        <span className="gradient-text">{t.qiblaPage.title}</span>
                     </h1>
-                    <p className="text-lg text-muted-foreground">Find the direction to the Holy Kaaba</p>
+                    <p className="text-lg text-muted-foreground">{t.qiblaPage.subtitle}</p>
                 </motion.div>
 
                 {/* Mode Selector */}
@@ -84,7 +86,7 @@ export default function QiblaPage() {
                             onClick={() => handleModeChange('compass')}
                         >
                             <Compass className="mr-2 h-4 w-4" />
-                            Compass
+                            {t.qiblaPage.compass}
                         </Button>
                         <Button
                             variant={mode === 'camera' ? 'default' : 'ghost'}
@@ -92,7 +94,7 @@ export default function QiblaPage() {
                             onClick={() => handleModeChange('camera')}
                         >
                             <Camera className="mr-2 h-4 w-4" />
-                            AR Camera
+                            {t.qiblaPage.camera}
                         </Button>
                     </div>
                 </motion.div>
@@ -115,7 +117,7 @@ export default function QiblaPage() {
                                 </div>
                                 {qiblaDirection && (
                                     <span className="text-sm font-medium">
-                                        Qibla: {qiblaDirection.toFixed(1)}°
+                                        {t.common.qibla}: {qiblaDirection.toFixed(1)}°
                                     </span>
                                 )}
                             </CardContent>
@@ -130,7 +132,7 @@ export default function QiblaPage() {
                             <div className="flex items-start gap-3">
                                 <AlertCircle className="h-5 w-5 text-destructive" />
                                 <div>
-                                    <p className="font-medium text-destructive">Error</p>
+                                    <p className="font-medium text-destructive">{t.common.error}</p>
                                     <p className="text-sm text-muted-foreground">
                                         {qiblaError || cameraError}
                                     </p>
@@ -145,12 +147,12 @@ export default function QiblaPage() {
                     <Card className="mb-6">
                         <CardContent className="p-6 text-center">
                             <Compass className="mx-auto mb-4 h-12 w-12 text-gold-600" />
-                            <h3 className="mb-2 text-lg font-semibold">Enable Device Orientation</h3>
+                            <h3 className="mb-2 text-lg font-semibold">{t.qiblaPage.permissionTitle}</h3>
                             <p className="mb-4 text-sm text-muted-foreground">
-                                We need access to your device&apos;s compass to show the Qibla direction
+                                {t.qiblaPage.enableCompassDesc}
                             </p>
                             <Button onClick={handleRequestPermission} className="bg-gold-600 hover:bg-gold-700">
-                                Enable Compass
+                                {t.qiblaPage.enableCompass}
                             </Button>
                         </CardContent>
                     </Card>
@@ -196,6 +198,8 @@ function CompassMode({
     isLoading: boolean
     isSupported: boolean
 }) {
+    const { t } = useLanguage()
+
     if (isLoading) {
         return (
             <Card className="premium-card">
@@ -209,7 +213,7 @@ function CompassMode({
     return (
         <Card className="premium-card overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                <CardTitle className="text-center text-2xl">Compass Mode</CardTitle>
+                <CardTitle className="text-center text-2xl">{t.qiblaPage.compassMode}</CardTitle>
             </CardHeader>
             <CardContent className="p-8">
                 {/* Compass Circle */}
@@ -260,13 +264,13 @@ function CompassMode({
 
                 {/* Direction Info */}
                 <div className="mt-8 text-center">
-                    <p className="mb-2 text-sm text-muted-foreground">Qibla Direction</p>
+                    <p className="mb-2 text-sm text-muted-foreground">{t.qiblaPage.title}</p>
                     <p className="text-4xl font-bold text-gold-600">
                         {relativeDirection.toFixed(0)}°
                     </p>
                     {isSupported && (
                         <p className="mt-4 text-sm text-muted-foreground">
-                            Device Heading: {deviceHeading.toFixed(0)}°
+                            {t.qiblaPage.deviceHeading}: {deviceHeading.toFixed(0)}°
                         </p>
                     )}
                 </div>
@@ -284,6 +288,8 @@ function CameraMode({
     relativeDirection: number
     isLoading: boolean
 }) {
+    const { t } = useLanguage()
+
     if (isLoading) {
         return (
             <Card className="premium-card">
@@ -297,7 +303,7 @@ function CameraMode({
     return (
         <Card className="premium-card overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
-                <CardTitle className="text-center text-2xl">AR Camera Mode</CardTitle>
+                <CardTitle className="text-center text-2xl">{t.qiblaPage.cameraMode}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                 <div className="relative aspect-video w-full overflow-hidden bg-black">
@@ -341,7 +347,7 @@ function CameraMode({
                         </>
                     ) : (
                         <div className="flex h-full items-center justify-center">
-                            <p className="text-white">Camera not available</p>
+                            <p className="text-white">{t.qiblaPage.cameraNotAvailable}</p>
                         </div>
                     )}
                 </div>

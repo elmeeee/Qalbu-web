@@ -8,11 +8,14 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, Play, Pause, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useAudio } from '@/contexts/audio-context'
+import { useLanguage } from '@/contexts/language-context'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
 
 export default function SurahPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
     const surahId = parseInt(id)
-    const { data: surah, isLoading, error } = useSurah(surahId, true)
+    const { language, t } = useLanguage()
+    const { data: surah, isLoading, error } = useSurah(surahId, true, language)
 
     const {
         isPlaying,
@@ -53,7 +56,7 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
             <div className="container mx-auto px-4 py-20">
                 <Card className="border-destructive/50">
                     <CardContent className="p-8 text-center">
-                        <p className="text-destructive">Failed to load surah</p>
+                        <p className="text-destructive">{t.common.error}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -69,24 +72,27 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <Link href="/quran">
-                        <Button variant="ghost" className="mb-4">
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Quran
-                        </Button>
-                    </Link>
+                    <div className="flex items-center justify-between mb-4">
+                        <Link href={`/quran?lang=${language}`}>
+                            <Button variant="ghost">
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                {t.common.quran}
+                            </Button>
+                        </Link>
+                        <LanguageSwitcher />
+                    </div>
 
                     <Card className="premium-card overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-gold-500 to-gold-600 text-white">
                             <div className="text-center">
-                                <p className="mb-2 text-sm opacity-90">Surah {surah.number}</p>
+                                <p className="mb-2 text-sm opacity-90">{t.common.surah} {surah.number}</p>
                                 <CardTitle className="mb-2 text-3xl font-bold">{surah.englishName}</CardTitle>
                                 <p className="mb-4 text-lg opacity-90">{surah.englishNameTranslation}</p>
                                 <p className="font-arabic text-4xl">{surah.name}</p>
                                 <div className="mt-4 flex items-center justify-center gap-6 text-sm">
                                     <span>{surah.revelationType}</span>
                                     <span>•</span>
-                                    <span>{surah.numberOfAyahs} Ayahs</span>
+                                    <span>{surah.numberOfAyahs} {t.common.ayah}</span>
                                 </div>
                             </div>
                         </CardHeader>
@@ -125,8 +131,8 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                         >
                             <Card
                                 className={`transition-all duration-300 ${currentSurah?.number === surah.number && currentAyah?.number === ayah.number
-                                        ? 'border-gold-500 shadow-lg shadow-gold-500/20'
-                                        : 'hover:shadow-md'
+                                    ? 'border-gold-500 shadow-lg shadow-gold-500/20'
+                                    : 'hover:shadow-md'
                                     }`}
                             >
                                 <CardContent className="p-6">
@@ -170,9 +176,9 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
 
                                     {/* Metadata */}
                                     <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground border-t pt-4">
-                                        <span>Juz {ayah.juz}</span>
+                                        <span>{t.common.juz} {ayah.juz}</span>
                                         <span>•</span>
-                                        <span>Page {ayah.page}</span>
+                                        <span>{t.common.page} {ayah.page}</span>
                                     </div>
                                 </CardContent>
                             </Card>

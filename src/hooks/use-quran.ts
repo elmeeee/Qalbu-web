@@ -19,10 +19,12 @@ export function useAllSurahs() {
     })
 }
 
-export function useSurah(id: number, withAudio: boolean = false) {
+import { Language } from '@/lib/i18n'
+
+export function useSurah(id: number, withAudio: boolean = false, language: Language = 'en') {
     return useQuery<SurahDetail>({
-        queryKey: ['surah', id, withAudio],
-        queryFn: () => (withAudio ? getSurahWithAudio(id) : getSurahById(id)),
+        queryKey: ['surah', id, withAudio, language],
+        queryFn: () => (withAudio ? getSurahWithAudio(id, language) : getSurahById(id)),
         enabled: id > 0 && id <= 114,
         staleTime: Infinity,
     })

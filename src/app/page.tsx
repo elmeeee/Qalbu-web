@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -7,6 +9,8 @@ import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight
 import { PrayerTimesWidget } from '@/components/prayer/prayer-times-widget'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { useLanguage } from '@/contexts/language-context'
 
 // Animation variants
 const fadeInUp = {
@@ -26,6 +30,17 @@ const staggerContainer = {
 }
 
 export default function HomePage() {
+    const { t } = useLanguage()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) {
+        return null // or a loading skeleton
+    }
+
     return (
         <main className="min-h-screen overflow-x-hidden bg-background selection:bg-gold-100 selection:text-gold-900">
             {/* Background Gradients */}
@@ -44,6 +59,7 @@ export default function HomePage() {
                         <span className="text-xl font-bold tracking-tight">Qalbu</span>
                     </div>
                     <div className="flex items-center gap-4">
+                        <LanguageSwitcher />
                         <Button variant="ghost" size="sm" className="hidden md:flex">
                             Sign In
                         </Button>
@@ -62,7 +78,7 @@ export default function HomePage() {
                 >
                     <motion.div variants={fadeInUp} className="mb-6 flex justify-center">
                         <span className="rounded-full border border-gold-200 bg-gold-50 px-4 py-1.5 text-sm font-medium text-gold-800 dark:border-gold-800 dark:bg-gold-950/30 dark:text-gold-300">
-                            Your Spiritual Companion
+                            {t.home.hero.badge}
                         </span>
                     </motion.div>
 
@@ -70,9 +86,9 @@ export default function HomePage() {
                         variants={fadeInUp}
                         className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl"
                     >
-                        Qalbu
+                        {t.home.hero.title}
                         <span className="block text-3xl font-light text-muted-foreground md:text-5xl lg:text-6xl mt-2">
-                            For nurturing your faith
+                            {t.home.hero.subtitle}
                         </span>
                     </motion.h1>
 
@@ -80,17 +96,16 @@ export default function HomePage() {
                         variants={fadeInUp}
                         className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl leading-relaxed"
                     >
-                        Embrace an Islamic lifestyle with Qalbu: Your all-in-one app for prayer times,
-                        Quranic readings, and supplications.
+                        {t.home.hero.description}
                     </motion.p>
 
                     <motion.div variants={fadeInUp} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Button size="lg" className="h-12 rounded-full px-8 text-base bg-gold-600 hover:bg-gold-700 text-white shadow-lg shadow-gold-500/20">
-                            Get Started
+                            {t.home.hero.getStarted}
                             <ChevronRight className="ml-2 h-4 w-4" />
                         </Button>
                         <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base">
-                            View Features
+                            {t.home.hero.viewFeatures}
                         </Button>
                     </motion.div>
                 </motion.div>
@@ -117,8 +132,8 @@ export default function HomePage() {
                         viewport={{ once: true }}
                         className="mb-12 text-center"
                     >
-                        <h2 className="mb-4 text-3xl font-bold md:text-4xl">Everything you need</h2>
-                        <p className="text-muted-foreground">Indispensable tools for your daily spiritual journey</p>
+                        <h2 className="mb-4 text-3xl font-bold md:text-4xl">{t.home.features.title}</h2>
+                        <p className="text-muted-foreground">{t.home.features.subtitle}</p>
                     </motion.div>
 
                     <div className="grid gap-4 md:grid-cols-3 md:grid-rows-2">
@@ -133,13 +148,13 @@ export default function HomePage() {
                                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-gold-600 shadow-sm dark:bg-gray-800">
                                     <BookOpen className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-2 text-2xl font-bold">The Holy Quran</h3>
+                                <h3 className="mb-2 text-2xl font-bold">{t.home.features.quran.title}</h3>
                                 <p className="max-w-md text-muted-foreground">
-                                    Complete 30 Juz with beautiful Arabic typography, translations, and audio recitations by Mishary Alafasy.
+                                    {t.home.features.quran.description}
                                 </p>
                                 <Link href="/quran">
                                     <Button variant="link" className="mt-4 h-auto p-0 text-gold-600 hover:text-gold-700">
-                                        Read Now <ChevronRight className="ml-1 h-4 w-4" />
+                                        {t.home.features.quran.action} <ChevronRight className="ml-1 h-4 w-4" />
                                     </Button>
                                 </Link>
                             </div>
@@ -160,9 +175,9 @@ export default function HomePage() {
                                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/50">
                                     <Compass className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-2 text-xl font-bold">Qibla Finder</h3>
+                                <h3 className="mb-2 text-xl font-bold">{t.home.features.qibla.title}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    AR-powered compass to find the Kaaba direction anywhere.
+                                    {t.home.features.qibla.description}
                                 </p>
                                 <Link href="/qibla">
                                     <div className="absolute inset-0" />
@@ -182,9 +197,9 @@ export default function HomePage() {
                                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/50">
                                     <Clock className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-2 text-xl font-bold">Prayer Times</h3>
+                                <h3 className="mb-2 text-xl font-bold">{t.home.features.prayer.title}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Precise timings based on your location with adhan notifications.
+                                    {t.home.features.prayer.description}
                                 </p>
                             </div>
                         </motion.div>
@@ -204,9 +219,9 @@ export default function HomePage() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-full bg-background/10">
                                     <Smartphone className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold">Stay Connected</h3>
+                                <h3 className="mb-3 text-xl font-bold">{t.home.value.connected.title}</h3>
                                 <p className="text-background/70">
-                                    Keep your heart connected to your Creator with daily reminders and easy access to worship tools.
+                                    {t.home.value.connected.description}
                                 </p>
                             </motion.div>
 
@@ -220,9 +235,9 @@ export default function HomePage() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-full bg-background/10">
                                     <Shield className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold">Stay Private</h3>
+                                <h3 className="mb-3 text-xl font-bold">{t.home.value.private.title}</h3>
                                 <p className="text-background/70">
-                                    Your spiritual journey is personal. We respect your privacy with no tracking or data selling.
+                                    {t.home.value.private.description}
                                 </p>
                             </motion.div>
 
@@ -236,9 +251,9 @@ export default function HomePage() {
                                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-full bg-background/10">
                                     <Heart className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold">Stay Faithful</h3>
+                                <h3 className="mb-3 text-xl font-bold">{t.home.value.faithful.title}</h3>
                                 <p className="text-background/70">
-                                    Nurture your iman with a companion that understands and supports your Islamic lifestyle.
+                                    {t.home.value.faithful.description}
                                 </p>
                             </motion.div>
                         </div>
@@ -256,18 +271,18 @@ export default function HomePage() {
                         Qalbu
                     </h2>
                     <p className="mx-auto mb-8 max-w-xl text-lg text-muted-foreground">
-                        Your indispensable companion for embracing an Islamic lifestyle.
+                        {t.home.footer.description}
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Button size="lg" className="rounded-full px-8">
-                            Download for iOS
+                            {t.home.footer.ios}
                         </Button>
                         <Button size="lg" variant="outline" className="rounded-full px-8">
-                            Download for Android
+                            {t.home.footer.android}
                         </Button>
                     </div>
                     <p className="mt-12 text-sm text-muted-foreground">
-                        © 2025 Qalbu. Made with peace and love.
+                        {t.home.footer.copyright}
                     </p>
                 </motion.div>
             </div>
