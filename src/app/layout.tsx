@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
     title: {
-        default: 'Qalbu - Your Islamic Companion',
+        default: 'Qalbu - For nurturing your faith',
         template: '%s | Qalbu',
     },
     description:
@@ -52,15 +52,15 @@ export const metadata: Metadata = {
         address: false,
         telephone: false,
     },
-    metadataBase: new URL('https://qalbu.app'),
+    metadataBase: new URL('https://qalbu.ai'),
     alternates: {
         canonical: '/',
     },
     openGraph: {
         type: 'website',
         locale: 'en_US',
-        url: 'https://qalbu.app',
-        title: 'Qalbu - Your Islamic Companion',
+        url: 'https://qalbu.ai',
+        title: 'Qalbu - For nurturing your faith',
         description:
             'A modern, elegant Islamic application featuring prayer times, full Quran with audio, Qibla direction, and more.',
         siteName: 'Qalbu',
@@ -69,13 +69,13 @@ export const metadata: Metadata = {
                 url: '/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Qalbu - Your Islamic Companion',
+                alt: 'Qalbu - For nurturing your faith',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Qalbu - Your Islamic Companion',
+        title: 'Qalbu - For nurturing your faith',
         description:
             'A modern, elegant Islamic application featuring prayer times, full Quran with audio, Qibla direction, and more.',
         images: ['/og-image.png'],
@@ -97,7 +97,7 @@ export const metadata: Metadata = {
             { url: '/icons/qalbuIcon.png', sizes: '192x192', type: 'image/png' },
             { url: '/icons/qalbuIcon.png', sizes: '512x512', type: 'image/png' },
         ],
-        apple: [{ url: '/icons/qalbuIcon.png', sizes: '180x180', type: 'image/png' }],
+        apple: [{ url: '/icons/AppIcon.png', sizes: '180x180', type: 'image/png' }],
     },
     manifest: '/manifest.json',
     appleWebApp: {

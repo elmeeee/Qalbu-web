@@ -1,5 +1,5 @@
 export default function sitemap() {
-    const baseUrl = 'https://qalbu.app'
+    const baseUrl = 'https://qalbu.ai'
 
     // Generate sitemap for all 114 surahs
     const surahUrls = Array.from({ length: 114 }, (_, i) => ({

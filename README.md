@@ -1,4 +1,4 @@
-# Qalbu - Your Islamic Companion
+# Qalbu - For nurturing your faith
 
 A modern, elegant, and production-ready Islamic web application built with Next.js 15, featuring prayer times, the complete Holy Quran with audio recitation, Qibla direction finder with AR camera mode, and more.
 
@@ -310,7 +310,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email support@qalbu.app or open an issue on GitHub.
+For support, email support@qalbu.ai or open an issue on GitHub.
 
 ---
 
