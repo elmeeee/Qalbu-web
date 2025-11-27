@@ -1,4 +1,4 @@
-# 🕌 Qalbu - Your Islamic Companion
+# Qalbu - Your Islamic Companion
 
 A modern, elegant, and production-ready Islamic web application built with Next.js 15, featuring prayer times, the complete Holy Quran with audio recitation, Qibla direction finder with AR camera mode, and more.
 
@@ -8,9 +8,9 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🕌 Prayer Times
+### Prayer Times
 - **Automatic location detection** using browser geolocation
 - **Real-time prayer times** from Aladhan API
 - **Next prayer countdown** with time remaining
@@ -18,7 +18,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 - **Beautiful widget** with gradient design
 - Auto-refresh every hour
 
-### 📖 Holy Quran
+### Holy Quran
 - **All 114 Surahs** with Arabic text
 - **Audio recitation** by Mishary Rashid Alafasy
 - **Ayah-by-ayah playback** with individual audio controls
@@ -29,7 +29,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 - **Bookmark support** (coming soon)
 - **Tafsir integration** (coming soon)
 
-### 🧭 Qibla Direction
+### Qibla Direction
 - **Dual mode support:**
   - **Compass Mode**: Real-time compass with rotating needle
   - **AR Camera Mode**: Live camera overlay with Qibla direction
@@ -39,7 +39,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 - **iOS permission handling** for device orientation
 - **Calibration feedback**
 
-### 🎨 Design & UX
+### Design & UX
 - **Premium Apple-like aesthetic** - clean, minimal, elegant
 - **Islamic color palette** - Sand, Gold, and neutral tones
 - **Dark/Light mode** with smooth transitions
@@ -49,7 +49,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 - **WCAG compliant** accessibility
 - **High readability** for Qur'an text
 
-### 📱 PWA Support
+### PWA Support
 - **Installable** on mobile and desktop
 - **Offline support** with service workers
 - **App shortcuts** for quick access
@@ -58,7 +58,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Category | Technology |
 |----------|-----------|
@@ -75,7 +75,7 @@ A modern, elegant, and production-ready Islamic web application built with Next.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 - Node.js 18.0.0 or higher
@@ -114,7 +114,7 @@ http://localhost:3000
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 qalbu/
@@ -160,7 +160,7 @@ qalbu/
 
 ---
 
-## 🎯 Core APIs Used
+## Core APIs Used
 
 ### Prayer Times - Aladhan API
 - **Endpoint**: `https://api.aladhan.com/v1/timings`
@@ -179,7 +179,7 @@ qalbu/
 
 ---
 
-## 🛠️ Available Scripts
+## Available Scripts
 
 | Command | Description |
 |---------|-------------|
@@ -191,7 +191,7 @@ qalbu/
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 ### Vercel (Recommended)
 
@@ -219,7 +219,7 @@ git push origin main
 
 ---
 
-## 📊 Performance
+## Performance
 
 Target Lighthouse scores:
 
@@ -240,7 +240,7 @@ Optimizations:
 
 ---
 
-## 🎨 Design System
+## Design System
 
 ### Colors
 - **Sand**: Warm neutral tones (50-900)
@@ -259,7 +259,7 @@ Optimizations:
 
 ---
 
-## 🔒 Privacy & Permissions
+## Privacy & Permissions
 
 ### Location Access
 - Required for prayer times and Qibla direction
@@ -280,7 +280,7 @@ Optimizations:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -331,5 +331,5 @@ For support, email support@qalbu.app or open an issue on GitHub.
 
 Made with ❤️ for the Muslim community
 
-**Qalbu** - *The spiritual version of Apple.com*
+**Qalbu**
 # Qalbu-web
