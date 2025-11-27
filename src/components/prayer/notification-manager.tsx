@@ -21,6 +21,7 @@ export function NotificationManager() {
         if (!prayerTimes?.timings) return
 
         const checkPrayerTimes = () => {
+            if (typeof window === 'undefined' || !('Notification' in window)) return
             if (Notification.permission !== 'granted') return
 
             const now = new Date()
@@ -43,11 +44,13 @@ export function NotificationManager() {
                     })
 
                     // Play adhan sound
-                    try {
-                        const audio = new Audio('/audio/adhan.mp3')
-                        audio.play().catch(e => console.error('Error playing adhan:', e))
-                    } catch (error) {
-                        console.error('Failed to initialize audio:', error)
+                    if (typeof window !== 'undefined' && 'Audio' in window) {
+                        try {
+                            const audio = new Audio('/audio/adhan.mp3')
+                            audio.play().catch(e => console.error('Error playing adhan:', e))
+                        } catch (error) {
+                            console.error('Failed to initialize audio:', error)
+                        }
                     }
 
                     lastNotificationRef.current = name
