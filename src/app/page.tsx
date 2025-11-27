@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight } from 'lucide-react'
+import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight, MapPin } from 'lucide-react'
 import { PrayerTimesWidget } from '@/components/prayer/prayer-times-widget'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -316,6 +316,20 @@ export default function HomePage() {
                                 </div>
                                 <h3 className="mb-1 text-base font-bold">{t.prayerGuide.title}</h3>
                                 <p className="text-xs text-muted-foreground line-clamp-2">{t.prayerGuide.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
+                        {/* Nearby Mosques */}
+                        <Link href="/mosques">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-4 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30">
+                                    <MapPin className="h-5 w-5" />
+                                </div>
+                                <h3 className="mb-1 text-base font-bold">Nearby Mosques</h3>
+                                <p className="text-xs text-muted-foreground line-clamp-2">Find the nearest place of worship</p>
                             </motion.div>
                         </Link>
                     </div>
