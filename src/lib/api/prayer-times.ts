@@ -14,6 +14,7 @@ export interface PrayerTimesResponse {
         readable: string
         hijri: {
             date: string
+            day: string
             month: {
                 en: string
                 ar: string
@@ -138,4 +139,25 @@ export function getNextPrayer(prayerTimes: PrayerTimes): {
 
     // If no prayer is left today, return Fajr of tomorrow
     return { name: 'Fajr', time: prayerTimes.Fajr }
+}
+
+export async function getCalendar(
+    coordinates: Coordinates,
+    month: number,
+    year: number,
+    method: number = 2
+): Promise<PrayerTimesResponse[]> {
+    const { latitude, longitude } = coordinates
+    const url = `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}&method=${method}`
+
+    const response = await fetch(url, {
+        next: { revalidate: 86400 }, // Cache for 24 hours
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch calendar')
+    }
+
+    const data = await response.json()
+    return data.data
 }
