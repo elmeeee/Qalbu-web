@@ -65,7 +65,7 @@ export function DailyHadithWidget() {
                             className="text-center"
                         >
                             <p className="text-lg font-medium leading-relaxed italic text-foreground/90">
-                                "{currentHadith.id}"
+                                &quot;{currentHadith.id}&quot;
                             </p>
                         </motion.div>
                     </AnimatePresence>
