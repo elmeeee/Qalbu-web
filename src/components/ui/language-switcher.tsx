@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
                         transition={{ duration: 0.2 }}
                         className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-border/50 bg-background/95 p-1 shadow-xl backdrop-blur-lg z-50"
                     >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 max-h-[60vh] overflow-y-auto custom-scrollbar">
                             {(Object.entries(languages) as [Language, string][]).map(([code, name]) => (
                                 <button
                                     key={code}
@@ -52,8 +52,8 @@ export function LanguageSwitcher() {
                                         setIsOpen(false)
                                     }}
                                     className={`flex items-center rounded-lg px-3 py-2 text-sm transition-colors ${language === code
-                                            ? 'bg-gold-500/10 text-gold-600 font-medium'
-                                            : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                                        ? 'bg-gold-500/10 text-gold-600 font-medium'
+                                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                                         }`}
                                 >
                                     <span className="flex-1 text-left">{name}</span>
