@@ -206,6 +206,77 @@ export default function HomePage() {
                     </div>
                 </div>
 
+                {/* Explore Section */}
+                <div className="mb-32">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-12 text-center"
+                    >
+                        <h2 className="mb-4 text-3xl font-bold md:text-4xl">Explore More</h2>
+                        <p className="text-muted-foreground">Deepen your knowledge and practice</p>
+                    </motion.div>
+
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        {/* Ramadan Calendar */}
+                        <Link href="/ramadan">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30">
+                                    <Moon className="h-6 w-6" />
+                                </div>
+                                <h3 className="mb-2 text-lg font-bold">{t.ramadan.title}</h3>
+                                <p className="text-sm text-muted-foreground">{t.ramadan.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
+                        {/* Daily Doas */}
+                        <Link href="/doa">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30">
+                                    <Heart className="h-6 w-6" />
+                                </div>
+                                <h3 className="mb-2 text-lg font-bold">{t.doas.title}</h3>
+                                <p className="text-sm text-muted-foreground">{t.doas.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
+                        {/* Prophets Stories */}
+                        <Link href="/prophets">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30">
+                                    <BookOpen className="h-6 w-6" />
+                                </div>
+                                <h3 className="mb-2 text-lg font-bold">{t.prophets.title}</h3>
+                                <p className="text-sm text-muted-foreground">{t.prophets.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
+                        {/* Prayer Guide */}
+                        <Link href="/prayer-guide">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30">
+                                    <Compass className="h-6 w-6" />
+                                </div>
+                                <h3 className="mb-2 text-lg font-bold">{t.prayerGuide.title}</h3>
+                                <p className="text-sm text-muted-foreground">{t.prayerGuide.subtitle}</p>
+                            </motion.div>
+                        </Link>
+                    </div>
+                </div>
+
                 {/* Value Proposition */}
                 <div className="mb-32">
                     <div className="rounded-[2.5rem] bg-foreground p-8 text-background md:p-16">

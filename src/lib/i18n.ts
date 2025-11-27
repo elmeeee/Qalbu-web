@@ -132,6 +132,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Made with peace and love.',
             },
         },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
+        },
     },
     ms: {
         common: {
@@ -231,6 +254,29 @@ export const translations = {
                 android: 'Muat turun untuk Android',
                 copyright: '© 2025 Qalbu. Dibuat dengan keamanan dan kasih sayang.',
             },
+        },
+        ramadan: {
+            title: 'Kalendar Ramadan',
+            subtitle: 'Jadual puasa anda',
+            suhoor: 'Sahur',
+            iftar: 'Iftar',
+            day: 'Hari',
+        },
+        doas: {
+            title: 'Doa Harian',
+            subtitle: 'Himpunan doa-doa sahih',
+            search: 'Cari doa...',
+            source: 'Sumber',
+        },
+        prophets: {
+            title: 'Kisah Nabi',
+            subtitle: 'Belajar dari kehidupan para Nabi',
+            readStory: 'Baca Kisah',
+        },
+        prayerGuide: {
+            title: 'Panduan Solat',
+            subtitle: 'Panduan langkah demi langkah untuk Solat',
+            step: 'Langkah',
         },
     },
     id: {
@@ -332,6 +378,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Dibuat dengan kedamaian dan cinta.',
             },
         },
+        ramadan: {
+            title: 'Kalender Ramadan',
+            subtitle: 'Jadwal puasa Anda',
+            suhoor: 'Sahur',
+            iftar: 'Buka Puasa',
+            day: 'Hari',
+        },
+        doas: {
+            title: 'Doa Harian',
+            subtitle: 'Kumpulan doa-doa shahih',
+            search: 'Cari doa...',
+            source: 'Sumber',
+        },
+        prophets: {
+            title: 'Kisah Nabi',
+            subtitle: 'Belajar dari kehidupan para Nabi',
+            readStory: 'Baca Kisah',
+        },
+        prayerGuide: {
+            title: 'Panduan Sholat',
+            subtitle: 'Panduan langkah demi langkah untuk Sholat',
+            step: 'Langkah',
+        },
     },
     ar: {
         common: {
@@ -431,6 +500,29 @@ export const translations = {
                 android: 'تنزيل لنظام Android',
                 copyright: '© 2025 قلب. صنع بسلام وحب.',
             },
+        },
+        ramadan: {
+            title: 'تقويم رمضان',
+            subtitle: 'تتبع جدول صيامك',
+            suhoor: 'السحور',
+            iftar: 'الإفطار',
+            day: 'يوم',
+        },
+        doas: {
+            title: 'أدعية يومية',
+            subtitle: 'مجموعة من الأدعية الصحيحة',
+            search: 'بحث عن دعاء...',
+            source: 'المصدر',
+        },
+        prophets: {
+            title: 'قصص الأنبياء',
+            subtitle: 'تعلم من حياة الأنبياء',
+            readStory: 'اقرأ القصة',
+        },
+        prayerGuide: {
+            title: 'دليل الصلاة',
+            subtitle: 'دليل خطوة بخطوة للصلاة',
+            step: 'خطوة',
         },
     },
     es: {
@@ -532,6 +624,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Hecho con paz y amor.',
             },
         },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
+        },
     },
     pt: {
         common: {
@@ -631,6 +746,29 @@ export const translations = {
                 android: 'Baixar para Android',
                 copyright: '© 2025 Qalbu. Feito com paz e amor.',
             },
+        },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
         },
     },
     'pt-br': {
@@ -732,6 +870,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Feito com paz e amor.',
             },
         },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
+        },
     },
     nl: {
         common: {
@@ -832,6 +993,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Gemaakt met vrede en liefde.',
             },
         },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
+        },
     },
     zh: {
         common: {
@@ -929,8 +1113,31 @@ export const translations = {
                 description: '拥抱伊斯兰生活方式不可或缺的伴侣。',
                 ios: '下载iOS版',
                 android: '下载Android版',
-                copyright: '© 2025 Qalbu。用和平与爱制作。',
+                copyright: '© 2025 Qalbu. 用和平与爱制作。',
             },
+        },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
         },
     },
     ja: {
@@ -1029,8 +1236,31 @@ export const translations = {
                 description: 'イスラムのライフスタイルを取り入れるために欠かせないパートナー。',
                 ios: 'iOS用ダウンロード',
                 android: 'Android用ダウンロード',
-                copyright: '© 2025 Qalbu。平和と愛を込めて。',
+                copyright: '© 2025 Qalbu。平和と愛を込めて作られました。',
             },
+        },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
         },
     },
     ko: {
@@ -1129,8 +1359,31 @@ export const translations = {
                 description: '이슬람 라이프스타일을 받아들이기 위한 필수 동반자.',
                 ios: 'iOS용 다운로드',
                 android: 'Android용 다운로드',
-                copyright: '© 2025 Qalbu. 평화와 사랑으로 제작.',
+                copyright: '© 2025 Qalbu. 평화와 사랑으로 만들었습니다.',
             },
+        },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
         },
     },
     ru: {
@@ -1232,6 +1485,29 @@ export const translations = {
                 copyright: '© 2025 Qalbu. Сделано с миром и любовью.',
             },
         },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
+        },
     },
     la: {
         common: {
@@ -1331,6 +1607,29 @@ export const translations = {
                 android: 'Download pro Android',
                 copyright: '© 2025 Qalbu. Factum cum pace et amore.',
             },
+        },
+        ramadan: {
+            title: 'Ramadan Calendar',
+            subtitle: 'Track your fasting schedule',
+            suhoor: 'Suhoor',
+            iftar: 'Iftar',
+            day: 'Day',
+        },
+        doas: {
+            title: 'Daily Doas',
+            subtitle: 'Collection of authentic supplications',
+            search: 'Search doas...',
+            source: 'Source',
+        },
+        prophets: {
+            title: 'Stories of Prophets',
+            subtitle: 'Learn from the lives of the Prophets',
+            readStory: 'Read Story',
+        },
+        prayerGuide: {
+            title: 'Prayer Guide',
+            subtitle: 'Step-by-step guide to Salah',
+            step: 'Step',
         },
     },
 }
