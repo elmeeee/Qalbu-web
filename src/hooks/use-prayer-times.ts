@@ -5,12 +5,15 @@ import { useState, useEffect } from 'react'
 import {
     getPrayerTimes,
     getCurrentLocation,
+    getReverseGeocoding,
     type PrayerTimesResponse,
     type Coordinates,
+    type LocationData,
 } from '@/lib/api/prayer-times'
 
 export function usePrayerTimes() {
     const [coordinates, setCoordinates] = useState<Coordinates | null>(null)
+    const [locationName, setLocationName] = useState<LocationData | null>(null)
     const [locationError, setLocationError] = useState<string | null>(null)
 
     useEffect(() => {
@@ -18,11 +21,15 @@ export function usePrayerTimes() {
             .then((coords) => {
                 setCoordinates(coords)
                 setLocationError(null)
+                // Fetch location name
+                getReverseGeocoding(coords).then(setLocationName)
             })
             .catch((error) => {
                 setLocationError(error.message)
                 // Default to Mecca coordinates if location fails
-                setCoordinates({ latitude: 21.4225, longitude: 39.826206 })
+                const meccaCoords = { latitude: 21.4225, longitude: 39.826206 }
+                setCoordinates(meccaCoords)
+                getReverseGeocoding(meccaCoords).then(setLocationName)
             })
     }, [])
 
@@ -39,6 +46,7 @@ export function usePrayerTimes() {
         isLoading,
         error: error || locationError,
         coordinates,
+        locationName,
         refetch,
     }
 }

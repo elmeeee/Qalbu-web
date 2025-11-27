@@ -35,6 +35,36 @@ export interface Coordinates {
     longitude: number
 }
 
+export interface LocationData {
+    city?: string
+    region?: string
+    country?: string
+    formatted?: string
+}
+
+export async function getReverseGeocoding(coordinates: Coordinates): Promise<LocationData> {
+    const { latitude, longitude } = coordinates
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=en`
+        )
+        if (!response.ok) throw new Error('Failed to fetch location name')
+
+        const data = await response.json()
+        const address = data.address
+
+        return {
+            city: address.city || address.town || address.village || address.county,
+            region: address.state || address.region,
+            country: address.country,
+            formatted: data.display_name
+        }
+    } catch (error) {
+        console.error('Reverse geocoding error:', error)
+        return {}
+    }
+}
+
 export async function getPrayerTimes(
     coordinates: Coordinates,
     method: number = 2
