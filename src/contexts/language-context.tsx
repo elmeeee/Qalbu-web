@@ -23,10 +23,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const urlLang = searchParams.get('lang') as Language
         const savedLang = localStorage.getItem('language') as Language
+        const supportedLangs = ['en', 'ms', 'id', 'vi', 'th', 'zh', 'ko', 'nl', 'ja']
 
-        if (urlLang && ['en', 'ms', 'id', 'ar'].includes(urlLang)) {
+        if (urlLang && supportedLangs.includes(urlLang)) {
             setLanguageState(urlLang)
-        } else if (savedLang && ['en', 'ms', 'id', 'ar'].includes(savedLang)) {
+        } else if (savedLang && supportedLangs.includes(savedLang)) {
             setLanguageState(savedLang)
         }
     }, [searchParams])
@@ -42,7 +43,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
 
     const t = translations[language]
-    const dir = language === 'ar' ? 'rtl' : 'ltr'
+    const dir = 'ltr'
 
     return (
         <LanguageContext.Provider value={{ language, setLanguage, t, dir }}>

@@ -1,192 +1,128 @@
-export interface PrayerStep {
-    id: number
-    title: {
-        en: string
-        id: string
-        ms: string
-        ar: string
-    }
-    description: {
-        en: string
-        id: string
-        ms: string
-    }
-    arabic?: string
-    transliteration?: string
-    translation?: {
-        en: string
-        id: string
-        ms: string
-    }
+import { Language } from '../i18n';
+
+export interface PrayerGuideContent {
+    name: string;
+    terjemah: string;
 }
 
-export const prayerSteps: PrayerStep[] = [
+export interface PrayerGuideItem {
+    id: number;
+    arabic: string;
+    latin: string;
+    translations: { [key in Language]?: PrayerGuideContent };
+}
+
+export const prayerGuideData: PrayerGuideItem[] = [
     {
         id: 1,
-        title: {
-            en: "Niyyah (Intention)",
-            id: "Niat",
-            ms: "Niat",
-            ar: "النية"
-        },
-        description: {
-            en: "Stand facing the Qiblah and make the intention in your heart for the specific prayer you are about to perform.",
-            id: "Berdiri menghadap Kiblat dan berniat di dalam hati untuk sholat tertentu yang akan Anda lakukan.",
-            ms: "Berdiri menghadap Kiblat dan berniat di dalam hati untuk solat tertentu yang akan Anda lakukan."
+        arabic: "اللَّهُ أَكْبَرُ",
+        latin: "Allahu Akbar",
+        translations: {
+            en: { name: "Takbiratul Ihram", terjemah: "Allah is the Greatest" },
+            ms: { name: "Takbiratul Ihram", terjemah: "Allah Maha Besar" },
+            id: { name: "Takbiratul Ihram", terjemah: "Allah Maha Besar" },
+            nl: { name: "Takbiratul Ihram", terjemah: "Allah is de Grootste" },
+            zh: { name: "入拜大赞", terjemah: "真主至大" },
+            ja: { name: "タクビール", terjemah: "アッラーは偉大なり" },
+            ko: { name: "탁비라툴 이흐람", terjemah: "알라는 위대하시다" },
+            vi: { name: "Takbiratul Ihram", terjemah: "Allah là Đấng Vĩ đại nhất" },
+            th: { name: "ตักบีรatul Ihram", terjemah: "อัลลอฮ์ทรงยิ่งใหญ่ที่สุด" }
         }
     },
     {
         id: 2,
-        title: {
-            en: "Takbiratul Ihram",
-            id: "Takbiratul Ihram",
-            ms: "Takbiratul Ihram",
-            ar: "تكبيرة الإحرام"
-        },
-        description: {
-            en: "Raise your hands to your ears (or shoulders) and say 'Allahu Akbar'.",
-            id: "Angkat kedua tangan sejajar telinga (atau bahu) dan ucapkan 'Allahu Akbar'.",
-            ms: "Angkat kedua tangan sejajar telinga (atau bahu) dan ucapkan 'Allahu Akbar'."
-        },
-        arabic: "الله أكبر",
-        transliteration: "Allahu Akbar",
-        translation: {
-            en: "Allah is the Greatest",
-            id: "Allah Maha Besar",
-            ms: "Allah Maha Besar"
+        arabic: "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+        latin: "Subhana Rabbiyal Adzim",
+        translations: {
+            en: { name: "Ruku'", terjemah: "Glory be to my Lord the Almighty" },
+            ms: { name: "Rukuk", terjemah: "Maha Suci Tuhanku Yang Maha Agung" },
+            id: { name: "Rukuk", terjemah: "Maha Suci Tuhanku Yang Maha Agung" },
+            nl: { name: "Ruku'", terjemah: "Glorie aan mijn Heer de Almachtige" },
+            zh: { name: "鞠躬", terjemah: "赞颂我伟大的主清净" },
+            ja: { name: "ルクー（立礼）", terjemah: "偉大なる我が主に栄光あれ" },
+            ko: { name: "루쿠", terjemah: "위대하신 나의 주님께 영광을" },
+            vi: { name: "Ruku'", terjemah: "Vinh quang thay Chúa tể Toàn năng của tôi" },
+            th: { name: "รุกู", terjemah: "มหาบริสุทธิ์แด่พระเจ้าของข้าพระองค์ ผู้ทรงยิ่งใหญ่" }
         }
     },
     {
         id: 3,
-        title: {
-            en: "Qiyam (Standing)",
-            id: "Berdiri (Qiyam)",
-            ms: "Berdiri (Qiyam)",
-            ar: "القيام"
-        },
-        description: {
-            en: "Place your right hand over your left hand on your chest/navel. Recite Surah Al-Fatiha and another Surah.",
-            id: "Letakkan tangan kanan di atas tangan kiri di dada/pusar. Baca Surah Al-Fatihah dan Surah lainnya.",
-            ms: "Letakkan tangan kanan di atas tangan kiri di dada/pusar. Baca Surah Al-Fatihah dan Surah lainnya."
+        arabic: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ",
+        latin: "Sami'allahu liman hamidah",
+        translations: {
+            en: { name: "I'tidal", terjemah: "Allah hears those who praise Him" },
+            ms: { name: "I'tidal", terjemah: "Allah mendengar sesiapa yang memuji-Nya" },
+            id: { name: "I'tidal", terjemah: "Allah mendengar orang yang memuji-Nya" },
+            nl: { name: "I'tidal", terjemah: "Allah hoort degenen die Hem prijzen" },
+            zh: { name: "鞠躬后站立", terjemah: "真主听到赞颂他的人" },
+            ja: { name: "イティダール", terjemah: "アッラーは彼を称える者の声を聞かれる" },
+            ko: { name: "이티달", terjemah: "알라께서는 그를 찬양하는 자의 소리를 들으신다" },
+            vi: { name: "I'tidal", terjemah: "Allah nghe thấy những ai ca ngợi Ngài" },
+            th: { name: "อิ'ติฎาล", terjemah: "อัลลอฮ์ทรงได้ยินผู้ที่สรรเสริญพระองค์" }
         }
     },
     {
         id: 4,
-        title: {
-            en: "Ruku (Bowing)",
-            id: "Rukuk",
-            ms: "Rukuk",
-            ar: "الركوع"
-        },
-        description: {
-            en: "Bow down, placing hands on knees, keeping back straight. Say 'Subhana Rabbiyal Azim' 3 times.",
-            id: "Rukuk dengan meletakkan tangan di lutut, punggung rata. Ucapkan 'Subhana Rabbiyal Azim' 3 kali.",
-            ms: "Rukuk dengan meletakkan tangan di lutut, punggung rata. Ucapkan 'Subhana Rabbiyal Azim' 3 kali."
-        },
-        arabic: "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
-        transliteration: "Subhana Rabbiyal Azim",
-        translation: {
-            en: "Glory be to my Lord the Almighty",
-            id: "Maha Suci Tuhanku Yang Maha Agung",
-            ms: "Maha Suci Tuhanku Yang Maha Agung"
+        arabic: "سُبْحَانَ رَبِّيَ الأَعْلَى",
+        latin: "Subhana Rabbiyal A'la",
+        translations: {
+            en: { name: "Sujud", terjemah: "Glory be to my Lord the Most High" },
+            ms: { name: "Sujud", terjemah: "Maha Suci Tuhanku Yang Maha Tinggi" },
+            id: { name: "Sujud", terjemah: "Maha Suci Tuhanku Yang Maha Tinggi" },
+            nl: { name: "Sujud", terjemah: "Glorie aan mijn Heer de Allerhoogste" },
+            zh: { name: "叩头", terjemah: "赞颂我至高的主清净" },
+            ja: { name: "スジュード（平伏）", terjemah: "至高なる我が主に栄光あれ" },
+            ko: { name: "수주드", terjemah: "지극히 높으신 나의 주님께 영광을" },
+            vi: { name: "Sujud", terjemah: "Vinh quang thay Chúa tể Tối cao của tôi" },
+            th: { name: "สุญูด", terjemah: "มหาบริสุทธิ์แด่พระเจ้าของข้าพระองค์ ผู้ทรงสูงสุด" }
         }
     },
     {
         id: 5,
-        title: {
-            en: "I'tidal (Standing up from Ruku)",
-            id: "Iktidal",
-            ms: "Iktidal",
-            ar: "الاعتدال"
-        },
-        description: {
-            en: "Stand up straight from Ruku and say 'Sami Allahu liman hamidah'.",
-            id: "Bangun dari rukuk dan berdiri tegak sambil mengucapkan 'Sami Allahu liman hamidah'.",
-            ms: "Bangun dari rukuk dan berdiri tegak sambil mengucapkan 'Sami Allahu liman hamidah'."
-        },
-        arabic: "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ",
-        transliteration: "Sami' Allahu liman hamidah",
-        translation: {
-            en: "Allah hears those who praise Him",
-            id: "Allah mendengar orang yang memuji-Nya",
-            ms: "Allah mendengar orang yang memuji-Nya"
+        arabic: "رَبِّ اغْفِرْ لِي وَارْحَمْنِي",
+        latin: "Rabbighfirli warhamni",
+        translations: {
+            en: { name: "Sitting Between Two Sujood", terjemah: "My Lord, forgive me and have mercy on me" },
+            ms: { name: "Duduk Antara Dua Sujud", terjemah: "Ya Tuhanku, ampunilah aku dan rahmatilah aku" },
+            id: { name: "Duduk Diantara Dua Sujud", terjemah: "Ya Tuhanku, ampunilah aku dan rahmatilah aku" },
+            nl: { name: "Zitten tussen twee Sujoods", terjemah: "Mijn Heer, vergeef mij en heb genade met mij" },
+            zh: { name: "两叩之间坐", terjemah: "我的主啊，求你饶恕我，慈悯我" },
+            ja: { name: "二つのスジュードの間の座り", terjemah: "我が主よ、私を許し、私に慈悲をお与えください" },
+            ko: { name: "두 수주드 사이에 앉기", terjemah: "나의 주님, 저를 용서하시고 자비를 베푸소서" },
+            vi: { name: "Ngồi giữa hai Sujud", terjemah: "Lạy Chúa, xin tha thứ cho con và thương xót con" },
+            th: { name: "นั่งระหว่างสองสุญูด", terjemah: "โอ้พระเจ้าของข้าพระองค์ โปรดอภัยให้ข้าพระองค์ และเมตตาข้าพระองค์" }
         }
     },
     {
         id: 6,
-        title: {
-            en: "Sujud (Prostration)",
-            id: "Sujud",
-            ms: "Sujud",
-            ar: "السجود"
-        },
-        description: {
-            en: "Prostrate on the floor with forehead, nose, palms, knees, and toes touching the ground. Say 'Subhana Rabbiyal A'la' 3 times.",
-            id: "Sujud di lantai dengan dahi, hidung, telapak tangan, lutut, dan jari kaki menyentuh tanah. Ucapkan 'Subhana Rabbiyal A'la' 3 kali.",
-            ms: "Sujud di lantai dengan dahi, hidung, telapak tangan, lutut, dan jari kaki menyentuh tanah. Ucapkan 'Subhana Rabbiyal A'la' 3 kali."
-        },
-        arabic: "سُبْحَانَ رَبِّيَ الأَعْلَى",
-        transliteration: "Subhana Rabbiyal A'la",
-        translation: {
-            en: "Glory be to my Lord the Most High",
-            id: "Maha Suci Tuhanku Yang Maha Tinggi",
-            ms: "Maha Suci Tuhanku Yang Maha Tinggi"
+        arabic: "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ",
+        latin: "At-tahiyyatu lillahi was-salawatu wat-tayyibat",
+        translations: {
+            en: { name: "Tashahhud", terjemah: "All compliments, prayers and pure words are due to Allah" },
+            ms: { name: "Tasyahhud", terjemah: "Segala penghormatan, keberkatan, dan kebaikan adalah milik Allah" },
+            id: { name: "Tasyahhud", terjemah: "Segala kehormatan, sholat dan kebaikan adalah milik Allah" },
+            nl: { name: "Tashahhud", terjemah: "Alle groeten, gebeden en goede woorden komen toe aan Allah" },
+            zh: { name: "作证词", terjemah: "一切敬意、祷告和美好的言辞都归于真主" },
+            ja: { name: "タシャッフド", terjemah: "すべての敬意、祈り、そして善き言葉はアッラーに帰す" },
+            ko: { name: "타샤후드", terjemah: "모든 경의와 기도와 선한 말은 알라께 속합니다" },
+            vi: { name: "Tashahhud", terjemah: "Mọi lời khen ngợi, cầu nguyện và lời nói thuần khiết đều thuộc về Allah" },
+            th: { name: "ตะชะฮุด", terjemah: "การคารวะทั้งหลาย การละหมาด และสิ่งดีงามทั้งหลาย เป็นสิทธิ์ของอัลลอฮ์" }
         }
     },
     {
         id: 7,
-        title: {
-            en: "Sitting between two Sujood",
-            id: "Duduk di antara dua Sujud",
-            ms: "Duduk di antara dua Sujud",
-            ar: "الجلوس بين السجدتين"
-        },
-        description: {
-            en: "Sit up from Sujud and say the supplication 'Rabbighfirli...'.",
-            id: "Duduk dari sujud dan baca doa 'Rabbighfirli...'.",
-            ms: "Duduk dari sujud dan baca doa 'Rabbighfirli...'. "
-        },
-        arabic: "رَبِّ اغْفِرْ لِي",
-        transliteration: "Rabbighfir li",
-        translation: {
-            en: "O Lord, forgive me",
-            id: "Ya Tuhanku, ampunilah aku",
-            ms: "Ya Tuhanku, ampunilah aku"
-        }
-    },
-    {
-        id: 8,
-        title: {
-            en: "Tashahhud",
-            id: "Tasyahud",
-            ms: "Tasyahud",
-            ar: "التحيات"
-        },
-        description: {
-            en: "Sit for the final testimony. Recite the Tashahhud and Salawat.",
-            id: "Duduk untuk tasyahud akhir. Baca Tasyahud dan Shalawat.",
-            ms: "Duduk untuk tasyahud akhir. Baca Tasyahud dan Shalawat."
-        }
-    },
-    {
-        id: 9,
-        title: {
-            en: "Taslim (Salam)",
-            id: "Salam",
-            ms: "Salam",
-            ar: "التسليم"
-        },
-        description: {
-            en: "Turn your head to the right and say 'Assalamu alaykum wa rahmatullah', then to the left.",
-            id: "Menoleh ke kanan dan ucapkan 'Assalamu alaykum wa rahmatullah', lalu ke kiri.",
-            ms: "Menoleh ke kanan dan ucapkan 'Assalamu alaykum wa rahmatullah', lalu ke kiri."
-        },
-        arabic: "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ",
-        transliteration: "Assalamu alaykum wa rahmatullah",
-        translation: {
-            en: "Peace be upon you and the mercy of Allah",
-            id: "Semoga kedamaian dan rahmat Allah menyertai kalian",
-            ms: "Semoga kedamaian dan rahmat Allah menyertai kalian"
+        arabic: "السَّلاَمُ عَلَيْكُمْ وَرَحْمَةُ اللهِ",
+        latin: "Assalamu 'alaikum wa rahmatullah",
+        translations: {
+            en: { name: "Salam", terjemah: "Peace be upon you and the mercy of Allah" },
+            ms: { name: "Salam", terjemah: "Sejahtera ke atas kamu dan rahmat Allah" },
+            id: { name: "Salam", terjemah: "Semoga keselamatan dan rahmat Allah tercurah kepadamu" },
+            nl: { name: "Salam", terjemah: "Vrede zij met u en de genade van Allah" },
+            zh: { name: "祝安词", terjemah: "愿真主的平安和慈悯在你们上" },
+            ja: { name: "サラーム", terjemah: "あなた方に平安とアッラーの慈悲がありますように" },
+            ko: { name: "살람", terjemah: "당신에게 평화와 알라의 자비가 있기를" },
+            vi: { name: "Salam", terjemah: "Bình an và lòng thương xót của Allah ở cùng bạn" },
+            th: { name: "สลาม", terjemah: "ขอความสันติและความเมตตาจากอัลลอฮ์จงมีแด่ท่าน" }
         }
     }
-]
+];

@@ -17,11 +17,11 @@ export default function DoaPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        getDoas()
+        getDoas(language)
             .then(setDoas)
             .catch(console.error)
             .finally(() => setLoading(false))
-    }, [])
+    }, [language])
 
     // Filter doas based on search query
     const filteredDoas = doas.filter((doa) => {

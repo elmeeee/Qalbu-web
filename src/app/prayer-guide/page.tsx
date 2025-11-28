@@ -15,11 +15,11 @@ export default function PrayerGuidePage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        getPrayerGuide()
+        getPrayerGuide(language)
             .then(setGuide)
             .catch(console.error)
             .finally(() => setLoading(false))
-    }, [])
+    }, [language])
 
     return (
         <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
