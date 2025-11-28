@@ -83,21 +83,21 @@ export default function HomePage() {
                             />
                         </div>
                         <span className="text-[8px] font-medium tracking-wider text-black dark:text-white text-center uppercase opacity-60 leading-none mt-0.5">
-                            For nurturing your faith
+                            {t.home.hero.subtitle}
                         </span>
                     </div>
                     <div className="flex items-center gap-4"> {/* Changed gap-2 to gap-4 */}
                         <ModeToggle />
                         <LanguageSwitcher />
                         <Button variant="ghost" size="sm" className="hidden md:flex">
-                            Sign In
+                            {t.common.signIn}
                         </Button>
                         {isInstallable && (
                             <Button
                                 onClick={promptInstall}
                                 className="rounded-full bg-foreground text-background hover:bg-foreground/90"
                             >
-                                Install App
+                                {t.common.installApp}
                             </Button>
                         )}
                     </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
                             </div>
                             <Link href="/qibla" className="mt-6 inline-block">
                                 <Button variant="link" className="h-auto p-0 text-lg font-semibold text-blue-600 hover:text-blue-700">
-                                    Find Direction <ChevronRight className="ml-1 h-5 w-5" />
+                                    {t.home.features.qibla.action} <ChevronRight className="ml-1 h-5 w-5" />
                                 </Button>
                             </Link>
                         </div>
@@ -259,7 +259,7 @@ export default function HomePage() {
                         viewport={{ once: true }}
                         className="mb-8"
                     >
-                        <h2 className="text-2xl font-bold">Explore More</h2>
+                        <h2 className="text-2xl font-bold">{t.common.explore}</h2>
                     </motion.div>
 
                     <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
@@ -328,8 +328,8 @@ export default function HomePage() {
                                 <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30">
                                     <MapPin className="h-5 w-5" />
                                 </div>
-                                <h3 className="mb-1 text-base font-bold">Nearby Mosques</h3>
-                                <p className="text-xs text-muted-foreground line-clamp-2">Find the nearest place of worship</p>
+                                <h3 className="mb-1 text-base font-bold">{t.home.features.mosques.title}</h3>
+                                <p className="text-xs text-muted-foreground line-clamp-2">{t.home.features.mosques.description}</p>
                             </motion.div>
                         </Link>
                     </div>
@@ -344,27 +344,27 @@ export default function HomePage() {
                                 <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
                                     <Smartphone className="h-6 w-6 text-foreground" />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3">Stay Connected</h3>
+                                <h3 className="text-xl font-bold mb-3">{t.home.value.connected.title}</h3>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    Keep your heart connected to your Creator with daily reminders and easy access to worship tools.
+                                    {t.home.value.connected.description}
                                 </p>
                             </div>
                             <div className="bg-card rounded-3xl p-8 border border-border/50">
                                 <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
                                     <Shield className="h-6 w-6 text-foreground" />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3">Stay Private</h3>
+                                <h3 className="text-xl font-bold mb-3">{t.home.value.private.title}</h3>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    Your spiritual journey is personal. We respect your privacy with no tracking or data selling.
+                                    {t.home.value.private.description}
                                 </p>
                             </div>
                             <div className="bg-card rounded-3xl p-8 border border-border/50">
                                 <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
                                     <Heart className="h-6 w-6 text-foreground" />
                                 </div>
-                                <h3 className="text-xl font-bold mb-3">Stay Faithful</h3>
+                                <h3 className="text-xl font-bold mb-3">{t.home.value.faithful.title}</h3>
                                 <p className="text-muted-foreground leading-relaxed">
-                                    Nurture your iman with a companion that understands and supports your Islamic lifestyle.
+                                    {t.home.value.faithful.description}
                                 </p>
                             </div>
                         </div>
@@ -373,14 +373,14 @@ export default function HomePage() {
                         <div className="rounded-[3rem] bg-black text-white p-12 md:p-24 text-center">
                             <h2 className="text-4xl md:text-5xl font-bold mb-6">Qalbu</h2>
                             <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-                                Your indispensable companion for embracing an Islamic lifestyle.
+                                {t.home.footer.description}
                             </p>
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                                 <Button className="h-12 rounded-full bg-white text-black hover:bg-gray-200 px-8">
-                                    Download for iOS
+                                    {t.home.footer.ios}
                                 </Button>
                                 <Button variant="outline" className="h-12 rounded-full border-gray-700 text-white hover:bg-gray-900 px-8 bg-transparent">
-                                    Download for Android
+                                    {t.home.footer.android}
                                 </Button>
                             </div>
                             <p className="text-sm text-gray-500">

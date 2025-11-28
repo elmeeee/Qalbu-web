@@ -75,9 +75,8 @@ export function PrayerTimesWidget({ variant = 'default' }: { variant?: 'default'
 
     // Format Dates
     const hijriDate = prayerTimes.date.hijri
-    const isArabic = language === 'ar'
-    const weekday = isArabic ? hijriDate.weekday.ar : hijriDate.weekday.en
-    const month = isArabic ? hijriDate.month.ar : hijriDate.month.en
+    const weekday = hijriDate.weekday.en
+    const month = hijriDate.month.en
     const formattedHijri = `${weekday}, ${hijriDate.date} ${month} ${hijriDate.year}`
 
     const gregorianDate = new Date().toLocaleDateString(language, {
