@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         template: '%s | Qalbu',
     },
     description:
-        'A modern, elegant Islamic application featuring prayer times, full Quran with audio, Qibla direction, and more. Your spiritual companion.',
+        'A modern, elegant Islamic application featuring prayer times, full Quran with audio, Qibla direction, and more. For nurturing your faith.',
     keywords: [
         'Islamic app',
         'Prayer times',

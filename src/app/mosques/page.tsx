@@ -60,7 +60,7 @@ export default function MosquesPage() {
                 {/* Content */}
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12 gap-4">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                         <p className="text-muted-foreground">Finding nearby mosques...</p>
                     </div>
                 ) : error ? (
@@ -86,7 +86,7 @@ export default function MosquesPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                             >
-                                <Card className="premium-card h-full flex flex-col hover:border-gold-500/50 transition-colors group">
+                                <Card className="premium-card h-full flex flex-col hover:border-blue-500/50 transition-colors group">
                                     <CardContent className="p-6 flex flex-col h-full">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
@@ -106,7 +106,7 @@ export default function MosquesPage() {
                                         </p>
 
                                         <Button
-                                            className="w-full gap-2 group-hover:bg-gold-600 group-hover:text-white transition-colors"
+                                            className="w-full gap-2 group-hover:bg-blue-600 group-hover:text-white transition-colors"
                                             variant="outline"
                                             onClick={() => openDirections(mosque.lat, mosque.lon)}
                                         >

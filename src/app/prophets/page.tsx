@@ -47,7 +47,7 @@ export default function ProphetsPage() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     </div>
                 ) : (
                     /* Prophets List */
@@ -59,10 +59,10 @@ export default function ProphetsPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
                             >
-                                <Card className="premium-card h-full flex flex-col hover:border-gold-500/50 transition-colors">
+                                <Card className="premium-card h-full flex flex-col hover:border-blue-500/50 transition-colors">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2 text-xl">
-                                            <Scroll className="h-5 w-5 text-gold-600" />
+                                            <Scroll className="h-5 w-5 text-blue-600" />
                                             {prophet.name}
                                         </CardTitle>
                                     </CardHeader>

@@ -52,7 +52,7 @@ export function LanguageSwitcher() {
                                         setIsOpen(false)
                                     }}
                                     className={`flex items-center rounded-lg px-3 py-2 text-sm transition-colors ${language === code
-                                        ? 'bg-gold-500/10 text-gold-600 font-medium'
+                                        ? 'bg-blue-500/10 text-blue-600 font-medium'
                                         : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                                         }`}
                                 >

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight, MapPin } from 'lucide-react'
+import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight, MapPin, Sparkles, Calendar, Settings } from 'lucide-react'
 import { PrayerTimesWidget } from '@/components/prayer/prayer-times-widget'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,9 @@ import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { useLanguage } from '@/contexts/language-context'
 
 import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
+import { IslamicHolidaysWidget } from '@/components/islamic/islamic-holidays-widget'
+import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
+import { usePrayerTimes } from '@/hooks/use-prayer-times'
 
 // Animation variants
 const fadeInUp = {
@@ -37,6 +40,7 @@ import { useInstallPrompt } from '@/hooks/use-install-prompt'
 export default function HomePage() {
     const { t } = useLanguage()
     const { isInstallable, promptInstall } = useInstallPrompt()
+    const { settings, updateSettings } = usePrayerTimes()
     const [mounted, setMounted] = useState(false)
     const [isPwa, setIsPwa] = useState(false)
 
@@ -53,10 +57,10 @@ export default function HomePage() {
     }
 
     return (
-        <main className="min-h-screen overflow-x-hidden bg-background selection:bg-gold-100 selection:text-gold-900">
+        <main className="min-h-screen overflow-x-hidden bg-background selection:bg-blue-100 selection:text-blue-900">
             {/* Background Gradients */}
             <div className="fixed inset-0 -z-10 h-full w-full bg-white dark:bg-black">
-                <div className="absolute left-0 top-0 h-[500px] w-[500px] -translate-x-[30%] -translate-y-[20%] rounded-full bg-gold-200/20 blur-[100px] dark:bg-gold-900/20" />
+                <div className="absolute left-0 top-0 h-[500px] w-[500px] -translate-x-[30%] -translate-y-[20%] rounded-full bg-blue-200/20 blur-[100px] dark:bg-blue-900/20" />
                 <div className="absolute right-0 top-0 h-[500px] w-[500px] translate-x-[30%] -translate-y-[20%] rounded-full bg-sand-200/20 blur-[100px] dark:bg-sand-900/20" />
             </div>
 
@@ -89,9 +93,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-4"> {/* Changed gap-2 to gap-4 */}
                         <ModeToggle />
                         <LanguageSwitcher />
-                        <Button variant="ghost" size="sm" className="hidden md:flex">
-                            {t.common.signIn}
-                        </Button>
+                        <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="icon" />
                         {isInstallable && (
                             <Button
                                 onClick={promptInstall}
@@ -112,20 +114,13 @@ export default function HomePage() {
                             variants={staggerContainer}
                             className="text-center lg:text-left"
                         >
-                            <motion.div variants={fadeInUp} className="mb-6 flex justify-center lg:justify-start">
-                                <span className="rounded-full border border-gold-200 bg-gold-50 px-4 py-1.5 text-sm font-medium text-gold-800 dark:border-gold-800 dark:bg-gold-950/30 dark:text-gold-300">
-                                    {t.home.hero.badge}
-                                </span>
-                            </motion.div>
+
 
                             <motion.h1
                                 variants={fadeInUp}
-                                className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl"
+                                className="mb-6 text-5xl font-bold tracking-tight md:text-7xl lg:text-8xl bg-gradient-to-b from-blue-600 to-blue-800 bg-clip-text text-transparent"
                             >
                                 {t.home.hero.title}
-                                <span className="block text-3xl font-light text-muted-foreground md:text-5xl lg:text-6xl mt-2">
-                                    {t.home.hero.subtitle}
-                                </span>
                             </motion.h1>
 
                             <motion.p
@@ -135,13 +130,16 @@ export default function HomePage() {
                                 {t.home.hero.description}
                             </motion.p>
 
-                            <motion.div variants={fadeInUp} className="flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
-                                <Button size="lg" className="h-12 rounded-full px-8 text-base bg-gold-600 hover:bg-gold-700 text-white shadow-lg shadow-gold-500/20">
-                                    {t.home.hero.getStarted}
+                            <motion.div variants={fadeInUp} className="flex flex-col items-center sm:flex-row lg:justify-start">
+                                <Button
+                                    size="lg"
+                                    className="h-12 rounded-full px-8 text-base bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white shadow-lg shadow-blue-500/20"
+                                    onClick={() => {
+                                        document.getElementById('download-section')?.scrollIntoView({ behavior: 'smooth' })
+                                    }}
+                                >
+                                    {t.common.downloadApp}
                                     <ChevronRight className="ml-2 h-4 w-4" />
-                                </Button>
-                                <Button size="lg" variant="outline" className="h-12 rounded-full px-8 text-base">
-                                    {t.home.hero.viewFeatures}
                                 </Button>
                             </motion.div>
                         </motion.div>
@@ -153,7 +151,7 @@ export default function HomePage() {
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="relative mx-auto max-w-[300px] lg:max-w-md"
                         >
-                            <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-r from-gold-500 to-sand-500 opacity-20 blur-3xl" />
+                            <div className="absolute -inset-4 rounded-[3rem] bg-gradient-to-r from-blue-500 to-cyan-500 opacity-20 blur-3xl" />
                             <div className="relative rounded-[2.5rem] border-8 border-white bg-black shadow-2xl dark:border-gray-800 overflow-hidden">
                                 <Image
                                     src="/icons/qalbuApp.png"
@@ -183,9 +181,19 @@ export default function HomePage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-12"
+                    className="mb-8"
                 >
                     <DailyHadithWidget />
+                </motion.div>
+
+                {/* Islamic Holidays Widget */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-12"
+                >
+                    <IslamicHolidaysWidget />
                 </motion.div>
 
                 {/* Main Features Grid */}
@@ -199,7 +207,7 @@ export default function HomePage() {
                     >
                         <div className="relative z-10 h-full flex flex-col justify-between">
                             <div>
-                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm text-gold-600 shadow-sm dark:bg-gray-800/80">
+                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm text-blue-600 shadow-sm dark:bg-gray-800/80">
                                     <Image
                                         src="/icons/Quran.svg"
                                         alt="Quran"
@@ -214,7 +222,7 @@ export default function HomePage() {
                                 </p>
                             </div>
                             <Link href="/quran" className="mt-6 inline-block">
-                                <Button variant="link" className="h-auto p-0 text-lg font-semibold text-gold-600 hover:text-gold-700">
+                                <Button variant="link" className="h-auto p-0 text-lg font-semibold text-blue-600 hover:text-blue-700">
                                     {t.home.features.quran.action} <ChevronRight className="ml-1 h-5 w-5" />
                                 </Button>
                             </Link>
@@ -259,10 +267,38 @@ export default function HomePage() {
                         viewport={{ once: true }}
                         className="mb-8"
                     >
-                        <h2 className="text-2xl font-bold">{t.common.explore}</h2>
+                        <h2 className="text-2xl font-bold bg-gradient-to-b from-blue-600 to-blue-800 bg-clip-text text-transparent">{t.common.explore}</h2>
                     </motion.div>
 
-                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
+                        {/* Asma Ul Husna */}
+                        <Link href="/asma-ul-husna">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-4 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-900/30">
+                                    <Sparkles className="h-5 w-5" />
+                                </div>
+                                <h3 className="mb-1 text-base font-bold">{t.asmaUlHusna.title}</h3>
+                                <p className="text-xs text-muted-foreground line-clamp-2">{t.asmaUlHusna.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
+                        {/* Islamic Calendar */}
+                        <Link href="/calendar">
+                            <motion.div
+                                whileHover={{ y: -5 }}
+                                className="group h-full rounded-2xl border border-border/50 bg-card p-4 shadow-sm transition-all hover:shadow-md"
+                            >
+                                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30">
+                                    <Calendar className="h-5 w-5" />
+                                </div>
+                                <h3 className="mb-1 text-base font-bold">{t.islamicCalendar.title}</h3>
+                                <p className="text-xs text-muted-foreground line-clamp-2">{t.islamicCalendar.subtitle}</p>
+                            </motion.div>
+                        </Link>
+
                         {/* Ramadan Calendar */}
                         <Link href="/ramadan">
                             <motion.div
@@ -370,7 +406,7 @@ export default function HomePage() {
                         </div>
 
                         {/* Main Footer */}
-                        <div className="rounded-[3rem] bg-black text-white p-12 md:p-24 text-center">
+                        <div id="download-section" className="rounded-[3rem] bg-black text-white p-12 md:p-24 text-center scroll-mt-20">
                             <h2 className="text-4xl md:text-5xl font-bold mb-6">Qalbu</h2>
                             <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
                                 {t.home.footer.description}

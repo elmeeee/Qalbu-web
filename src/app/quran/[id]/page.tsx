@@ -46,7 +46,7 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
     if (isLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center">
-                <Loader2 className="h-12 w-12 animate-spin text-gold-600" />
+                <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
             </div>
         )
     }
@@ -83,7 +83,7 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                     </div>
 
                     <Card className="premium-card overflow-hidden">
-                        <CardHeader className="bg-gradient-to-r from-gold-500 to-gold-600 text-white">
+                        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                             <div className="text-center">
                                 <p className="mb-2 text-sm opacity-90">{t.common.surah} {surah.number}</p>
                                 <CardTitle className="mb-2 text-3xl font-bold">{surah.englishName}</CardTitle>
@@ -131,14 +131,14 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                         >
                             <Card
                                 className={`transition-all duration-300 ${currentSurah?.number === surah.number && currentAyah?.number === ayah.number
-                                    ? 'border-gold-500 shadow-lg shadow-gold-500/20'
+                                    ? 'border-blue-500 shadow-lg shadow-blue-500/20'
                                     : 'hover:shadow-md'
                                     }`}
                             >
                                 <CardContent className="p-6">
                                     {/* Ayah Number and Play Button */}
                                     <div className="mb-4 flex items-center justify-between">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-100 text-sm font-semibold text-gold-700 dark:bg-gold-900/30 dark:text-gold-400">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                                             {ayah.numberInSurah}
                                         </div>
                                         <Button
@@ -163,7 +163,7 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                                     {/* Transliteration & Translation */}
                                     <div className="space-y-2">
                                         {ayah.transliteration && (
-                                            <p className="text-lg font-medium text-gold-600 dark:text-gold-400">
+                                            <p className="text-lg font-medium text-blue-600 dark:text-blue-400">
                                                 {ayah.transliteration}
                                             </p>
                                         )}
