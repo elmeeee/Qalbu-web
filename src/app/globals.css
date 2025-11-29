@@ -53,6 +53,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
@@ -96,6 +97,7 @@ html {
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -103,12 +105,10 @@ html {
 
 .shimmer {
   animation: shimmer 2s infinite;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%);
   background-size: 1000px 100%;
 }
 
@@ -128,11 +128,43 @@ html {
 }
 
 /* Tajweed Colors */
-.tajweed-h { @apply text-gray-400 dark:text-gray-500; } /* Hamzat Wasl */
-.tajweed-l { @apply text-gray-400 dark:text-gray-500; } /* Lam Shamsiyyah */
-.tajweed-n { @apply text-emerald-600 dark:text-emerald-400; } /* Ghunnah */
-.tajweed-m { @apply text-red-600 dark:text-red-400; } /* Madd */
-.tajweed-p { @apply text-blue-600 dark:text-blue-400; } /* Qalqalah */
-.tajweed-q { @apply text-blue-600 dark:text-blue-400; } /* Qalqalah (alt) */
-.tajweed-c { @apply text-cyan-600 dark:text-cyan-400; } /* Ikhfa */
-.tajweed-k { @apply text-purple-600 dark:text-purple-400; } /* Other */
+.tajweed-h {
+  @apply text-gray-400 dark:text-gray-500 font-bold;
+}
+
+/* Hamzat Wasl */
+.tajweed-l {
+  @apply text-gray-400 dark:text-gray-500 font-bold;
+}
+
+/* Lam Shamsiyyah */
+.tajweed-n {
+  @apply text-emerald-600 dark:text-emerald-400 font-bold;
+}
+
+/* Ghunnah */
+.tajweed-m {
+  @apply text-red-600 dark:text-red-400 font-bold;
+}
+
+/* Madd */
+.tajweed-p {
+  @apply text-blue-600 dark:text-blue-400 font-bold;
+}
+
+/* Qalqalah */
+.tajweed-q {
+  @apply text-blue-600 dark:text-blue-400 font-bold;
+}
+
+/* Qalqalah (alt) */
+.tajweed-c {
+  @apply text-cyan-600 dark:text-cyan-400 font-bold;
+}
+
+/* Ikhfa */
+.tajweed-k {
+  @apply text-purple-600 dark:text-purple-400 font-bold;
+}
+
+/* Other */

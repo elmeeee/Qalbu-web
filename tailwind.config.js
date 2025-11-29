@@ -6,6 +6,16 @@ module.exports = {
         './src/components/**/*.{js,ts,jsx,tsx,mdx}',
         './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     ],
+    safelist: [
+        'tajweed-h',
+        'tajweed-l',
+        'tajweed-n',
+        'tajweed-m',
+        'tajweed-p',
+        'tajweed-q',
+        'tajweed-c',
+        'tajweed-k',
+    ],
     theme: {
         extend: {
             colors: {

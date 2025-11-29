@@ -10,7 +10,12 @@ export function TajweedText({ text, className }: TajweedTextProps) {
     // Examples: [h:1[\u0671], [n[\u0640\u0670], [l[\u0644]
     const regex = /(\[[a-z]+(?::\d+)?\[[^\]]+\])/g
     if (!text) return null
+
+    // Debug logging
+    // console.log('TajweedText input:', text.substring(0, 50))
     const parts = text.split(regex)
+    // console.log('TajweedText parts:', parts.length)
+
 
     return (
         <span className={className}>
