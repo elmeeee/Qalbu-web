@@ -126,3 +126,13 @@ html {
 .gradient-text {
   @apply bg-gradient-to-r from-gold-600 to-gold-400 bg-clip-text text-transparent;
 }
+
+/* Tajweed Colors */
+.tajweed-h { @apply text-gray-400 dark:text-gray-500; } /* Hamzat Wasl */
+.tajweed-l { @apply text-gray-400 dark:text-gray-500; } /* Lam Shamsiyyah */
+.tajweed-n { @apply text-emerald-600 dark:text-emerald-400; } /* Ghunnah */
+.tajweed-m { @apply text-red-600 dark:text-red-400; } /* Madd */
+.tajweed-p { @apply text-blue-600 dark:text-blue-400; } /* Qalqalah */
+.tajweed-q { @apply text-blue-600 dark:text-blue-400; } /* Qalqalah (alt) */
+.tajweed-c { @apply text-cyan-600 dark:text-cyan-400; } /* Ikhfa */
+.tajweed-k { @apply text-purple-600 dark:text-purple-400; } /* Other */
