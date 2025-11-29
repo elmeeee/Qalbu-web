@@ -68,7 +68,7 @@ export default function QuranPage() {
                             placeholder={`${t.common.search}...`}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-2xl border border-border bg-background px-12 py-4 text-lg shadow-sm transition-all focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/20"
+                            className="w-full rounded-2xl border border-border bg-background px-12 py-4 text-lg shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
                 </motion.div>
@@ -76,7 +76,7 @@ export default function QuranPage() {
                 {/* Loading State */}
                 {isLoading && (
                     <div className="flex items-center justify-center py-20">
-                        <Loader2 className="h-12 w-12 animate-spin text-gold-600" />
+                        <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
                     </div>
                 )}
 
@@ -110,14 +110,14 @@ export default function QuranPage() {
                                         <CardContent className="p-6">
                                             <div className="flex items-start gap-4">
                                                 {/* Surah Number Badge */}
-                                                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gold-500 to-gold-600 text-lg font-bold text-white shadow-lg">
+                                                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 text-lg font-bold text-white shadow-lg">
                                                     {surah.number}
                                                 </div>
 
                                                 {/* Surah Info */}
                                                 <div className="flex-1">
                                                     <div className="mb-1 flex items-start justify-between">
-                                                        <h3 className="text-lg font-semibold group-hover:text-gold-600">
+                                                        <h3 className="text-lg font-semibold group-hover:text-blue-600">
                                                             {surah.englishName}
                                                         </h3>
                                                         <BookOpen className="h-4 w-4 text-muted-foreground" />

@@ -1,18 +1,20 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Compass, Camera, MapPin, Loader2, AlertCircle, ArrowLeft } from 'lucide-react'
 import { useQibla, useCameraStream } from '@/hooks/use-qibla'
 import { useLanguage } from '@/contexts/language-context'
+import { getReverseGeocoding, type LocationData } from '@/lib/api/prayer-times'
 
 type Mode = 'compass' | 'camera'
 
 export default function QiblaPage() {
     const [mode, setMode] = useState<Mode>('compass')
+    const [locationName, setLocationName] = useState<LocationData | null>(null)
     const { t } = useLanguage()
     const {
         qiblaDirection,
@@ -33,6 +35,15 @@ export default function QiblaPage() {
         startCamera,
         stopCamera,
     } = useCameraStream()
+
+    // Fetch location name when coordinates change
+    useEffect(() => {
+        if (coordinates) {
+            getReverseGeocoding(coordinates)
+                .then(setLocationName)
+                .catch(console.error)
+        }
+    }, [coordinates])
 
     const handleModeChange = async (newMode: Mode) => {
         if (newMode === 'camera') {
@@ -109,14 +120,27 @@ export default function QiblaPage() {
                     >
                         <Card className="glass">
                             <CardContent className="flex items-center justify-between p-4">
-                                <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-gold-600" />
-                                    <span className="text-sm">
-                                        {coordinates.latitude.toFixed(4)}, {coordinates.longitude.toFixed(4)}
-                                    </span>
+                                <div className="flex items-center gap-2 flex-1">
+                                    <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                                    <div className="flex flex-col">
+                                        {locationName?.formatted ? (
+                                            <>
+                                                <span className="text-sm font-medium">
+                                                    {locationName.formatted}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {coordinates.latitude.toFixed(4)}, {coordinates.longitude.toFixed(4)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="text-sm">
+                                                {coordinates.latitude.toFixed(4)}, {coordinates.longitude.toFixed(4)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 {qiblaDirection && (
-                                    <span className="text-sm font-medium">
+                                    <span className="text-sm font-medium whitespace-nowrap ml-2">
                                         {t.common.qibla}: {qiblaDirection.toFixed(1)}°
                                     </span>
                                 )}
@@ -146,12 +170,12 @@ export default function QiblaPage() {
                 {isSupported && !permissionGranted && mode === 'compass' && (
                     <Card className="mb-6">
                         <CardContent className="p-6 text-center">
-                            <Compass className="mx-auto mb-4 h-12 w-12 text-gold-600" />
-                            <h3 className="mb-2 text-lg font-semibold">{t.qiblaPage.permissionTitle}</h3>
-                            <p className="mb-4 text-sm text-muted-foreground">
+                            <Compass className="mx-auto mb-4 h-12 w-12 text-blue-600" />
+                            <h3 className="mb-2 text-xl font-bold">{t.qiblaPage.permissionTitle}</h3>
+                            <p className="mb-6 text-muted-foreground">
                                 {t.qiblaPage.enableCompassDesc}
                             </p>
-                            <Button onClick={handleRequestPermission} className="bg-gold-600 hover:bg-gold-700">
+                            <Button onClick={handleRequestPermission} className="bg-blue-600 hover:bg-blue-700">
                                 {t.qiblaPage.enableCompass}
                             </Button>
                         </CardContent>
@@ -204,7 +228,7 @@ function CompassMode({
         return (
             <Card className="premium-card">
                 <CardContent className="flex items-center justify-center p-20">
-                    <Loader2 className="h-12 w-12 animate-spin text-gold-600" />
+                    <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
                 </CardContent>
             </Card>
         )
@@ -219,25 +243,34 @@ function CompassMode({
                 {/* Compass Circle */}
                 <div className="relative mx-auto aspect-square max-w-md">
                     {/* Compass Background */}
-                    <div className="absolute inset-0 rounded-full border-8 border-muted bg-gradient-to-br from-sand-100 to-sand-200 dark:from-gray-800 dark:to-gray-900">
+                    <div className="absolute inset-0 rounded-full border-[3px] border-gray-300 dark:border-gray-700 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-800 dark:to-gray-900 shadow-2xl">
                         {/* Cardinal Directions */}
-                        <div className="absolute left-1/2 top-4 -translate-x-1/2 text-sm font-bold">N</div>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold">E</div>
-                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm font-bold">S</div>
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold">W</div>
+                        <div className="absolute left-1/2 top-6 -translate-x-1/2 text-lg font-bold text-foreground">N</div>
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-lg font-bold text-foreground">E</div>
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-lg font-bold text-foreground">S</div>
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-lg font-bold text-foreground">W</div>
 
-                        {/* Degree Markers */}
-                        {Array.from({ length: 36 }).map((_, i) => {
-                            const angle = i * 10
+                        {/* Degree Markers - More precise */}
+                        {Array.from({ length: 72 }).map((_, i) => {
+                            const angle = i * 5
                             const isCardinal = angle % 90 === 0
+                            const isMajor = angle % 30 === 0
                             return (
                                 <div
                                     key={i}
-                                    className="absolute left-1/2 top-1/2 h-1/2 w-0.5 origin-bottom"
-                                    style={{ transform: `rotate(${angle}deg)` }}
+                                    className="absolute left-1/2 top-1/2 h-1/2 origin-bottom"
+                                    style={{
+                                        transform: `rotate(${angle}deg)`,
+                                        width: '1px'
+                                    }}
                                 >
                                     <div
-                                        className={`${isCardinal ? 'h-4 bg-foreground' : 'h-2 bg-muted-foreground'} w-full`}
+                                        className={`w-full ${isCardinal
+                                            ? 'h-6 bg-foreground'
+                                            : isMajor
+                                                ? 'h-4 bg-foreground/70'
+                                                : 'h-2 bg-foreground/40'
+                                            }`}
                                     />
                                 </div>
                             )
@@ -247,17 +280,17 @@ function CompassMode({
                     {/* Qibla Needle */}
                     {isSupported && (
                         <div
-                            className="absolute left-1/2 top-1/2 h-1/2 w-1 origin-bottom transition-transform duration-300"
+                            className="absolute left-1/2 top-1/2 h-1/2 w-1.5 origin-bottom transition-transform duration-300 ease-out"
                             style={{ transform: `translate(-50%, -100%) rotate(${relativeDirection}deg)` }}
                         >
-                            <div className="h-full w-full bg-gradient-to-t from-gold-600 to-gold-400 shadow-lg">
-                                <div className="absolute -top-3 left-1/2 h-0 w-0 -translate-x-1/2 border-b-[12px] border-l-[8px] border-r-[8px] border-b-gold-600 border-l-transparent border-r-transparent" />
+                            <div className="h-full w-full bg-gradient-to-t from-blue-600 to-blue-400 shadow-xl rounded-full">
+                                <div className="absolute -top-4 left-1/2 h-0 w-0 -translate-x-1/2 border-b-[16px] border-l-[10px] border-r-[10px] border-b-blue-600 border-l-transparent border-r-transparent drop-shadow-lg" />
                             </div>
                         </div>
                     )}
 
-                    {/* Center Kaaba Icon */}
-                    <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-gold-600 text-2xl text-white shadow-xl">
+                    {/* Center Point */}
+                    <div className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-3xl text-white shadow-2xl ring-4 ring-white dark:ring-gray-800">
                         🕋
                     </div>
                 </div>
@@ -265,7 +298,7 @@ function CompassMode({
                 {/* Direction Info */}
                 <div className="mt-8 text-center">
                     <p className="mb-2 text-sm text-muted-foreground">{t.qiblaPage.title}</p>
-                    <p className="text-4xl font-bold text-gold-600">
+                    <p className="text-4xl font-bold text-blue-600">
                         {relativeDirection.toFixed(0)}°
                     </p>
                     {isSupported && (
@@ -294,7 +327,7 @@ function CameraMode({
         return (
             <Card className="premium-card">
                 <CardContent className="flex items-center justify-center p-20">
-                    <Loader2 className="h-12 w-12 animate-spin text-gold-600" />
+                    <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
                 </CardContent>
             </Card>
         )
@@ -329,8 +362,8 @@ function CameraMode({
                                     style={{ transform: `rotate(${relativeDirection}deg)` }}
                                 >
                                     <div className="flex flex-col items-center">
-                                        <div className="mb-4 h-32 w-1 bg-gradient-to-t from-gold-600 to-transparent" />
-                                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gold-600/90 text-3xl shadow-2xl backdrop-blur-sm">
+                                        <div className="mb-4 h-32 w-1 bg-gradient-to-t from-blue-600 to-transparent" />
+                                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600/90 text-3xl shadow-2xl backdrop-blur-sm">
                                             🕋
                                         </div>
                                         <div className="mt-4 rounded-full bg-black/50 px-4 py-2 backdrop-blur-sm">

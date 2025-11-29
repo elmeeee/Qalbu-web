@@ -54,7 +54,7 @@ export default async function Image() {
                         maxWidth: 800,
                     }}
                 >
-                    Your spiritual companion for prayer times, Quran, and Qibla direction
+                    For nurturing your faith, prayer times, Quran, and Qibla direction
                 </div>
             </div>
         ),

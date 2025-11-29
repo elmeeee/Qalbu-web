@@ -1,0 +1,201 @@
+'use client'
+
+import { useState } from 'react'
+import { Settings } from 'lucide-react'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import {
+    CALCULATION_METHODS,
+    JURISTIC_SCHOOLS,
+    LATITUDE_ADJUSTMENTS,
+    MIDNIGHT_MODES,
+    type PrayerSettings,
+} from '@/lib/api/prayer-times'
+import { useLanguage } from '@/contexts/language-context'
+
+interface PrayerSettingsDialogProps {
+    settings: PrayerSettings
+    onSettingsChange: (settings: Partial<PrayerSettings>) => void
+    variant?: 'icon' | 'button' // icon for compact, button for full
+}
+
+export function PrayerSettingsDialog({ settings, onSettingsChange, variant = 'icon' }: PrayerSettingsDialogProps) {
+    const [open, setOpen] = useState(false)
+    const { t } = useLanguage()
+
+    const handleSettingChange = (newSettings: Partial<PrayerSettings>) => {
+        onSettingsChange(newSettings)
+        // Close dialog after a short delay to show the change
+        setTimeout(() => setOpen(false), 300)
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                {variant === 'icon' ? (
+                    <Button
+                        variant="secondary"
+                        size="icon"
+                        className="h-8 w-8 bg-white/40 dark:bg-white/10 backdrop-blur-xl hover:bg-white/60 dark:hover:bg-white/20 text-blue-600 hover:text-blue-700 shadow-lg shadow-black/5 border border-white/60 dark:border-white/20"
+                        title={t.prayer?.settings || 'Settings'}
+                    >
+                        <Settings className="h-4 w-4" />
+                    </Button>
+                ) : (
+                    <Button variant="outline" size="default" className="gap-2 bg-white hover:bg-white/90 text-blue-600 hover:text-blue-700 border-white/20">
+                        <Settings className="h-4 w-4" />
+                        {t.prayer?.settings || 'Settings'}
+                    </Button>
+                )}
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>{t.prayer?.settingsTitle || 'Prayer Time Settings'}</DialogTitle>
+                    <DialogDescription>
+                        {t.prayer?.settingsDescription || 'Customize how prayer times are calculated'}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                    {/* Calculation Method */}
+                    <div className="space-y-2">
+                        <Label htmlFor="method">
+                            {t.prayer?.calculationMethod || 'Calculation Method'}
+                        </Label>
+                        <Select
+                            value={settings.method.toString()}
+                            onValueChange={(value) => handleSettingChange({ method: parseInt(value) })}
+                        >
+                            <SelectTrigger id="method">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {CALCULATION_METHODS.map((method) => (
+                                    <SelectItem key={method.id} value={method.id.toString()}>
+                                        {method.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                            {t.prayer?.methodDescription || 'Different regions use different calculation methods for Fajr and Isha times'}
+                        </p>
+                    </div>
+
+                    {/* Juristic School */}
+                    <div className="space-y-2">
+                        <Label htmlFor="school">
+                            {t.prayer?.juristicSchool || 'Juristic School (Madhab)'}
+                        </Label>
+                        <Select
+                            value={settings.school.toString()}
+                            onValueChange={(value) => handleSettingChange({ school: parseInt(value) })}
+                        >
+                            <SelectTrigger id="school">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {JURISTIC_SCHOOLS.map((school) => (
+                                    <SelectItem key={school.id} value={school.id.toString()}>
+                                        {school.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                            {t.prayer?.schoolDescription || 'Affects Asr prayer time calculation. Shafi is used by Shafi\'i, Maliki, Hanbali, and Shia schools.'}
+                        </p>
+                    </div>
+
+                    {/* Higher Latitude Adjustment */}
+                    <div className="space-y-2">
+                        <Label htmlFor="latitude">
+                            {t.prayer?.latitudeAdjustment || 'Higher Latitude Adjustment'}
+                        </Label>
+                        <Select
+                            value={settings.latitudeAdjustment.toString()}
+                            onValueChange={(value) => handleSettingChange({ latitudeAdjustment: parseInt(value) })}
+                        >
+                            <SelectTrigger id="latitude">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {LATITUDE_ADJUSTMENTS.map((adjustment) => (
+                                    <SelectItem key={adjustment.id} value={adjustment.id.toString()}>
+                                        {adjustment.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                            {t.prayer?.latitudeDescription || 'For locations at higher latitudes where twilight is continuous during certain times of the year'}
+                        </p>
+                    </div>
+
+                    {/* Midnight Mode */}
+                    <div className="space-y-2">
+                        <Label htmlFor="midnight">
+                            {t.prayer?.midnightMode || 'Midnight Calculation Mode'}
+                        </Label>
+                        <Select
+                            value={settings.midnightMode.toString()}
+                            onValueChange={(value) => handleSettingChange({ midnightMode: parseInt(value) })}
+                        >
+                            <SelectTrigger id="midnight">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {MIDNIGHT_MODES.map((mode) => (
+                                    <SelectItem key={mode.id} value={mode.id.toString()}>
+                                        {mode.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                            {t.prayer?.midnightDescription || 'Determines how midnight is calculated, which affects the end time of Isha'}
+                        </p>
+                    </div>
+
+                    {/* Current Settings Summary */}
+                    <div className="rounded-lg bg-muted p-4 space-y-2">
+                        <h4 className="font-semibold text-sm">{t.prayer?.currentSettings || 'Current Settings'}</h4>
+                        <div className="text-xs space-y-1 text-muted-foreground">
+                            <p>
+                                <span className="font-medium">Method:</span>{' '}
+                                {CALCULATION_METHODS.find((m) => m.id === settings.method)?.name}
+                            </p>
+                            <p>
+                                <span className="font-medium">School:</span>{' '}
+                                {JURISTIC_SCHOOLS.find((s) => s.id === settings.school)?.name}
+                            </p>
+                            <p>
+                                <span className="font-medium">Latitude Adjustment:</span>{' '}
+                                {LATITUDE_ADJUSTMENTS.find((l) => l.id === settings.latitudeAdjustment)?.name}
+                            </p>
+                            <p>
+                                <span className="font-medium">Midnight Mode:</span>{' '}
+                                {MIDNIGHT_MODES.find((m) => m.id === settings.midnightMode)?.name}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}

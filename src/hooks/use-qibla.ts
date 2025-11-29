@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { calculateQiblaDirection } from '@/lib/utils'
+import { getQiblaDirection } from '@/lib/api/qibla'
 import { useLocation } from './use-prayer-times'
 
 export function useQibla() {
@@ -13,8 +13,13 @@ export function useQibla() {
 
     useEffect(() => {
         if (coordinates) {
-            const direction = calculateQiblaDirection(coordinates.latitude, coordinates.longitude)
-            setQiblaDirection(direction)
+            getQiblaDirection(coordinates)
+                .then((data) => {
+                    setQiblaDirection(data.direction)
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch Qibla direction:', error)
+                })
         }
     }, [coordinates])
 

@@ -77,7 +77,7 @@ export default function DoaPage() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     </div>
                 ) : (
                     /* Doa List */
@@ -92,7 +92,7 @@ export default function DoaPage() {
                                 <Card className="premium-card h-full flex flex-col hover:shadow-md transition-all">
                                     <CardHeader>
                                         <CardTitle className="flex items-start gap-2 text-lg leading-tight">
-                                            <BookOpen className="h-5 w-5 text-gold-600 shrink-0 mt-1" />
+                                            <BookOpen className="h-5 w-5 text-blue-600 shrink-0 mt-1" />
                                             <span>{doa.judul}</span>
                                         </CardTitle>
                                     </CardHeader>
@@ -101,11 +101,11 @@ export default function DoaPage() {
                                             <p className="arabic-text text-2xl leading-loose" dir="rtl">{doa.arab}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold text-gold-600 mb-1 uppercase tracking-wider">Transliteration</p>
+                                            <p className="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wider">Transliteration</p>
                                             <p className="text-sm italic text-muted-foreground">{doa.latin}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold text-gold-600 mb-1 uppercase tracking-wider">Translation</p>
+                                            <p className="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wider">Translation</p>
                                             <p className="text-sm leading-relaxed">
                                                 {doa.terjemah}
                                             </p>

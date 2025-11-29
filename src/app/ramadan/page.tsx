@@ -1,68 +1,118 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
+import { Calendar, MapPin, Loader2, Moon, ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { ArrowLeft, Moon, Sun, Calendar as CalendarIcon, Loader2 } from 'lucide-react'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import {
+    getRamadanCalendar,
+    COUNTRIES,
+    type Coordinates,
+    type PrayerTimesResponse,
+    type PrayerSettings,
+} from '@/lib/api/prayer-times'
+import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { useLanguage } from '@/contexts/language-context'
-import { usePrayerTimes } from '@/hooks/use-prayer-times'
-import { getCalendar, type PrayerTimesResponse } from '@/lib/api/prayer-times'
-import { useEffect, useState } from 'react'
 
-export default function FastingCalendarPage() {
+export default function RamadanCalendarPage() {
     const { t, language } = useLanguage()
-    const { coordinates } = usePrayerTimes()
-    const [calendar, setCalendar] = useState<PrayerTimesResponse[]>([])
-    const [loading, setLoading] = useState(true)
+    const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0])
+    const [hijriYear, setHijriYear] = useState(1447) // Ramadan 2026 is in Hijri year 1447
+    const [settings, setSettings] = useState<PrayerSettings>({
+        method: 2,
+        school: 0,
+        latitudeAdjustment: 1,
+        midnightMode: 0,
+    })
+    const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null)
 
+    // Load settings from localStorage
     useEffect(() => {
-        if (coordinates) {
-            const date = new Date()
-            getCalendar(coordinates, date.getMonth() + 1, date.getFullYear())
-                .then(setCalendar)
-                .catch(console.error)
-                .finally(() => setLoading(false))
+        const stored = localStorage.getItem('prayer-settings')
+        if (stored) {
+            try {
+                setSettings(JSON.parse(stored))
+            } catch (e) {
+                console.error('Failed to parse stored settings:', e)
+            }
         }
-    }, [coordinates])
+    }, [])
 
-    const getFastingType = (day: PrayerTimesResponse) => {
-        const hijriDay = parseInt(day.date.hijri.day)
-        const hijriMonth = day.date.hijri.month.en
-        const weekday = day.date.readable.split(' ')[0] // This might be just the day number, need to check API response format or use Date object
+    // Auto-detect user's country based on location
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords
+                    setUserLocation({ lat: latitude, lon: longitude })
 
-        // Create a date object to check for Monday/Thursday
-        // The API returns date in "DD MMM YYYY" format usually, but let's be safe
-        // Actually, the API response has `weekday.en`
-        const dayName = day.date.hijri.weekday.en
+                    // Find closest country from the list
+                    let closestCountry = COUNTRIES[0]
+                    let minDistance = Infinity
 
-        if (hijriMonth === 'Ramadan') return { type: 'Ramadan', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', label: 'Ramadan' }
+                    COUNTRIES.forEach((country) => {
+                        const distance = Math.sqrt(
+                            Math.pow(country.lat - latitude, 2) + Math.pow(country.lon - longitude, 2)
+                        )
+                        if (distance < minDistance) {
+                            minDistance = distance
+                            closestCountry = country
+                        }
+                    })
 
-        if ([13, 14, 15].includes(hijriDay)) return { type: 'Ayamul Bidh', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', label: 'Ayamul Bidh' }
+                    setSelectedCountry(closestCountry)
+                },
+                (error) => {
+                    console.error('Geolocation error:', error)
+                    // Keep default country
+                }
+            )
+        }
+    }, [])
 
-        if (dayName === 'Monday' || dayName === 'Thursday') return { type: 'Sunnah', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', label: 'Sunnah (Mon/Thu)' }
-
-        return null
+    const coordinates: Coordinates = {
+        latitude: selectedCountry.lat,
+        longitude: selectedCountry.lon,
     }
 
-    if (loading && !calendar.length) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-sand-50 dark:bg-gray-950">
-                <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
-            </div>
-        )
+    const { data: ramadanData, isLoading, error } = useQuery<PrayerTimesResponse[]>({
+        queryKey: ['ramadan', selectedCountry.code, hijriYear, settings],
+        queryFn: () => getRamadanCalendar(coordinates, hijriYear, settings),
+        staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    })
+
+    const updateSettings = (newSettings: Partial<PrayerSettings>) => {
+        const updated = { ...settings, ...newSettings }
+        setSettings(updated)
+        localStorage.setItem('prayer-settings', JSON.stringify(updated))
+    }
+
+    const getTranslatedPrayerName = (name: string) => {
+        const key = name.toLowerCase() as keyof typeof t.prayer
+        return t.prayer[key] || name
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-            <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4">
+            <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8 text-center relative"
                 >
-                    <div className="absolute left-0 top-0 md:left-4">
+                    <div className="absolute left-0 top-0">
                         <Link href="/">
                             <Button variant="ghost" size="sm" className="gap-2">
                                 <ArrowLeft className="h-4 w-4" />
@@ -70,94 +120,252 @@ export default function FastingCalendarPage() {
                             </Button>
                         </Link>
                     </div>
-                    <h1 className="mb-4 text-3xl font-bold md:text-5xl pt-12 md:pt-0">
-                        <span className="gradient-text">Fasting Calendar</span>
-                    </h1>
-                    <p className="text-lg text-muted-foreground mb-6">Schedule for Sunnah Fasting</p>
-
-                    {/* Legend */}
-                    <div className="flex flex-wrap justify-center gap-3 text-xs md:text-sm">
-                        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Ramadan</span>
-                        <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Ayamul Bidh (13-15)</span>
-                        <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Mon & Thu</span>
+                    <div className="flex items-center justify-center gap-3 mb-4 pt-12 md:pt-0">
+                        <Moon className="h-10 w-10 text-blue-600" />
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+                            {t.ramadan?.title || 'Ramadan Prayer Times 2026'}
+                        </h1>
                     </div>
+                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                        {t.ramadan?.description || 'View prayer times for the blessed month of Ramadan across different countries'}
+                    </p>
                 </motion.div>
 
+                {/* Controls */}
+                <Card className="premium-card mb-6">
+                    <CardContent className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            {/* Country Selection */}
+                            <div className="space-y-2">
+                                <Label htmlFor="country" className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-blue-600" />
+                                    {t.ramadan?.selectCountry || 'Select Country'}
+                                </Label>
+                                <Select
+                                    value={selectedCountry.code}
+                                    onValueChange={(code) => {
+                                        const country = COUNTRIES.find((c) => c.code === code)
+                                        if (country) setSelectedCountry(country)
+                                    }}
+                                >
+                                    <SelectTrigger id="country">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[300px]">
+                                        {COUNTRIES.map((country) => (
+                                            <SelectItem key={country.code} value={country.code}>
+                                                {country.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Year Selection */}
+                            <div className="space-y-2">
+                                <Label htmlFor="year" className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-blue-600" />
+                                    {t.ramadan?.hijriYear || 'Hijri Year'}
+                                </Label>
+                                <Select
+                                    value={hijriYear.toString()}
+                                    onValueChange={(value) => setHijriYear(parseInt(value))}
+                                >
+                                    <SelectTrigger id="year">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1447">1447 AH (2026 CE)</SelectItem>
+                                        <SelectItem value="1448">1448 AH (2027 CE)</SelectItem>
+                                        <SelectItem value="1449">1449 AH (2028 CE)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Settings Button */}
+                            <div>
+                                <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="button" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Loading State */}
+                {isLoading && (
+                    <Card className="premium-card">
+                        <CardContent className="flex items-center justify-center p-12">
+                            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Error State */}
+                {error && (
+                    <Card className="premium-card border-destructive/50">
+                        <CardContent className="p-8 text-center">
+                            <p className="text-destructive">{t.common.error}</p>
+                            <p className="mt-2 text-sm text-muted-foreground">{error.toString()}</p>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Calendar Grid */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {calendar.map((day, index) => {
-                        const date = new Date()
-                        // Parse the readable date "01 Sep 2024" -> check if today
-                        // API date format: "DD MM YYYY" or "DD MMM YYYY"
-                        // Let's rely on string comparison for simplicity if formats align, or just use the index if we fetched current month
-                        // Better: compare day/month/year
+                {ramadanData && !isLoading && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {ramadanData.map((day, index) => {
+                            const hijriDate = day.date.hijri
+                            const gregorianDate = day.date.gregorian
+                            const dayNumber = parseInt(hijriDate.day)
 
-                        const fastingInfo = getFastingType(day)
-                        const isToday = day.date.readable === new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ')
-                        // Note: Date matching can be tricky with formats. Let's just highlight if it matches today's day number for this month view.
-                        const currentDay = new Date().getDate().toString().padStart(2, '0')
-                        const isTodaySimple = day.date.readable.startsWith(currentDay)
-
-                        return (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                            >
-                                <Card className={`premium-card h-full transition-all hover:shadow-md ${isTodaySimple ? 'border-gold-500 ring-1 ring-gold-500' : ''} ${fastingInfo ? 'bg-opacity-50' : 'opacity-80 hover:opacity-100'}`}>
-                                    <CardHeader className="pb-2">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <span className="font-bold text-lg block">
-                                                    {day.date.readable.split(' ')[0]} <span className="text-sm font-normal text-muted-foreground">{day.date.readable.split(' ')[1]}</span>
-                                                </span>
-                                                <span className="text-xs text-muted-foreground block mt-1">
-                                                    {day.date.hijri.weekday.en}
-                                                </span>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-xs font-medium bg-muted px-2 py-1 rounded-full block mb-1">
-                                                    {day.date.hijri.day} {day.date.hijri.month.en}
-                                                </span>
-                                                {fastingInfo && (
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full inline-block ${fastingInfo.color}`}>
-                                                        {fastingInfo.label}
+                            return (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.02 }}
+                                >
+                                    <Card className={`premium-card ${dayNumber === 1 || dayNumber === 27 ? 'border-blue-500 shadow-lg shadow-blue-500/20' : ''}`}>
+                                        <CardHeader className="pb-3">
+                                            <CardTitle className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex items-center justify-center h-12 w-12 rounded-full bg-blue-600 text-white font-bold text-lg">
+                                                        {hijriDate.day}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-lg font-bold">
+                                                            {hijriDate.weekday.en}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground font-normal">
+                                                            {gregorianDate.day} {gregorianDate.month.en} {gregorianDate.year}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {dayNumber === 1 && (
+                                                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full">
+                                                        {t.ramadan?.firstDay || 'First Day'}
                                                     </span>
                                                 )}
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3 pt-2">
-                                        {fastingInfo ? (
-                                            <>
-                                                <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                                                    <div className="flex items-center gap-2">
-                                                        <Moon className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                                                        <span className="text-xs font-medium">{t.ramadan.suhoor}</span>
-                                                    </div>
-                                                    <span className="font-bold text-sm">{day.timings.Fajr.split(' ')[0]}</span>
+                                                {dayNumber === 27 && (
+                                                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
+                                                        {t.ramadan?.laylatulQadr || 'Laylatul Qadr'}
+                                                    </span>
+                                                )}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                                {/* Imsak (Suhoor ends) */}
+                                                <div className="text-center p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {t.prayer?.imsak || 'Imsak'}
+                                                    </p>
+                                                    <p className="font-semibold text-purple-700 dark:text-purple-400">
+                                                        {day.timings.Imsak}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-center justify-between p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20">
-                                                    <div className="flex items-center gap-2">
-                                                        <Sun className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400" />
-                                                        <span className="text-xs font-medium">{t.ramadan.iftar}</span>
-                                                    </div>
-                                                    <span className="font-bold text-sm">{day.timings.Maghrib.split(' ')[0]}</span>
+
+                                                {/* Fajr */}
+                                                <div className="text-center p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {getTranslatedPrayerName('Fajr')}
+                                                    </p>
+                                                    <p className="font-semibold text-blue-700 dark:text-blue-400">
+                                                        {day.timings.Fajr}
+                                                    </p>
                                                 </div>
-                                            </>
-                                        ) : (
-                                            <div className="flex items-center justify-center h-20 text-xs text-muted-foreground italic">
-                                                No fasting scheduled
+
+                                                {/* Sunrise (Iftar ends) */}
+                                                <div className="text-center p-2 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {t.prayer?.sunrise || 'Sunrise'}
+                                                    </p>
+                                                    <p className="font-semibold text-orange-700 dark:text-orange-400">
+                                                        {day.timings.Sunrise}
+                                                    </p>
+                                                </div>
+
+                                                {/* Dhuhr */}
+                                                <div className="text-center p-2 rounded-lg bg-amber-100 dark:bg-amber-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {getTranslatedPrayerName('Dhuhr')}
+                                                    </p>
+                                                    <p className="font-semibold text-amber-700 dark:text-amber-400">
+                                                        {day.timings.Dhuhr}
+                                                    </p>
+                                                </div>
+
+                                                {/* Asr */}
+                                                <div className="text-center p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {getTranslatedPrayerName('Asr')}
+                                                    </p>
+                                                    <p className="font-semibold text-yellow-700 dark:text-yellow-400">
+                                                        {day.timings.Asr}
+                                                    </p>
+                                                </div>
+
+                                                {/* Maghrib (Iftar) */}
+                                                <div className="text-center p-2 rounded-lg bg-rose-100 dark:bg-rose-900/20">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {getTranslatedPrayerName('Maghrib')} ⭐
+                                                    </p>
+                                                    <p className="font-semibold text-rose-700 dark:text-rose-400">
+                                                        {day.timings.Maghrib}
+                                                    </p>
+                                                </div>
+
+                                                {/* Isha */}
+                                                <div className="text-center p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/20 sm:col-span-2">
+                                                    <p className="text-xs text-muted-foreground mb-1">
+                                                        {getTranslatedPrayerName('Isha')}
+                                                    </p>
+                                                    <p className="font-semibold text-indigo-700 dark:text-indigo-400">
+                                                        {day.timings.Isha}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-                        )
-                    })}
-                </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            )
+                        })}
+                    </div>
+                )}
+
+                {/* Info Card */}
+                <Card className="premium-card mt-6 overflow-hidden border-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-xl">
+                    <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0 rounded-full bg-white/20 p-3 backdrop-blur-sm">
+                                <Moon className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="space-y-3 text-sm flex-1">
+                                <p className="font-bold text-lg text-white">
+                                    {t.ramadan?.infoTitle || 'About Ramadan Prayer Times'}
+                                </p>
+                                <ul className="space-y-2 text-white/95">
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-xl">⭐</span>
+                                        <span><strong className="text-white">Maghrib</strong> - {t.ramadan?.iftarTime || 'Iftar (breaking fast) time'}</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-xl">🌙</span>
+                                        <span><strong className="text-white">Imsak</strong> - {t.ramadan?.imsakTime || 'Suhoor (pre-dawn meal) ends'}</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-xl">🌅</span>
+                                        <span><strong className="text-white">Fajr</strong> - {t.ramadan?.fajrTime || 'Fasting begins'}</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="text-xl">✨</span>
+                                        <span><strong className="text-white">{t.ramadan?.laylatulQadr || 'Laylatul Qadr'}</strong> - {t.ramadan?.laylatulQadrDesc || 'The Night of Power, often observed on the 27th night'}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
-        </main>
+        </div>
     )
 }

@@ -47,7 +47,7 @@ export default function PrayerGuidePage() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-gold-600" />
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     </div>
                 ) : (
                     /* Steps List */
@@ -61,7 +61,7 @@ export default function PrayerGuidePage() {
                             >
                                 <div className="flex gap-4">
                                     <div className="flex flex-col items-center">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-600 text-white font-bold shadow-lg z-10">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-bold shadow-lg z-10">
                                             {index + 1}
                                         </div>
                                         {index !== guide.length - 1 && (
