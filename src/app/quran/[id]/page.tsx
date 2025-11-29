@@ -1,7 +1,6 @@
 'use client'
-
-import { use } from 'react'
-import { motion } from 'framer-motion'
+import { use, useState } from 'react'
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion'
 import { useSurah } from '@/hooks/use-quran'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -17,6 +16,18 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
     const surahId = parseInt(id)
     const { language, t } = useLanguage()
     const { data: surah, isLoading, error } = useSurah(surahId, true, language)
+
+    const { scrollY } = useScroll()
+    const [isHidden, setIsHidden] = useState(false)
+
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        const previous = scrollY.getPrevious() || 0
+        if (latest > previous && latest > 150) {
+            setIsHidden(true)
+        } else {
+            setIsHidden(false)
+        }
+    })
 
     const {
         isPlaying,
@@ -67,13 +78,17 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
     return (
         <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 pb-24">
             <div className="container mx-auto px-4 py-8 md:py-12">
-                {/* Header */}
+                {/* Sticky Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8"
+                    variants={{
+                        visible: { y: 0 },
+                        hidden: { y: "-100%" },
+                    }}
+                    animate={isHidden ? "hidden" : "visible"}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="sticky top-0 z-50 -mx-4 mb-6 px-4 py-2 backdrop-blur-md bg-background/80 supports-[backdrop-filter]:bg-background/60"
                 >
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between">
                         <Link href={`/quran?lang=${language}`}>
                             <Button variant="ghost">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -82,7 +97,14 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
                         </Link>
                         <LanguageSwitcher />
                     </div>
+                </motion.div>
 
+                {/* Surah Info */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8"
+                >
                     <Card className="premium-card overflow-hidden">
                         <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                             <div className="text-center">
