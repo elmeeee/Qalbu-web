@@ -75,7 +75,7 @@ export async function getSurahWithAudio(id: number, language: Language = 'en'): 
     const edition = quranEditions[language]
 
     const [arabicResponse, audioResponse, translationResponse, transliterationResponse] = await Promise.all([
-        fetch(`${BASE_URL}/surah/${id}`),
+        fetch(`${BASE_URL}/surah/${id}/quran-tajweed`),
         fetch(`${BASE_URL}/surah/${id}/ar.alafasy`),
         fetch(`${BASE_URL}/surah/${id}/${edition}`),
         fetch(`${BASE_URL}/surah/${id}/en.transliteration`), // Transliteration usually stays English/Latin

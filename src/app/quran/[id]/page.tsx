@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { useAudio } from '@/contexts/audio-context'
 import { useLanguage } from '@/contexts/language-context'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { TajweedText } from '@/components/quran/tajweed-text'
 
 export default function SurahPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -157,7 +158,7 @@ export default function SurahPage({ params }: { params: Promise<{ id: string }> 
 
                                     {/* Arabic Text */}
                                     <div className="mb-6 text-right">
-                                        <p className="arabic-text leading-loose text-3xl">{ayah.text}</p>
+                                        <TajweedText text={ayah.text} className="arabic-text leading-loose text-3xl" />
                                     </div>
 
                                     {/* Transliteration & Translation */}
