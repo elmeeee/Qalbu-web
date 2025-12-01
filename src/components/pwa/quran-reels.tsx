@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2 } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
+import html2canvas from 'html2canvas'
 
 interface Ayah {
     number: number
@@ -21,6 +22,124 @@ interface Ayah {
     }
 }
 
+// List of all 114 Surahs
+const SURAHS = [
+    { number: 1, name: 'Al-Fatihah', translation: 'The Opening', verses: 7, revelation: 'Meccan' },
+    { number: 2, name: 'Al-Baqarah', translation: 'The Cow', verses: 286, revelation: 'Medinan' },
+    { number: 3, name: 'Ali \'Imran', translation: 'Family of Imran', verses: 200, revelation: 'Medinan' },
+    { number: 4, name: 'An-Nisa', translation: 'The Women', verses: 176, revelation: 'Medinan' },
+    { number: 5, name: 'Al-Ma\'idah', translation: 'The Table Spread', verses: 120, revelation: 'Medinan' },
+    { number: 6, name: 'Al-An\'am', translation: 'The Cattle', verses: 165, revelation: 'Meccan' },
+    { number: 7, name: 'Al-A\'raf', translation: 'The Heights', verses: 206, revelation: 'Meccan' },
+    { number: 8, name: 'Al-Anfal', translation: 'The Spoils of War', verses: 75, revelation: 'Medinan' },
+    { number: 9, name: 'At-Tawbah', translation: 'The Repentance', verses: 129, revelation: 'Medinan' },
+    { number: 10, name: 'Yunus', translation: 'Jonah', verses: 109, revelation: 'Meccan' },
+    { number: 11, name: 'Hud', translation: 'Hud', verses: 123, revelation: 'Meccan' },
+    { number: 12, name: 'Yusuf', translation: 'Joseph', verses: 111, revelation: 'Meccan' },
+    { number: 13, name: 'Ar-Ra\'d', translation: 'The Thunder', verses: 43, revelation: 'Medinan' },
+    { number: 14, name: 'Ibrahim', translation: 'Abraham', verses: 52, revelation: 'Meccan' },
+    { number: 15, name: 'Al-Hijr', translation: 'The Rocky Tract', verses: 99, revelation: 'Meccan' },
+    { number: 16, name: 'An-Nahl', translation: 'The Bee', verses: 128, revelation: 'Meccan' },
+    { number: 17, name: 'Al-Isra', translation: 'The Night Journey', verses: 111, revelation: 'Meccan' },
+    { number: 18, name: 'Al-Kahf', translation: 'The Cave', verses: 110, revelation: 'Meccan' },
+    { number: 19, name: 'Maryam', translation: 'Mary', verses: 98, revelation: 'Meccan' },
+    { number: 20, name: 'Taha', translation: 'Ta-Ha', verses: 135, revelation: 'Meccan' },
+    { number: 21, name: 'Al-Anbya', translation: 'The Prophets', verses: 112, revelation: 'Meccan' },
+    { number: 22, name: 'Al-Hajj', translation: 'The Pilgrimage', verses: 78, revelation: 'Medinan' },
+    { number: 23, name: 'Al-Mu\'minun', translation: 'The Believers', verses: 118, revelation: 'Meccan' },
+    { number: 24, name: 'An-Nur', translation: 'The Light', verses: 64, revelation: 'Medinan' },
+    { number: 25, name: 'Al-Furqan', translation: 'The Criterion', verses: 77, revelation: 'Meccan' },
+    { number: 26, name: 'Ash-Shu\'ara', translation: 'The Poets', verses: 227, revelation: 'Meccan' },
+    { number: 27, name: 'An-Naml', translation: 'The Ant', verses: 93, revelation: 'Meccan' },
+    { number: 28, name: 'Al-Qasas', translation: 'The Stories', verses: 88, revelation: 'Meccan' },
+    { number: 29, name: 'Al-\'Ankabut', translation: 'The Spider', verses: 69, revelation: 'Meccan' },
+    { number: 30, name: 'Ar-Rum', translation: 'The Romans', verses: 60, revelation: 'Meccan' },
+    { number: 31, name: 'Luqman', translation: 'Luqman', verses: 34, revelation: 'Meccan' },
+    { number: 32, name: 'As-Sajdah', translation: 'The Prostration', verses: 30, revelation: 'Meccan' },
+    { number: 33, name: 'Al-Ahzab', translation: 'The Combined Forces', verses: 73, revelation: 'Medinan' },
+    { number: 34, name: 'Saba', translation: 'Sheba', verses: 54, revelation: 'Meccan' },
+    { number: 35, name: 'Fatir', translation: 'Originator', verses: 45, revelation: 'Meccan' },
+    { number: 36, name: 'Ya-Sin', translation: 'Ya Sin', verses: 83, revelation: 'Meccan' },
+    { number: 37, name: 'As-Saffat', translation: 'Those who set the Ranks', verses: 182, revelation: 'Meccan' },
+    { number: 38, name: 'Sad', translation: 'The Letter "Saad"', verses: 88, revelation: 'Meccan' },
+    { number: 39, name: 'Az-Zumar', translation: 'The Troops', verses: 75, revelation: 'Meccan' },
+    { number: 40, name: 'Ghafir', translation: 'The Forgiver', verses: 85, revelation: 'Meccan' },
+    { number: 41, name: 'Fussilat', translation: 'Explained in Detail', verses: 54, revelation: 'Meccan' },
+    { number: 42, name: 'Ash-Shuraa', translation: 'The Consultation', verses: 53, revelation: 'Meccan' },
+    { number: 43, name: 'Az-Zukhruf', translation: 'The Ornaments of Gold', verses: 89, revelation: 'Meccan' },
+    { number: 44, name: 'Ad-Dukhan', translation: 'The Smoke', verses: 59, revelation: 'Meccan' },
+    { number: 45, name: 'Al-Jathiyah', translation: 'The Crouching', verses: 37, revelation: 'Meccan' },
+    { number: 46, name: 'Al-Ahqaf', translation: 'The Wind-Curved Sandhills', verses: 35, revelation: 'Meccan' },
+    { number: 47, name: 'Muhammad', translation: 'Muhammad', verses: 38, revelation: 'Medinan' },
+    { number: 48, name: 'Al-Fath', translation: 'The Victory', verses: 29, revelation: 'Medinan' },
+    { number: 49, name: 'Al-Hujurat', translation: 'The Rooms', verses: 18, revelation: 'Medinan' },
+    { number: 50, name: 'Qaf', translation: 'The Letter "Qaf"', verses: 45, revelation: 'Meccan' },
+    { number: 51, name: 'Adh-Dhariyat', translation: 'The Winnowing Winds', verses: 60, revelation: 'Meccan' },
+    { number: 52, name: 'At-Tur', translation: 'The Mount', verses: 49, revelation: 'Meccan' },
+    { number: 53, name: 'An-Najm', translation: 'The Star', verses: 62, revelation: 'Meccan' },
+    { number: 54, name: 'Al-Qamar', translation: 'The Moon', verses: 55, revelation: 'Meccan' },
+    { number: 55, name: 'Ar-Rahman', translation: 'The Beneficent', verses: 78, revelation: 'Medinan' },
+    { number: 56, name: 'Al-Waqi\'ah', translation: 'The Inevitable', verses: 96, revelation: 'Meccan' },
+    { number: 57, name: 'Al-Hadid', translation: 'The Iron', verses: 29, revelation: 'Medinan' },
+    { number: 58, name: 'Al-Mujadila', translation: 'The Pleading Woman', verses: 22, revelation: 'Medinan' },
+    { number: 59, name: 'Al-Hashr', translation: 'The Exile', verses: 24, revelation: 'Medinan' },
+    { number: 60, name: 'Al-Mumtahanah', translation: 'She that is to be examined', verses: 13, revelation: 'Medinan' },
+    { number: 61, name: 'As-Saf', translation: 'The Ranks', verses: 14, revelation: 'Medinan' },
+    { number: 62, name: 'Al-Jumu\'ah', translation: 'The Congregation', verses: 11, revelation: 'Medinan' },
+    { number: 63, name: 'Al-Munafiqun', translation: 'The Hypocrites', verses: 11, revelation: 'Medinan' },
+    { number: 64, name: 'At-Taghabun', translation: 'The Mutual Disillusion', verses: 18, revelation: 'Medinan' },
+    { number: 65, name: 'At-Talaq', translation: 'The Divorce', verses: 12, revelation: 'Medinan' },
+    { number: 66, name: 'At-Tahrim', translation: 'The Prohibition', verses: 12, revelation: 'Medinan' },
+    { number: 67, name: 'Al-Mulk', translation: 'The Sovereignty', verses: 30, revelation: 'Meccan' },
+    { number: 68, name: 'Al-Qalam', translation: 'The Pen', verses: 52, revelation: 'Meccan' },
+    { number: 69, name: 'Al-Haqqah', translation: 'The Reality', verses: 52, revelation: 'Meccan' },
+    { number: 70, name: 'Al-Ma\'arij', translation: 'The Ascending Stairways', verses: 44, revelation: 'Meccan' },
+    { number: 71, name: 'Nuh', translation: 'Noah', verses: 28, revelation: 'Meccan' },
+    { number: 72, name: 'Al-Jinn', translation: 'The Jinn', verses: 28, revelation: 'Meccan' },
+    { number: 73, name: 'Al-Muzzammil', translation: 'The Enshrouded One', verses: 20, revelation: 'Meccan' },
+    { number: 74, name: 'Al-Muddaththir', translation: 'The Cloaked One', verses: 56, revelation: 'Meccan' },
+    { number: 75, name: 'Al-Qiyamah', translation: 'The Resurrection', verses: 40, revelation: 'Meccan' },
+    { number: 76, name: 'Al-Insan', translation: 'The Man', verses: 31, revelation: 'Medinan' },
+    { number: 77, name: 'Al-Mursalat', translation: 'The Emissaries', verses: 50, revelation: 'Meccan' },
+    { number: 78, name: 'An-Naba', translation: 'The Tidings', verses: 40, revelation: 'Meccan' },
+    { number: 79, name: 'An-Nazi\'at', translation: 'Those who drag forth', verses: 46, revelation: 'Meccan' },
+    { number: 80, name: 'Abasa', translation: 'He Frowned', verses: 42, revelation: 'Meccan' },
+    { number: 81, name: 'At-Takwir', translation: 'The Overthrowing', verses: 29, revelation: 'Meccan' },
+    { number: 82, name: 'Al-Infitar', translation: 'The Cleaving', verses: 19, revelation: 'Meccan' },
+    { number: 83, name: 'Al-Mutaffifin', translation: 'The Defrauding', verses: 36, revelation: 'Meccan' },
+    { number: 84, name: 'Al-Inshiqaq', translation: 'The Sundering', verses: 25, revelation: 'Meccan' },
+    { number: 85, name: 'Al-Buruj', translation: 'The Mansions of the Stars', verses: 22, revelation: 'Meccan' },
+    { number: 86, name: 'At-Tariq', translation: 'The Nightcommer', verses: 17, revelation: 'Meccan' },
+    { number: 87, name: 'Al-A\'la', translation: 'The Most High', verses: 19, revelation: 'Meccan' },
+    { number: 88, name: 'Al-Ghashiyah', translation: 'The Overwhelming', verses: 26, revelation: 'Meccan' },
+    { number: 89, name: 'Al-Fajr', translation: 'The Dawn', verses: 30, revelation: 'Meccan' },
+    { number: 90, name: 'Al-Balad', translation: 'The City', verses: 20, revelation: 'Meccan' },
+    { number: 91, name: 'Ash-Shams', translation: 'The Sun', verses: 15, revelation: 'Meccan' },
+    { number: 92, name: 'Al-Layl', translation: 'The Night', verses: 21, revelation: 'Meccan' },
+    { number: 93, name: 'Ad-Duhaa', translation: 'The Morning Hours', verses: 11, revelation: 'Meccan' },
+    { number: 94, name: 'Ash-Sharh', translation: 'The Relief', verses: 8, revelation: 'Meccan' },
+    { number: 95, name: 'At-Tin', translation: 'The Fig', verses: 8, revelation: 'Meccan' },
+    { number: 96, name: 'Al-Alaq', translation: 'The Clot', verses: 19, revelation: 'Meccan' },
+    { number: 97, name: 'Al-Qadr', translation: 'The Power', verses: 5, revelation: 'Meccan' },
+    { number: 98, name: 'Al-Bayyinah', translation: 'The Clear Proof', verses: 8, revelation: 'Medinan' },
+    { number: 99, name: 'Az-Zalzalah', translation: 'The Earthquake', verses: 8, revelation: 'Medinan' },
+    { number: 100, name: 'Al-Adiyat', translation: 'The Courser', verses: 11, revelation: 'Meccan' },
+    { number: 101, name: 'Al-Qari\'ah', translation: 'The Calamity', verses: 11, revelation: 'Meccan' },
+    { number: 102, name: 'At-Takathur', translation: 'The Rivalry in world increase', verses: 8, revelation: 'Meccan' },
+    { number: 103, name: 'Al-Asr', translation: 'The Declining Day', verses: 3, revelation: 'Meccan' },
+    { number: 104, name: 'Al-Humazah', translation: 'The Traducer', verses: 9, revelation: 'Meccan' },
+    { number: 105, name: 'Al-Fil', translation: 'The Elephant', verses: 5, revelation: 'Meccan' },
+    { number: 106, name: 'Quraysh', translation: 'Quraysh', verses: 4, revelation: 'Meccan' },
+    { number: 107, name: 'Al-Ma\'un', translation: 'The Small kindnesses', verses: 7, revelation: 'Meccan' },
+    { number: 108, name: 'Al-Kawthar', translation: 'The Abundance', verses: 3, revelation: 'Meccan' },
+    { number: 109, name: 'Al-Kafirun', translation: 'The Disbelievers', verses: 6, revelation: 'Meccan' },
+    { number: 110, name: 'An-Nasr', translation: 'The Divine Support', verses: 3, revelation: 'Medinan' },
+    { number: 111, name: 'Al-Masad', translation: 'The Palm Fiber', verses: 5, revelation: 'Meccan' },
+    { number: 112, name: 'Al-Ikhlas', translation: 'The Sincerity', verses: 4, revelation: 'Meccan' },
+    { number: 113, name: 'Al-Falaq', translation: 'The Daybreak', verses: 5, revelation: 'Meccan' },
+    { number: 114, name: 'An-Nas', translation: 'Mankind', verses: 6, revelation: 'Meccan' },
+]
+
 export function QuranReels() {
     const { language } = useLanguage()
     const [ayahs, setAyahs] = useState<Ayah[]>([])
@@ -30,8 +149,49 @@ export function QuranReels() {
     const [isLoading, setIsLoading] = useState(true)
     const [currentSurah, setCurrentSurah] = useState(1)
     const [currentAyah, setCurrentAyah] = useState(1)
+    const [showTranslation, setShowTranslation] = useState(true)
+    const [showMenu, setShowMenu] = useState(false)
+    const [showSurahSelector, setShowSurahSelector] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
     const audioRef = useRef<HTMLAudioElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const shareCardRef = useRef<HTMLDivElement>(null)
+
+    const handleShare = async () => {
+        if (!shareCardRef.current || !ayahs[currentIndex]) return
+
+        try {
+            const canvas = await html2canvas(shareCardRef.current, {
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+            })
+
+            canvas.toBlob(async (blob) => {
+                if (!blob) return
+
+                const file = new File([blob], 'qalbu-ayah.png', { type: 'image/png' })
+
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: `Quran - ${ayahs[currentIndex].surah?.englishName}`,
+                        text: `Ayah ${ayahs[currentIndex].numberInSurah}`,
+                    })
+                } else {
+                    // Fallback: download the image
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = 'qalbu-ayah.png'
+                    a.click()
+                    URL.revokeObjectURL(url)
+                }
+            })
+        } catch (error) {
+            console.error('Error sharing:', error)
+        }
+    }
 
     // Load initial ayahs
     useEffect(() => {
@@ -41,8 +201,15 @@ export function QuranReels() {
     // Auto-play audio when ayah changes
     useEffect(() => {
         if (ayahs[currentIndex] && audioRef.current) {
-            audioRef.current.src = ayahs[currentIndex].audio
-            audioRef.current.load()
+            const audio = audioRef.current
+
+            // Pause current audio first to prevent interruption
+            audio.pause()
+            audio.currentTime = 0
+
+            // Set new source
+            audio.src = ayahs[currentIndex].audio
+            audio.load()
 
             // Auto-play and auto-scroll to next ayah when audio ends
             const handleAudioEnd = () => {
@@ -55,15 +222,27 @@ export function QuranReels() {
                 }
             }
 
-            audioRef.current.addEventListener('ended', handleAudioEnd)
-
-            if (!isMuted) {
-                audioRef.current.play().catch(console.error)
-                setIsPlaying(true)
+            // Wait for audio to be ready before playing
+            const handleCanPlay = () => {
+                if (!isMuted) {
+                    audio.play().catch(err => {
+                        // Ignore AbortError as it's expected when switching ayahs quickly
+                        if (err.name !== 'AbortError') {
+                            console.error('Audio play error:', err)
+                        }
+                    })
+                    setIsPlaying(true)
+                } else {
+                    setIsPlaying(false)
+                }
             }
 
+            audio.addEventListener('ended', handleAudioEnd)
+            audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+
             return () => {
-                audioRef.current?.removeEventListener('ended', handleAudioEnd)
+                audio.removeEventListener('ended', handleAudioEnd)
+                audio.removeEventListener('canplaythrough', handleCanPlay)
             }
         }
     }, [currentIndex, ayahs, isMuted])
@@ -123,6 +302,40 @@ export function QuranReels() {
         }
     }
 
+    const handleTap = () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause()
+            } else {
+                audioRef.current.play().catch(console.error)
+            }
+            setIsPlaying(!isPlaying)
+        }
+    }
+
+    const handleChangeSurah = (surahNumber: number) => {
+        // Reset everything and load new surah
+        setAyahs([])
+        setCurrentIndex(0)
+        setCurrentSurah(surahNumber)
+        setCurrentAyah(1)
+        setShowSurahSelector(false)
+        setSearchQuery('')
+        loadAyahs(surahNumber, 1)
+
+        // Scroll to top
+        if (containerRef.current) {
+            containerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
+
+    // Filter surahs based on search
+    const filteredSurahs = SURAHS.filter(surah =>
+        surah.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        surah.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        surah.number.toString().includes(searchQuery)
+    )
+
     if (isLoading && ayahs.length === 0) {
         return (
             <div className="h-screen flex items-center justify-center bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900">
@@ -134,6 +347,93 @@ export function QuranReels() {
     return (
         <div className="relative h-screen overflow-hidden bg-black">
             <audio ref={audioRef} />
+
+            {/* Hidden Share Card for Image Generation */}
+            <div className="fixed -left-[9999px] top-0">
+                {ayahs[currentIndex] && (
+                    <div
+                        ref={shareCardRef}
+                        className="w-[1080px] h-[1920px] relative overflow-hidden"
+                        style={{
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)'
+                        }}
+                    >
+                        {/* Decorative Elements */}
+                        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-white/10 blur-3xl -mr-48 -mt-48" />
+                        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-white/10 blur-3xl -ml-32 -mb-32" />
+
+                        {/* Content Container */}
+                        <div className="relative z-10 h-full flex flex-col p-16">
+                            {/* Header - Logo & Branding */}
+                            <div className="flex items-center gap-5 mb-12">
+                                <img
+                                    src="/icons/qalbuIcon.png"
+                                    alt="Qalbu"
+                                    className="w-24 h-24 rounded-2xl shadow-2xl"
+                                />
+                                <div>
+                                    <h1 className="text-6xl font-bold text-white leading-tight">Qalbu</h1>
+                                    <p className="text-2xl text-white/80 font-medium">Quran</p>
+                                </div>
+                            </div>
+
+                            {/* Main Content */}
+                            <div className="flex-1 flex flex-col gap-10 overflow-hidden">
+                                {/* Surah Info Badge */}
+                                <div className="text-center flex-shrink-0">
+                                    <div className="inline-block bg-white/20 backdrop-blur-2xl px-10 py-4 rounded-full border-3 border-white/30 shadow-xl">
+                                        <span className="text-3xl font-bold text-white">
+                                            {ayahs[currentIndex].surah?.englishName} • {ayahs[currentIndex].numberInSurah}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Arabic Text - Main Focus */}
+                                <div className="bg-white/15 backdrop-blur-2xl rounded-[50px] p-12 border-3 border-white/20 shadow-2xl flex-shrink-0">
+                                    <p
+                                        className="text-[3.5rem] font-arabic text-white leading-[1.9] text-center"
+                                        dir="rtl"
+                                        style={{
+                                            fontFamily: "'Scheherazade New', serif",
+                                            textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                                        }}
+                                    >
+                                        {ayahs[currentIndex].text}
+                                    </p>
+                                </div>
+
+                                {/* Transliteration */}
+                                {ayahs[currentIndex].transliteration && (
+                                    <div className="bg-white/10 backdrop-blur-xl rounded-[40px] px-12 py-8 border-2 border-white/15 shadow-xl flex-shrink-0">
+                                        <p className="text-2xl font-medium italic text-white/95 text-center leading-relaxed">
+                                            {ayahs[currentIndex].transliteration}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Translation */}
+                                {ayahs[currentIndex].translation && (
+                                    <div className="bg-white/10 backdrop-blur-xl rounded-[40px] px-12 py-8 border-2 border-white/15 shadow-xl flex-shrink-0">
+                                        <p className="text-2xl text-white/90 text-center leading-relaxed font-medium">
+                                            {ayahs[currentIndex].translation}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer - App Promotion */}
+                            <div className="mt-8 text-center pt-8 border-t-2 border-white/20 flex-shrink-0">
+                                <p className="text-3xl font-semibold text-white mb-2">
+                                    Download Qalbu App
+                                </p>
+                                <p className="text-2xl text-white/70">
+                                    Your Daily Islamic Companion 🤲
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* Scrollable Container */}
             <div
@@ -155,38 +455,85 @@ export function QuranReels() {
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
                         </div>
 
-                        {/* Content */}
-                        <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-6 pb-24">
-                            {/* Top Info */}
+                        {/* Tap Area for Play/Pause */}
+                        <div
+                            onClick={handleTap}
+                            className="absolute inset-0 z-10 cursor-pointer"
+                        />
+
+                        {/* Fixed Header */}
+                        <div className="absolute top-0 left-0 right-0 z-30 p-6 pointer-events-none">
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="w-full flex items-center justify-between"
+                                className="w-full flex items-center justify-between pointer-events-auto"
                             >
-                                <div className="flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full">
+                                {/* Clickable Surah Name */}
+                                <button
+                                    onClick={() => setShowSurahSelector(true)}
+                                    className="flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full hover:bg-black/40 transition-all"
+                                >
                                     <BookOpen className="h-4 w-4 text-emerald-300" />
                                     <span className="text-white text-sm font-medium">
                                         {ayah.surah?.englishName} • {ayah.numberInSurah}
                                     </span>
-                                </div>
-                                <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-full">
-                                    <span className="text-emerald-300 text-sm font-medium">
-                                        {ayah.surah?.revelationType}
-                                    </span>
+                                </button>
+                                <div className="flex items-center gap-2">
+                                    <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-full">
+                                        <span className="text-emerald-300 text-sm font-medium">
+                                            {ayah.surah?.revelationType}
+                                        </span>
+                                    </div>
+                                    {/* Menu Button */}
+                                    <button
+                                        onClick={() => setShowMenu(!showMenu)}
+                                        className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/40 transition-all"
+                                    >
+                                        <MoreVertical className="h-5 w-5 text-white" />
+                                    </button>
                                 </div>
                             </motion.div>
+                        </div>
 
-                            {/* Arabic Text with Tajweed */}
+                        {/* Content */}
+                        <div className="relative z-20 w-full h-full flex flex-col items-center justify-center px-6 pt-24 pb-32 pointer-events-none">
+                            {/* Menu Dropdown */}
+                            <AnimatePresence>
+                                {showMenu && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="absolute top-16 right-6 bg-black/80 backdrop-blur-md rounded-lg overflow-hidden shadow-xl z-50 pointer-events-auto min-w-[200px]"
+                                    >
+                                        {/* Show Translation Toggle */}
+                                        <button
+                                            onClick={() => {
+                                                setShowTranslation(!showTranslation)
+                                                setShowMenu(false)
+                                            }}
+                                            className="w-full px-6 py-3 text-left text-white hover:bg-white/10 transition-colors flex items-center justify-between gap-4"
+                                        >
+                                            <span>Show Translation</span>
+                                            <div className={`w-10 h-6 rounded-full transition-colors ${showTranslation ? 'bg-emerald-500' : 'bg-gray-600'} relative`}>
+                                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${showTranslation ? 'translate-x-4' : ''}`} />
+                                            </div>
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Arabic Text with Tajweed - Scrollable for long content */}
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.1 }}
-                                className="flex-1 flex items-center justify-center w-full max-w-2xl"
+                                className="w-full max-w-2xl overflow-y-auto scrollbar-hide pointer-events-auto"
                             >
-                                <div className="text-center space-y-6 px-4">
+                                <div className="text-center space-y-4 px-4 py-4">
                                     {/* Arabic Text */}
                                     <div
-                                        className="text-4xl leading-loose text-white font-arabic"
+                                        className="text-3xl leading-relaxed text-white font-arabic"
                                         style={{ fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}
                                     >
                                         {ayah.text}
@@ -194,82 +541,56 @@ export function QuranReels() {
 
                                     {/* Transliteration */}
                                     {ayah.transliteration && (
-                                        <p className="text-lg text-emerald-200 italic opacity-80">
+                                        <p className="text-sm text-emerald-200 italic opacity-80 leading-relaxed">
                                             {ayah.transliteration}
                                         </p>
                                     )}
 
-                                    {/* Translation */}
-                                    {ayah.translation && (
-                                        <p className="text-base text-white/90 leading-relaxed max-w-xl mx-auto">
+                                    {/* Translation - Toggleable */}
+                                    {showTranslation && ayah.translation && (
+                                        <p className="text-sm text-white/90 leading-relaxed max-w-xl mx-auto">
                                             {ayah.translation}
                                         </p>
                                     )}
                                 </div>
                             </motion.div>
+                        </div>
 
-                            {/* Bottom Actions */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="w-full flex items-center justify-between"
-                            >
-                                {/* Left: Surah Info */}
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-white font-bold text-lg">
-                                        {ayah.surah?.englishName}
-                                    </span>
-                                    <span className="text-emerald-300 text-sm">
-                                        {ayah.surah?.englishNameTranslation}
-                                    </span>
+                        {/* Fixed Action Buttons - Bottom Right */}
+                        <div className="fixed right-6 bottom-32 flex flex-col gap-4 z-40 pointer-events-auto">
+                            {/* Like - Liquid Glass Effect */}
+                            <button className="flex flex-col items-center gap-1 group">
+                                <div className="relative w-14 h-14 rounded-full overflow-hidden">
+                                    {/* Liquid glass background */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent backdrop-blur-xl" />
+                                    <div className="absolute inset-0 bg-white/5 backdrop-blur-md" />
+                                    {/* Border */}
+                                    <div className="absolute inset-0 rounded-full border border-white/20" />
+                                    {/* Shine effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    {/* Icon */}
+                                    <div className="relative w-full h-full flex items-center justify-center">
+                                        <Heart className="h-6 w-6 text-white drop-shadow-lg" />
+                                    </div>
                                 </div>
+                            </button>
 
-                                {/* Right: Action Buttons */}
-                                <div className="flex flex-col gap-4">
-                                    {/* Play/Pause */}
-                                    <button
-                                        onClick={togglePlay}
-                                        className="flex flex-col items-center gap-1 group"
-                                    >
-                                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white/30 transition-all">
-                                            {isPlaying ? (
-                                                <Pause className="h-6 w-6 text-white fill-white" />
-                                            ) : (
-                                                <Play className="h-6 w-6 text-white fill-white ml-1" />
-                                            )}
-                                        </div>
-                                    </button>
-
-                                    {/* Mute */}
-                                    <button
-                                        onClick={toggleMute}
-                                        className="flex flex-col items-center gap-1 group"
-                                    >
-                                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white/30 transition-all">
-                                            {isMuted ? (
-                                                <VolumeX className="h-5 w-5 text-white" />
-                                            ) : (
-                                                <Volume2 className="h-5 w-5 text-white" />
-                                            )}
-                                        </div>
-                                    </button>
-
-                                    {/* Like */}
-                                    <button className="flex flex-col items-center gap-1 group">
-                                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white/30 transition-all">
-                                            <Heart className="h-5 w-5 text-white" />
-                                        </div>
-                                    </button>
-
-                                    {/* Share */}
-                                    <button className="flex flex-col items-center gap-1 group">
-                                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center group-hover:bg-white/30 transition-all">
-                                            <Share2 className="h-5 w-5 text-white" />
-                                        </div>
-                                    </button>
+                            {/* Share - Liquid Glass Effect */}
+                            <button onClick={handleShare} className="flex flex-col items-center gap-1 group">
+                                <div className="relative w-14 h-14 rounded-full overflow-hidden">
+                                    {/* Liquid glass background */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent backdrop-blur-xl" />
+                                    <div className="absolute inset-0 bg-white/5 backdrop-blur-md" />
+                                    {/* Border */}
+                                    <div className="absolute inset-0 rounded-full border border-white/20" />
+                                    {/* Shine effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    {/* Icon */}
+                                    <div className="relative w-full h-full flex items-center justify-center">
+                                        <Share2 className="h-6 w-6 text-white drop-shadow-lg" />
+                                    </div>
                                 </div>
-                            </motion.div>
+                            </button>
                         </div>
                     </div>
                 ))}
@@ -282,16 +603,101 @@ export function QuranReels() {
                 )}
             </div>
 
-            {/* Scroll Indicator */}
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-20">
-                {ayahs.slice(Math.max(0, currentIndex - 2), currentIndex + 3).map((_, i) => (
-                    <div
-                        key={i}
-                        className={`w-1 h-8 rounded-full transition-all ${i === Math.min(2, currentIndex) ? 'bg-white' : 'bg-white/30'
-                            }`}
-                    />
-                ))}
-            </div>
+            {/* Surah Selector Modal */}
+            <AnimatePresence>
+                {showSurahSelector && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                        onClick={() => setShowSurahSelector(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: "spring", damping: 25 }}
+                            className="bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="sticky top-0 bg-black/30 backdrop-blur-md border-b border-white/10 p-6 z-10">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-2xl font-bold text-white">Choose Surah</h2>
+                                    <button
+                                        onClick={() => setShowSurahSelector(false)}
+                                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                    >
+                                        <X className="h-5 w-5 text-white" />
+                                    </button>
+                                </div>
+
+                                {/* Search Bar */}
+                                <div className="relative">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-300" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search surah..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Surah List */}
+                            <div className="overflow-y-auto max-h-[calc(80vh-180px)] p-4">
+                                <div className="grid grid-cols-1 gap-2">
+                                    {filteredSurahs.map((surah) => (
+                                        <motion.button
+                                            key={surah.number}
+                                            onClick={() => handleChangeSurah(surah.number)}
+                                            className="group relative bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-2xl p-4 transition-all border border-white/10 hover:border-emerald-500/50 text-left"
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                {/* Surah Number */}
+                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-white font-bold text-lg">{surah.number}</span>
+                                                </div>
+
+                                                {/* Surah Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-white font-semibold text-lg mb-1">{surah.name}</h3>
+                                                    <p className="text-emerald-200 text-sm">{surah.translation}</p>
+                                                </div>
+
+                                                {/* Verses & Type */}
+                                                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                                                    <span className="text-white/70 text-xs bg-white/10 px-2 py-1 rounded-full">
+                                                        {surah.verses} verses
+                                                    </span>
+                                                    <span className={`text-xs px-2 py-1 rounded-full ${surah.revelation === 'Meccan'
+                                                        ? 'bg-amber-500/20 text-amber-300'
+                                                        : 'bg-blue-500/20 text-blue-300'
+                                                        }`}>
+                                                        {surah.revelation}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </motion.button>
+                                    ))}
+                                </div>
+
+                                {/* No Results */}
+                                {filteredSurahs.length === 0 && (
+                                    <div className="text-center py-12">
+                                        <BookOpen className="h-16 w-16 text-white/30 mx-auto mb-4" />
+                                        <p className="text-white/50 text-lg">No surahs found</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <style jsx global>{`
                 .scrollbar-hide::-webkit-scrollbar {
@@ -301,6 +707,6 @@ export function QuranReels() {
                     font-family: 'Scheherazade New', serif;
                 }
             `}</style>
-        </div>
+        </div >
     )
 }
