@@ -7,6 +7,7 @@ import { AudioProvider } from '@/contexts/audio-context'
 import { LanguageProvider } from '@/contexts/language-context'
 import { MiniPlayer } from '@/components/audio/mini-player'
 import { NotificationManager } from '@/components/prayer/notification-manager'
+import { PWALayout } from '@/components/pwa/pwa-layout'
 import { Suspense } from 'react'
 
 const inter = Inter({
@@ -115,15 +116,10 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap"
-                    rel="stylesheet"
-                />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet" />
                 <link rel="manifest" href="/manifest.json" />
-                <meta name="theme-color" content="#e9a84a" />
             </head>
             <body className={`${inter.variable} font-sans antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -131,7 +127,9 @@ export default function RootLayout({
                         <Suspense fallback={null}>
                             <LanguageProvider>
                                 <AudioProvider>
-                                    {children}
+                                    <PWALayout>
+                                        {children}
+                                    </PWALayout>
                                     <MiniPlayer />
                                     <NotificationManager />
                                 </AudioProvider>

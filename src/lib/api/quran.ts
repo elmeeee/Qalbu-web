@@ -17,6 +17,7 @@ export interface Ayah {
     page: number
     audio: string
     audioSecondary?: string[]
+    surah?: Surah
 }
 
 export interface SurahDetail {
@@ -149,4 +150,24 @@ export function getReciterAudio(
     const paddedSurah = String(surahNumber).padStart(3, '0')
     const paddedAyah = String(ayahNumber).padStart(3, '0')
     return `https://cdn.islamic.network/quran/audio/128/${reciter}/${paddedSurah}${paddedAyah}.mp3`
+}
+
+export async function getRandomAyahs(count: number = 5, language: Language = 'en'): Promise<Ayah[]> {
+    const edition = quranEditions[language]
+
+    try {
+        const response = await fetch(`/api/quran/random?count=${count}&edition=${edition}`, {
+            cache: 'no-store'
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch random ayahs')
+        }
+
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error('Error fetching random ayahs:', error)
+        return []
+    }
 }

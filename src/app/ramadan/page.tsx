@@ -24,9 +24,11 @@ import {
 } from '@/lib/api/prayer-times'
 import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { useLanguage } from '@/contexts/language-context'
+import { usePWAMode } from '@/hooks/use-pwa-mode'
 
 export default function RamadanCalendarPage() {
     const { t, language } = useLanguage()
+    const isPwa = usePWAMode()
     const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0])
     const [hijriYear, setHijriYear] = useState(1447) // Ramadan 2026 is in Hijri year 1447
     const [settings, setSettings] = useState<PrayerSettings>({
@@ -104,7 +106,7 @@ export default function RamadanCalendarPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4">
+        <div className={`min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4 ${isPwa ? 'pb-24' : ''}`}>
             <div className="container mx-auto max-w-7xl">
                 {/* Header */}
                 <motion.div
@@ -112,14 +114,16 @@ export default function RamadanCalendarPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8 text-center relative"
                 >
-                    <div className="absolute left-0 top-0">
-                        <Link href="/">
-                            <Button variant="ghost" size="sm" className="gap-2">
-                                <ArrowLeft className="h-4 w-4" />
-                                <span className="hidden sm:inline">{t.common.home}</span>
-                            </Button>
-                        </Link>
-                    </div>
+                    {!isPwa && (
+                        <div className="absolute left-0 top-0">
+                            <Link href="/">
+                                <Button variant="ghost" size="sm" className="gap-2">
+                                    <ArrowLeft className="h-4 w-4" />
+                                    <span className="hidden sm:inline">{t.common.home}</span>
+                                </Button>
+                            </Link>
+                        </div>
+                    )}
                     <div className="flex items-center justify-center gap-3 mb-4 pt-12 md:pt-0">
                         <Moon className="h-10 w-10 text-blue-600" />
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
@@ -369,3 +373,4 @@ export default function RamadanCalendarPage() {
         </div>
     )
 }
+

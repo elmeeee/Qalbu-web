@@ -9,6 +9,7 @@ import { Compass, Camera, MapPin, Loader2, AlertCircle, ArrowLeft } from 'lucide
 import { useQibla, useCameraStream } from '@/hooks/use-qibla'
 import { useLanguage } from '@/contexts/language-context'
 import { getReverseGeocoding, type LocationData } from '@/lib/api/prayer-times'
+import { usePWAMode } from '@/hooks/use-pwa-mode'
 
 type Mode = 'compass' | 'camera'
 
@@ -16,6 +17,7 @@ export default function QiblaPage() {
     const [mode, setMode] = useState<Mode>('compass')
     const [locationName, setLocationName] = useState<LocationData | null>(null)
     const { t } = useLanguage()
+    const isPwa = usePWAMode()
     const {
         qiblaDirection,
         deviceHeading,
@@ -61,7 +63,7 @@ export default function QiblaPage() {
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <main className={`min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 ${isPwa ? 'pb-24' : ''}`}>
             <div className="container mx-auto px-4 py-8 md:py-12">
                 {/* Header */}
                 <motion.div
@@ -69,14 +71,16 @@ export default function QiblaPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8 text-center relative"
                 >
-                    <div className="absolute left-0 top-0 md:left-4">
-                        <Link href="/">
-                            <Button variant="ghost" size="sm" className="gap-2">
-                                <ArrowLeft className="h-4 w-4" />
-                                <span className="hidden sm:inline">{t.common.home}</span>
-                            </Button>
-                        </Link>
-                    </div>
+                    {!isPwa && (
+                        <div className="absolute left-0 top-0 md:left-4">
+                            <Link href="/">
+                                <Button variant="ghost" size="sm" className="gap-2">
+                                    <ArrowLeft className="h-4 w-4" />
+                                    <span className="hidden sm:inline">{t.common.home}</span>
+                                </Button>
+                            </Link>
+                        </div>
+                    )}
                     <h1 className="mb-4 text-4xl font-bold md:text-5xl pt-8 md:pt-0">
                         <span className="gradient-text">{t.qiblaPage.title}</span>
                     </h1>
