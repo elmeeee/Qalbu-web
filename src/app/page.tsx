@@ -14,6 +14,7 @@ import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { useLanguage } from '@/contexts/language-context'
 
 import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
+import { DailyDuaWidget } from '@/components/dua/daily-dua-widget'
 import { IslamicHolidaysWidget } from '@/components/islamic/islamic-holidays-widget'
 import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
@@ -184,6 +185,16 @@ export default function HomePage() {
                     className="mb-8"
                 >
                     <DailyHadithWidget />
+                </motion.div>
+
+                {/* Daily Dua Widget */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-8"
+                >
+                    <DailyDuaWidget />
                 </motion.div>
 
                 {/* Islamic Holidays Widget */}
