@@ -6,14 +6,22 @@ import { useAllSurahs } from '@/hooks/use-quran'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Loader2, BookOpen, ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/language-context'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { usePWAMode } from '@/hooks/use-pwa-mode'
+import { QuranReels } from '@/components/pwa'
 
 export default function QuranPage() {
     const { data: surahs, isLoading, error } = useAllSurahs()
     const [searchQuery, setSearchQuery] = useState('')
     const { t, language } = useLanguage()
+    const isPwa = usePWAMode()
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const filteredSurahs = surahs?.filter(
         (surah) =>
@@ -22,6 +30,14 @@ export default function QuranPage() {
             surah.number.toString().includes(searchQuery)
     )
 
+    if (!mounted) return null
+
+    // PWA Mode: Show TikTok-style Reels
+    if (isPwa) {
+        return <QuranReels />
+    }
+
+    // Standard Website Mode
     return (
         <main className="min-h-screen bg-gradient-to-b from-sand-50 via-white to-sand-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
             <div className="container mx-auto px-4 py-8 md:py-12">
