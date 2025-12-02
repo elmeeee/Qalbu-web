@@ -1,5 +1,30 @@
 # Qalbu - For nurturing your faith
 
+![Coverage](https://img.shields.io/badge/coverage-25.90%25-red)
+
+## Testing
+
+This project uses **Vitest** for unit testing.
+
+### Coverage Report
+| Type | Percentage |
+|------|------------|
+| Statements | 25.90% |
+| Branches | 72.28% |
+| Functions | 45.68% |
+| Lines | 25.90% |
+
+To run tests:
+```bash
+npm run test
+```
+
+To generate coverage:
+```bash
+npm run test:coverage
+```
+
+
 A modern, elegant, and production-ready Islamic web application built with Next.js 15, featuring prayer times, the complete Holy Quran with audio recitation, Qibla direction finder with AR camera mode, and more.
 
 ![Qalbu Banner](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
