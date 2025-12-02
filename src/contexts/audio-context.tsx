@@ -17,6 +17,16 @@ interface AudioContextType {
     seek: (time: number) => void
 }
 
+// Add global declaration for TypeScript if needed, though usually available in modern envs
+// declare global {
+//     interface Navigator {
+//         mediaSession?: MediaSession;
+//     }
+//     interface Window {
+//         MediaSession?: any;
+//     }
+// }
+
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
@@ -31,8 +41,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     // Initialize audio element
     useEffect(() => {
         audioRef.current = new Audio()
-
         const audio = audioRef.current
+
+        // Important for background audio on some devices
+        audio.preload = 'auto'
 
         const handleTimeUpdate = () => setProgress(audio.currentTime)
         const handleLoadedMetadata = () => setDuration(audio.duration)
@@ -42,12 +54,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         }
         const handleCanPlay = () => setIsLoading(false)
         const handleWaiting = () => setIsLoading(true)
+        const handlePlay = () => setIsPlaying(true)
+        const handlePause = () => setIsPlaying(false)
 
         audio.addEventListener('timeupdate', handleTimeUpdate)
         audio.addEventListener('loadedmetadata', handleLoadedMetadata)
         audio.addEventListener('ended', handleEnded)
         audio.addEventListener('canplay', handleCanPlay)
         audio.addEventListener('waiting', handleWaiting)
+        audio.addEventListener('play', handlePlay)
+        audio.addEventListener('pause', handlePause)
 
         return () => {
             audio.removeEventListener('timeupdate', handleTimeUpdate)
@@ -55,9 +71,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             audio.removeEventListener('ended', handleEnded)
             audio.removeEventListener('canplay', handleCanPlay)
             audio.removeEventListener('waiting', handleWaiting)
+            audio.removeEventListener('play', handlePlay)
+            audio.removeEventListener('pause', handlePause)
             audio.pause()
         }
-    }, []) // Empty dependency array is intentional, we use refs for state access if needed, but here playNext needs to be stable or accessed via ref/callback
+    }, []) // Empty dependency array is intentional
 
     const playAyah = useCallback(async (surah: SurahDetail, ayah: Ayah) => {
         if (!audioRef.current) return
@@ -70,6 +88,21 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             audioRef.current.src = ayah.audio
             await audioRef.current.play()
             setIsPlaying(true)
+
+            // Update Media Session Metadata
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: `Surah ${surah.englishName}`,
+                    artist: `Ayah ${ayah.numberInSurah}`,
+                    album: 'Qalbu Quran',
+                    artwork: [
+                        { src: '/icons/qalbuIcon.png', sizes: '96x96', type: 'image/png' },
+                        { src: '/icons/qalbuIcon.png', sizes: '128x128', type: 'image/png' },
+                        { src: '/icons/qalbuIcon.png', sizes: '192x192', type: 'image/png' },
+                        { src: '/icons/qalbuIcon.png', sizes: '512x512', type: 'image/png' },
+                    ]
+                })
+            }
         } catch (error) {
             console.error('Failed to play audio:', error)
             setIsPlaying(false)
@@ -161,6 +194,44 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             setProgress(time)
         }
     }, [])
+
+    // Setup Media Session Action Handlers
+    useEffect(() => {
+        if (!('mediaSession' in navigator)) return
+
+        const audio = audioRef.current
+        if (!audio) return
+
+        navigator.mediaSession.setActionHandler('play', () => {
+            audio.play()
+        })
+
+        navigator.mediaSession.setActionHandler('pause', () => {
+            audio.pause()
+        })
+
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            playPrevious()
+        })
+
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            playNextRef.current()
+        })
+
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+            if (details.seekTime && audio) {
+                audio.currentTime = details.seekTime
+            }
+        })
+
+        return () => {
+            navigator.mediaSession.setActionHandler('play', null)
+            navigator.mediaSession.setActionHandler('pause', null)
+            navigator.mediaSession.setActionHandler('previoustrack', null)
+            navigator.mediaSession.setActionHandler('nexttrack', null)
+            navigator.mediaSession.setActionHandler('seekto', null)
+        }
+    }, [playPrevious]) // playNextRef is stable, playPrevious is stable from useCallback
 
     // Re-bind ended listener when playNext changes
     useEffect(() => {
