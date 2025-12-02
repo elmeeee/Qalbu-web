@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { getHijriCalendar, getCurrentHijriDate, type IslamicCalendarDay, type HijriDate } from '@/lib/api/islamic-calendar'
+import { type IslamicCalendarDay, type HijriDate } from '@/lib/api/islamic-calendar'
 import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Loader2, Moon, Star } from 'lucide-react'
 import Link from 'next/link'
 import { useLanguage } from '@/contexts/language-context'
@@ -34,13 +34,25 @@ export default function CalendarPage() {
 
     const { data: currentHijri } = useQuery<HijriDate>({
         queryKey: ['currentHijriDate'],
-        queryFn: getCurrentHijriDate,
+        queryFn: async () => {
+            const response = await fetch('/api/islamic-calendar/current-hijri')
+            if (!response.ok) {
+                throw new Error('Failed to fetch current Hijri date')
+            }
+            return response.json()
+        },
         staleTime: 1000 * 60 * 60,
     })
 
     const { data: calendarData, isLoading } = useQuery<IslamicCalendarDay[]>({
         queryKey: ['hijriCalendar', selectedMonth, selectedYear],
-        queryFn: () => getHijriCalendar(selectedMonth, selectedYear),
+        queryFn: async () => {
+            const response = await fetch(`/api/islamic-calendar/hijri?month=${selectedMonth}&year=${selectedYear}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch Hijri calendar')
+            }
+            return response.json()
+        },
         staleTime: 1000 * 60 * 60 * 24,
     })
 

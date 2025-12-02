@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
-import { getUpcomingHolidays, getCurrentHijriDate, type IslamicHoliday, type HijriDate } from '@/lib/api/islamic-calendar'
+import { type IslamicHoliday, type HijriDate } from '@/lib/api/islamic-calendar'
 import { Calendar, Star, Loader2, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 
@@ -12,13 +12,25 @@ export function IslamicHolidaysWidget() {
 
     const { data: holidays, isLoading: holidaysLoading } = useQuery<IslamicHoliday[]>({
         queryKey: ['upcomingHolidays'],
-        queryFn: getUpcomingHolidays,
+        queryFn: async () => {
+            const response = await fetch('/api/islamic-calendar/upcoming-holidays')
+            if (!response.ok) {
+                throw new Error('Failed to fetch upcoming holidays')
+            }
+            return response.json()
+        },
         staleTime: 1000 * 60 * 60, // 1 hour
     })
 
     const { data: currentHijri } = useQuery<HijriDate>({
         queryKey: ['currentHijriDate'],
-        queryFn: getCurrentHijriDate,
+        queryFn: async () => {
+            const response = await fetch('/api/islamic-calendar/current-hijri')
+            if (!response.ok) {
+                throw new Error('Failed to fetch current Hijri date')
+            }
+            return response.json()
+        },
         staleTime: 1000 * 60 * 60, // 1 hour
     })
 
