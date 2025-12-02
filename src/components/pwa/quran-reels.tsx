@@ -153,6 +153,8 @@ export function QuranReels() {
     const [showMenu, setShowMenu] = useState(false)
     const [showSurahSelector, setShowSurahSelector] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
+    const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
+    const [showEndSurahAlert, setShowEndSurahAlert] = useState(false)
     const audioRef = useRef<HTMLAudioElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
@@ -213,6 +215,16 @@ export function QuranReels() {
 
             // Auto-play and auto-scroll to next ayah when audio ends
             const handleAudioEnd = () => {
+                const currentAyahData = ayahs[currentIndex]
+                const currentSurahData = SURAHS.find(s => s.number === currentAyahData.surah?.number)
+
+                // Check if this is the last ayah of the surah
+                if (currentSurahData && currentAyahData.numberInSurah === currentSurahData.verses) {
+                    setIsPlaying(false)
+                    setShowEndSurahAlert(true)
+                    return
+                }
+
                 if (containerRef.current && currentIndex < ayahs.length - 1) {
                     const nextIndex = currentIndex + 1
                     containerRef.current.scrollTo({
@@ -247,18 +259,22 @@ export function QuranReels() {
         }
     }, [currentIndex, ayahs, isMuted])
 
-    const loadAyahs = async (surah: number, startAyah: number) => {
+    const loadAyahs = async (surah: number, startAyah: number, reset: boolean = false) => {
         setIsLoading(true)
         try {
             const response = await fetch(`/api/quran/ayahs?surah=${surah}&startAyah=${startAyah}&count=10&edition=en.asad`)
             const data = await response.json()
 
-            // Prevent duplicates by checking if ayah already exists
-            setAyahs(prev => {
-                const existingKeys = new Set(prev.map(a => `${a.surah?.number}-${a.numberInSurah}`))
-                const newAyahs = data.ayahs.filter((a: Ayah) => !existingKeys.has(`${a.surah?.number}-${a.numberInSurah}`))
-                return [...prev, ...newAyahs]
-            })
+            if (reset) {
+                setAyahs(data.ayahs)
+            } else {
+                // Prevent duplicates by checking if ayah already exists
+                setAyahs(prev => {
+                    const existingKeys = new Set(prev.map(a => `${a.surah?.number}-${a.numberInSurah}`))
+                    const newAyahs = data.ayahs.filter((a: Ayah) => !existingKeys.has(`${a.surah?.number}-${a.numberInSurah}`))
+                    return [...prev, ...newAyahs]
+                })
+            }
             setCurrentSurah(data.nextSurah)
             setCurrentAyah(data.nextAyah)
         } catch (error) {
@@ -288,10 +304,13 @@ export function QuranReels() {
         if (audioRef.current) {
             if (isPlaying) {
                 audioRef.current.pause()
+                setShowOverlayIcon('pause')
             } else {
                 audioRef.current.play().catch(console.error)
+                setShowOverlayIcon('play')
             }
             setIsPlaying(!isPlaying)
+            setTimeout(() => setShowOverlayIcon(null), 600)
         }
     }
 
@@ -306,10 +325,13 @@ export function QuranReels() {
         if (audioRef.current) {
             if (isPlaying) {
                 audioRef.current.pause()
+                setShowOverlayIcon('pause')
             } else {
                 audioRef.current.play().catch(console.error)
+                setShowOverlayIcon('play')
             }
             setIsPlaying(!isPlaying)
+            setTimeout(() => setShowOverlayIcon(null), 600)
         }
     }
 
@@ -321,11 +343,24 @@ export function QuranReels() {
         setCurrentAyah(1)
         setShowSurahSelector(false)
         setSearchQuery('')
-        loadAyahs(surahNumber, 1)
+        // Pass reset=true to ensure we start fresh and avoid duplicates/ordering issues
+        loadAyahs(surahNumber, 1, true)
 
         // Scroll to top
         if (containerRef.current) {
             containerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
+
+    const handleNextSurah = () => {
+        // Use the current ayah's surah number to determine the next one
+        // This prevents skipping surahs if currentSurah state is ahead (due to pre-fetching)
+        const currentDisplayedSurah = ayahs[currentIndex]?.surah?.number || currentSurah
+        const nextSurahNum = currentDisplayedSurah + 1
+
+        if (nextSurahNum <= 114) {
+            handleChangeSurah(nextSurahNum)
+            setShowEndSurahAlert(false)
         }
     }
 
@@ -338,8 +373,8 @@ export function QuranReels() {
 
     if (isLoading && ayahs.length === 0) {
         return (
-            <div className="h-screen flex items-center justify-center bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900">
-                <Loader2 className="h-12 w-12 animate-spin text-white" />
+            <div className="h-screen flex items-center justify-center bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950">
+                <Loader2 className="h-12 w-12 animate-spin text-emerald-500" />
             </div>
         )
     }
@@ -355,12 +390,12 @@ export function QuranReels() {
                         ref={shareCardRef}
                         className="w-[1080px] h-[1920px] relative overflow-hidden"
                         style={{
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)'
+                            background: 'linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #064e3b 100%)'
                         }}
                     >
                         {/* Decorative Elements */}
-                        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-white/10 blur-3xl -mr-48 -mt-48" />
-                        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-white/10 blur-3xl -ml-32 -mb-32" />
+                        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-3xl -mr-48 -mt-48" />
+                        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-teal-500/10 blur-3xl -ml-32 -mb-32" />
 
                         {/* Content Container */}
                         <div className="relative z-10 h-full flex flex-col p-16">
@@ -373,7 +408,7 @@ export function QuranReels() {
                                 />
                                 <div>
                                     <h1 className="text-6xl font-bold text-white leading-tight">Qalbu</h1>
-                                    <p className="text-2xl text-white/80 font-medium">Quran</p>
+                                    <p className="text-2xl text-emerald-200/80 font-medium">Quran</p>
                                 </div>
                             </div>
 
@@ -381,7 +416,7 @@ export function QuranReels() {
                             <div className="flex-1 flex flex-col gap-10 overflow-hidden">
                                 {/* Surah Info Badge */}
                                 <div className="text-center flex-shrink-0">
-                                    <div className="inline-block bg-white/20 backdrop-blur-2xl px-10 py-4 rounded-full border-3 border-white/30 shadow-xl">
+                                    <div className="inline-block bg-white/10 backdrop-blur-2xl px-10 py-4 rounded-full border border-white/10 shadow-xl">
                                         <span className="text-3xl font-bold text-white">
                                             {ayahs[currentIndex].surah?.englishName} • {ayahs[currentIndex].numberInSurah}
                                         </span>
@@ -389,7 +424,7 @@ export function QuranReels() {
                                 </div>
 
                                 {/* Arabic Text - Main Focus */}
-                                <div className="bg-white/15 backdrop-blur-2xl rounded-[50px] p-12 border-3 border-white/20 shadow-2xl flex-shrink-0">
+                                <div className="bg-white/5 backdrop-blur-2xl rounded-[50px] p-12 border border-white/10 shadow-2xl flex-shrink-0">
                                     <p
                                         className="text-[3.5rem] font-arabic text-white leading-[1.9] text-center"
                                         dir="rtl"
@@ -404,8 +439,8 @@ export function QuranReels() {
 
                                 {/* Transliteration */}
                                 {ayahs[currentIndex].transliteration && (
-                                    <div className="bg-white/10 backdrop-blur-xl rounded-[40px] px-12 py-8 border-2 border-white/15 shadow-xl flex-shrink-0">
-                                        <p className="text-2xl font-medium italic text-white/95 text-center leading-relaxed">
+                                    <div className="bg-white/5 backdrop-blur-xl rounded-[40px] px-12 py-8 border border-white/5 shadow-xl flex-shrink-0">
+                                        <p className="text-2xl font-medium italic text-emerald-100/90 text-center leading-relaxed">
                                             {ayahs[currentIndex].transliteration}
                                         </p>
                                     </div>
@@ -413,7 +448,7 @@ export function QuranReels() {
 
                                 {/* Translation */}
                                 {ayahs[currentIndex].translation && (
-                                    <div className="bg-white/10 backdrop-blur-xl rounded-[40px] px-12 py-8 border-2 border-white/15 shadow-xl flex-shrink-0">
+                                    <div className="bg-white/5 backdrop-blur-xl rounded-[40px] px-12 py-8 border border-white/5 shadow-xl flex-shrink-0">
                                         <p className="text-2xl text-white/90 text-center leading-relaxed font-medium">
                                             {ayahs[currentIndex].translation}
                                         </p>
@@ -422,11 +457,11 @@ export function QuranReels() {
                             </div>
 
                             {/* Footer - App Promotion */}
-                            <div className="mt-8 text-center pt-8 border-t-2 border-white/20 flex-shrink-0">
+                            <div className="mt-8 text-center pt-8 border-t border-white/10 flex-shrink-0">
                                 <p className="text-3xl font-semibold text-white mb-2">
                                     Download Qalbu App
                                 </p>
-                                <p className="text-2xl text-white/70">
+                                <p className="text-2xl text-emerald-200/70">
                                     Your Daily Islamic Companion 🤲
                                 </p>
                             </div>
@@ -448,11 +483,11 @@ export function QuranReels() {
                         className="h-screen w-full snap-start snap-always relative flex items-center justify-center"
                     >
                         {/* Dynamic Gradient Background */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900 opacity-95" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950" />
 
                         {/* Animated Pattern Overlay */}
                         <div className="absolute inset-0 opacity-10">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_50%)]" />
                         </div>
 
                         {/* Tap Area for Play/Pause */}
@@ -461,8 +496,29 @@ export function QuranReels() {
                             className="absolute inset-0 z-10 cursor-pointer"
                         />
 
-                        {/* Fixed Header */}
-                        <div className="absolute top-0 left-0 right-0 z-30 p-6 pointer-events-none">
+                        {/* Play/Pause Overlay Icon */}
+                        <AnimatePresence>
+                            {showOverlayIcon && (
+                                <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                                    <motion.div
+                                        initial={{ scale: 0.5, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        exit={{ scale: 1.5, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="bg-black/40 backdrop-blur-md p-6 rounded-full"
+                                    >
+                                        {showOverlayIcon === 'play' ? (
+                                            <Play className="h-12 w-12 text-white fill-white" />
+                                        ) : (
+                                            <Pause className="h-12 w-12 text-white fill-white" />
+                                        )}
+                                    </motion.div>
+                                </div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Fixed Header - Added pt-12 for mobile safe area */}
+                        <div className="absolute top-0 left-0 right-0 z-30 p-6 pt-12 pointer-events-none">
                             <motion.div
                                 initial={{ opacity: 0, y: -20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -471,23 +527,23 @@ export function QuranReels() {
                                 {/* Clickable Surah Name */}
                                 <button
                                     onClick={() => setShowSurahSelector(true)}
-                                    className="flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full hover:bg-black/40 transition-all"
+                                    className="flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full hover:bg-black/30 transition-all border border-white/5"
                                 >
-                                    <BookOpen className="h-4 w-4 text-emerald-300" />
+                                    <BookOpen className="h-4 w-4 text-emerald-400" />
                                     <span className="text-white text-sm font-medium">
                                         {ayah.surah?.englishName} • {ayah.numberInSurah}
                                     </span>
                                 </button>
                                 <div className="flex items-center gap-2">
-                                    <div className="bg-black/30 backdrop-blur-md px-4 py-2 rounded-full">
-                                        <span className="text-emerald-300 text-sm font-medium">
+                                    <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/5">
+                                        <span className="text-emerald-400 text-sm font-medium">
                                             {ayah.surah?.revelationType}
                                         </span>
                                     </div>
                                     {/* Menu Button */}
                                     <button
                                         onClick={() => setShowMenu(!showMenu)}
-                                        className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center hover:bg-black/40 transition-all"
+                                        className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center hover:bg-black/30 transition-all border border-white/5"
                                     >
                                         <MoreVertical className="h-5 w-5 text-white" />
                                     </button>
@@ -504,7 +560,7 @@ export function QuranReels() {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="absolute top-16 right-6 bg-black/80 backdrop-blur-md rounded-lg overflow-hidden shadow-xl z-50 pointer-events-auto min-w-[200px]"
+                                        className="absolute top-16 right-6 bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 z-50 pointer-events-auto min-w-[200px]"
                                     >
                                         {/* Show Translation Toggle */}
                                         <button
@@ -512,10 +568,10 @@ export function QuranReels() {
                                                 setShowTranslation(!showTranslation)
                                                 setShowMenu(false)
                                             }}
-                                            className="w-full px-6 py-3 text-left text-white hover:bg-white/10 transition-colors flex items-center justify-between gap-4"
+                                            className="w-full px-6 py-4 text-left text-white hover:bg-white/5 transition-colors flex items-center justify-between gap-4"
                                         >
-                                            <span>Show Translation</span>
-                                            <div className={`w-10 h-6 rounded-full transition-colors ${showTranslation ? 'bg-emerald-500' : 'bg-gray-600'} relative`}>
+                                            <span className="text-sm font-medium">Show Translation</span>
+                                            <div className={`w-10 h-6 rounded-full transition-colors ${showTranslation ? 'bg-emerald-500' : 'bg-slate-700'} relative`}>
                                                 <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${showTranslation ? 'translate-x-4' : ''}`} />
                                             </div>
                                         </button>
@@ -530,10 +586,10 @@ export function QuranReels() {
                                 transition={{ delay: 0.1 }}
                                 className="w-full max-w-2xl overflow-y-auto scrollbar-hide pointer-events-auto"
                             >
-                                <div className="text-center space-y-4 px-4 py-4">
+                                <div className="text-center space-y-6 px-4 py-4">
                                     {/* Arabic Text */}
                                     <div
-                                        className="text-3xl leading-relaxed text-white font-arabic"
+                                        className="text-4xl leading-[2] text-white font-arabic drop-shadow-md"
                                         style={{ fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}
                                     >
                                         {ayah.text}
@@ -541,14 +597,14 @@ export function QuranReels() {
 
                                     {/* Transliteration */}
                                     {ayah.transliteration && (
-                                        <p className="text-sm text-emerald-200 italic opacity-80 leading-relaxed">
+                                        <p className="text-base text-emerald-200/90 italic leading-relaxed font-medium">
                                             {ayah.transliteration}
                                         </p>
                                     )}
 
                                     {/* Translation - Toggleable */}
                                     {showTranslation && ayah.translation && (
-                                        <p className="text-sm text-white/90 leading-relaxed max-w-xl mx-auto">
+                                        <p className="text-base text-white/90 leading-relaxed max-w-xl mx-auto font-light">
                                             {ayah.translation}
                                         </p>
                                     )}
@@ -560,34 +616,28 @@ export function QuranReels() {
                         <div className="fixed right-6 bottom-32 flex flex-col gap-4 z-40 pointer-events-auto">
                             {/* Like - Liquid Glass Effect */}
                             <button className="flex flex-col items-center gap-1 group">
-                                <div className="relative w-14 h-14 rounded-full overflow-hidden">
+                                <div className="relative w-12 h-12 rounded-full overflow-hidden transition-transform active:scale-95">
                                     {/* Liquid glass background */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent backdrop-blur-xl" />
-                                    <div className="absolute inset-0 bg-white/5 backdrop-blur-md" />
+                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
                                     {/* Border */}
                                     <div className="absolute inset-0 rounded-full border border-white/20" />
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                     {/* Icon */}
                                     <div className="relative w-full h-full flex items-center justify-center">
-                                        <Heart className="h-6 w-6 text-white drop-shadow-lg" />
+                                        <Heart className="h-6 w-6 text-white drop-shadow-md" />
                                     </div>
                                 </div>
                             </button>
 
                             {/* Share - Liquid Glass Effect */}
                             <button onClick={handleShare} className="flex flex-col items-center gap-1 group">
-                                <div className="relative w-14 h-14 rounded-full overflow-hidden">
+                                <div className="relative w-12 h-12 rounded-full overflow-hidden transition-transform active:scale-95">
                                     {/* Liquid glass background */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-white/10 to-transparent backdrop-blur-xl" />
-                                    <div className="absolute inset-0 bg-white/5 backdrop-blur-md" />
+                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
                                     {/* Border */}
                                     <div className="absolute inset-0 rounded-full border border-white/20" />
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                     {/* Icon */}
                                     <div className="relative w-full h-full flex items-center justify-center">
-                                        <Share2 className="h-6 w-6 text-white drop-shadow-lg" />
+                                        <Share2 className="h-6 w-6 text-white drop-shadow-md" />
                                     </div>
                                 </div>
                             </button>
@@ -597,11 +647,52 @@ export function QuranReels() {
 
                 {/* Loading More */}
                 {isLoading && ayahs.length > 0 && (
-                    <div className="h-screen w-full snap-start flex items-center justify-center bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900">
-                        <Loader2 className="h-12 w-12 animate-spin text-white" />
+                    <div className="h-screen w-full snap-start flex items-center justify-center bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950">
+                        <Loader2 className="h-12 w-12 animate-spin text-emerald-500" />
                     </div>
                 )}
             </div>
+
+            {/* End of Surah Alert */}
+            <AnimatePresence>
+                {showEndSurahAlert && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-slate-900/90 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full border border-white/10 text-center"
+                        >
+                            <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+                                <BookOpen className="h-8 w-8 text-emerald-400" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Surah Completed</h3>
+                            <p className="text-slate-400 mb-8">
+                                You have finished Surah {ayahs[currentIndex]?.surah?.englishName}. Would you like to continue to the next Surah?
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={handleNextSurah}
+                                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition-colors"
+                                >
+                                    Continue to Next Surah
+                                </button>
+                                <button
+                                    onClick={() => setShowEndSurahAlert(false)}
+                                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white rounded-xl font-semibold transition-colors"
+                                >
+                                    Stay Here
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Surah Selector Modal */}
             <AnimatePresence>
@@ -618,16 +709,16 @@ export function QuranReels() {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
                             transition={{ type: "spring", damping: 25 }}
-                            className="bg-gradient-to-b from-emerald-900 via-teal-900 to-cyan-900 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl"
+                            className="bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl border border-white/10"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className="sticky top-0 bg-black/30 backdrop-blur-md border-b border-white/10 p-6 z-10">
+                            <div className="sticky top-0 bg-slate-900/80 backdrop-blur-md border-b border-white/10 p-6 z-10">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-2xl font-bold text-white">Choose Surah</h2>
                                     <button
                                         onClick={() => setShowSurahSelector(false)}
-                                        className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                        className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
                                     >
                                         <X className="h-5 w-5 text-white" />
                                     </button>
@@ -635,13 +726,13 @@ export function QuranReels() {
 
                                 {/* Search Bar */}
                                 <div className="relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-300" />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-400" />
                                     <input
                                         type="text"
                                         placeholder="Search surah..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all"
                                     />
                                 </div>
                             </div>
@@ -653,30 +744,30 @@ export function QuranReels() {
                                         <motion.button
                                             key={surah.number}
                                             onClick={() => handleChangeSurah(surah.number)}
-                                            className="group relative bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-2xl p-4 transition-all border border-white/10 hover:border-emerald-500/50 text-left"
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
+                                            className="group relative bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-2xl p-4 transition-all border border-white/5 hover:border-emerald-500/30 text-left"
+                                            whileHover={{ scale: 1.01 }}
+                                            whileTap={{ scale: 0.99 }}
                                         >
                                             <div className="flex items-center gap-4">
                                                 {/* Surah Number */}
-                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center flex-shrink-0">
-                                                    <span className="text-white font-bold text-lg">{surah.number}</span>
+                                                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:border-emerald-500/50 transition-colors">
+                                                    <span className="text-emerald-400 font-bold text-lg">{surah.number}</span>
                                                 </div>
 
                                                 {/* Surah Info */}
                                                 <div className="flex-1 min-w-0">
                                                     <h3 className="text-white font-semibold text-lg mb-1">{surah.name}</h3>
-                                                    <p className="text-emerald-200 text-sm">{surah.translation}</p>
+                                                    <p className="text-slate-400 text-sm">{surah.translation}</p>
                                                 </div>
 
                                                 {/* Verses & Type */}
                                                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                                                    <span className="text-white/70 text-xs bg-white/10 px-2 py-1 rounded-full">
+                                                    <span className="text-slate-400 text-xs bg-white/5 px-2 py-1 rounded-full border border-white/5">
                                                         {surah.verses} verses
                                                     </span>
-                                                    <span className={`text-xs px-2 py-1 rounded-full ${surah.revelation === 'Meccan'
-                                                        ? 'bg-amber-500/20 text-amber-300'
-                                                        : 'bg-blue-500/20 text-blue-300'
+                                                    <span className={`text-xs px-2 py-1 rounded-full border ${surah.revelation === 'Meccan'
+                                                        ? 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+                                                        : 'bg-blue-500/10 text-blue-300 border-blue-500/20'
                                                         }`}>
                                                         {surah.revelation}
                                                     </span>
@@ -689,8 +780,8 @@ export function QuranReels() {
                                 {/* No Results */}
                                 {filteredSurahs.length === 0 && (
                                     <div className="text-center py-12">
-                                        <BookOpen className="h-16 w-16 text-white/30 mx-auto mb-4" />
-                                        <p className="text-white/50 text-lg">No surahs found</p>
+                                        <BookOpen className="h-16 w-16 text-white/10 mx-auto mb-4" />
+                                        <p className="text-white/30 text-lg">No surahs found</p>
                                     </div>
                                 )}
                             </div>

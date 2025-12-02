@@ -59,13 +59,13 @@ export default function HomePage() {
         return (
             <main className="min-h-screen bg-background pb-24">
                 <div className="container mx-auto px-4 py-6 space-y-6">
-                    {/* PWA Header */}
-                    <div className="flex items-center justify-between mb-2">
+                    {/* PWA Header - Fixed & Premium Glass */}
+                    <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/10 shadow-sm shadow-emerald-500/5 flex items-center justify-between transition-all duration-300">
                         <div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
                                 Qalbu
                             </h1>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                                 {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
                             </p>
                         </div>
@@ -74,6 +74,9 @@ export default function HomePage() {
                             <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="icon" />
                         </div>
                     </div>
+
+                    {/* Spacer for Fixed Header */}
+                    <div className="h-20" />
 
                     {/* 1. Prayer Times Widget */}
                     <PrayerTimesWidgetPWA />
