@@ -70,6 +70,7 @@ export default function HomePage() {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
+                            <LanguageSwitcher />
                             <ModeToggle />
                             <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="icon" />
                         </div>
