@@ -28,12 +28,9 @@ We believe that interacting with your faith should be a delightful experience. T
 
 ## Gallery
 
-<div align="center" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
-  <img src="public/icons/home.PNG" alt="Home Screen" style="border-radius: 16px; width: 100%; object-fit: cover;">
-  <img src="public/icons/quran.PNG" alt="Quran Reels" style="border-radius: 16px; width: 100%; object-fit: cover;">
-  <img src="public/icons/qibla.PNG" alt="Qibla AR" style="border-radius: 16px; width: 100%; object-fit: cover;">
-  <img src="public/icons/ramadan.PNG" alt="Ramadan" style="border-radius: 16px; width: 100%; object-fit: cover;">
-</div>
+| Home | Quran | Qibla | Ramadan |
+| :---: | :---: | :---: | :---: |
+| <img src="public/icons/home.PNG" alt="Home Screen" width="200"> | <img src="public/icons/quran.PNG" alt="Quran Reels" width="200"> | <img src="public/icons/qibla.PNG" alt="Qibla AR" width="200"> | <img src="public/icons/ramadan.PNG" alt="Ramadan" width="200"> |
 
 ---
 
