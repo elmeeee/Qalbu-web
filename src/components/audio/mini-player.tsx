@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, SkipBack, SkipForward, X, Loader2 } from 'lucide-react'
 import { useAudio } from '@/contexts/audio-context'
 import { useLanguage } from '@/contexts/language-context'
+import { usePWAMode } from '@/hooks/use-pwa-mode'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useEffect, useState } from 'react'
@@ -23,6 +24,7 @@ export function MiniPlayer() {
         isLoading
     } = useAudio()
     const { t } = useLanguage()
+    const isPWA = usePWAMode()
 
     const [isVisible, setIsVisible] = useState(false)
 
@@ -47,7 +49,8 @@ export function MiniPlayer() {
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
-                    className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60"
+                    className={`fixed left-0 right-0 z-50 border-t border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 ${isPWA ? 'bottom-[80px]' : 'bottom-0'
+                        }`}
                 >
                     <div className="container mx-auto flex items-center gap-4 p-4">
                         {/* Info */}
