@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, Compass, Clock, Moon, Heart, Shield, Smartphone, ChevronRight, MapPin, Sparkles, Calendar, Settings } from 'lucide-react'
 import { PrayerTimesWidget } from '@/components/prayer/prayer-times-widget'
+import { PrayerTimesWidgetPWA } from '@/components/prayer/prayer-times-widget-pwa'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
@@ -14,6 +15,7 @@ import { useLanguage } from '@/contexts/language-context'
 import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
 import { DailyDuaWidget } from '@/components/dua/daily-dua-widget'
 import { IslamicHolidaysWidget } from '@/components/islamic/islamic-holidays-widget'
+import { IslamicHolidaysWidgetPWA } from '@/components/islamic/islamic-holidays-widget-pwa'
 import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
@@ -74,7 +76,7 @@ export default function HomePage() {
                     </div>
 
                     {/* 1. Prayer Times Widget */}
-                    <PrayerTimesWidget variant="horizontal" />
+                    <PrayerTimesWidgetPWA />
 
                     {/* 2. Daily Dua Slider */}
                     <DailyDuaSlider />
@@ -82,29 +84,10 @@ export default function HomePage() {
                     {/* 3. Nearby Mosque Card */}
                     <NearbyMosqueCard />
 
-                    {/* 4. Quick Links Grid */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <Link href="/quran">
-                            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-none shadow-sm">
-                                <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                                    <div className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-sm">
-                                        <BookOpen className="h-5 w-5 text-emerald-600" />
-                                    </div>
-                                    <span className="text-sm font-medium">Read Quran</span>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                        <Link href="/qibla">
-                            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-none shadow-sm">
-                                <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                                    <div className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-sm">
-                                        <Compass className="h-5 w-5 text-blue-600" />
-                                    </div>
-                                    <span className="text-sm font-medium">Qibla Finder</span>
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    </div>
+                    {/* 4. Islamic Holidays Widget */}
+                    <IslamicHolidaysWidgetPWA />
+
+
                 </div>
             </main>
         )

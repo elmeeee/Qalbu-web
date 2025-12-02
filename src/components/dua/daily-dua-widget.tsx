@@ -46,22 +46,24 @@ export function DailyDuaWidget() {
     const currentDua = duas[currentIndex]
 
     return (
-        <Card className="premium-card overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-white dark:from-gray-900 dark:via-emerald-950/20 dark:to-gray-950 border-emerald-200/50 dark:border-emerald-900/30">
-            <CardContent className="p-4 sm:p-6 relative">
-                {/* Decorative background elements */}
-                <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-400/10 to-teal-400/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-tr from-teal-400/10 to-emerald-400/10 rounded-full blur-2xl" />
+        <div className="relative overflow-hidden rounded-3xl glass shadow-2xl">
+            <div className="p-6 relative">
+                {/* Subtle decorative background */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
 
-                <Sparkles className="absolute top-3 left-3 sm:top-4 sm:left-4 h-6 w-6 sm:h-8 sm:w-8 text-emerald-300/30 dark:text-emerald-700/20" />
+                <Sparkles className="absolute top-4 left-4 h-5 w-5 text-emerald-500/40 dark:text-emerald-400/30" />
 
-                <div className="mb-4 sm:mb-6 text-center relative z-10">
+                <div className="mb-6 text-center relative z-10">
                     <div className="flex items-center justify-center gap-2 mb-2">
-                        <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 dark:text-emerald-400" />
-                        <h3 className="text-base sm:text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                        <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <BookOpen className="h-4 w-4" />
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground dark:text-white tracking-tight">
                             Daily Dua
                         </h3>
                     </div>
-                    <p className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1 px-2">
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1 px-2">
                         {currentDua.nama}
                     </p>
                     <p className="text-xs text-muted-foreground px-2">
@@ -69,26 +71,26 @@ export function DailyDuaWidget() {
                     </p>
                 </div>
 
-                <div className="relative min-h-[180px] sm:min-h-[200px] flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+                <div className="relative min-h-[180px] sm:min-h-[200px] flex flex-col items-center justify-center space-y-4">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentIndex}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.4, ease: "easeInOut" }}
-                            className="text-center w-full space-y-3 sm:space-y-4"
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.4, ease: "easeOut" }}
+                            className="text-center w-full space-y-4"
                         >
                             {/* Arabic Text */}
-                            <div className="bg-white/50 dark:bg-gray-800/30 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-emerald-200/30 dark:border-emerald-800/30">
-                                <p className="text-xl sm:text-2xl md:text-3xl font-arabic leading-loose text-right text-emerald-900 dark:text-emerald-100 break-words" dir="rtl">
+                            <div className="bg-white/40 dark:bg-black/20 backdrop-blur-sm rounded-2xl p-5 border border-white/20 dark:border-white/5">
+                                <p className="text-2xl md:text-3xl font-arabic leading-loose text-center text-foreground dark:text-white break-words" dir="rtl">
                                     {currentDua.ar}
                                 </p>
                             </div>
 
                             {/* Transliteration */}
-                            <div className="bg-gradient-to-r from-emerald-100/50 to-teal-100/50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-2.5 sm:p-3 border border-emerald-200/30 dark:border-emerald-800/20">
-                                <p className="text-xs sm:text-sm md:text-base font-medium italic text-emerald-800 dark:text-emerald-200 leading-relaxed break-words">
+                            <div className="px-2">
+                                <p className="text-sm md:text-base font-medium italic text-emerald-800 dark:text-emerald-200 leading-relaxed">
                                     {currentDua.tr}
                                 </p>
                             </div>
@@ -103,8 +105,8 @@ export function DailyDuaWidget() {
                                         transition={{ duration: 0.3 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="bg-white/70 dark:bg-gray-800/40 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-emerald-200/40 dark:border-emerald-800/30">
-                                            <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed break-words">
+                                        <div className="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl p-4 border border-emerald-100/50 dark:border-emerald-500/10">
+                                            <p className="text-sm text-foreground/80 dark:text-white/80 leading-relaxed">
                                                 &quot;{currentDua.idn}&quot;
                                             </p>
                                         </div>
@@ -117,7 +119,7 @@ export function DailyDuaWidget() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowTranslation(!showTranslation)}
-                                className="text-xs text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 h-8"
+                                className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 h-8 rounded-full"
                             >
                                 {showTranslation ? 'Hide' : 'Show'} Translation
                             </Button>
@@ -126,29 +128,30 @@ export function DailyDuaWidget() {
                 </div>
 
                 {/* Navigation */}
-                <div className="flex justify-between items-center mt-4 sm:mt-6 relative z-10">
+                <div className="flex justify-between items-center mt-6 relative z-10">
                     <Button
                         variant="ghost"
                         size="icon"
                         onClick={prevDua}
-                        className="hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 transition-all h-8 w-8 sm:h-10 sm:w-10"
+                        className="hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 transition-all h-10 w-10 rounded-full"
                     >
-                        <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <ChevronLeft className="h-5 w-5" />
                     </Button>
 
-                    <div className="flex gap-1 sm:gap-1.5">
+                    <div className="flex gap-1.5">
                         {duas.map((_, idx) => (
                             <motion.div
                                 key={idx}
                                 initial={false}
                                 animate={{
-                                    width: idx === currentIndex ? 12 : 6,
+                                    width: idx === currentIndex ? 16 : 6,
                                     backgroundColor: idx === currentIndex
-                                        ? 'rgb(5 150 105)' // emerald-600
-                                        : 'rgb(209 213 219)' // gray-300
+                                        ? 'var(--primary)'
+                                        : 'currentColor',
+                                    opacity: idx === currentIndex ? 1 : 0.2
                                 }}
                                 transition={{ duration: 0.3 }}
-                                className="h-1 sm:h-1.5 rounded-full"
+                                className="h-1.5 rounded-full bg-foreground dark:bg-white"
                             />
                         ))}
                     </div>
@@ -157,26 +160,26 @@ export function DailyDuaWidget() {
                         variant="ghost"
                         size="icon"
                         onClick={nextDua}
-                        className="hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 transition-all h-8 w-8 sm:h-10 sm:w-10"
+                        className="hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 transition-all h-10 w-10 rounded-full"
                     >
-                        <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <ChevronRight className="h-5 w-5" />
                     </Button>
                 </div>
 
                 {/* Tags */}
                 {currentDua.tag && currentDua.tag.length > 0 && (
-                    <div className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2 justify-center">
+                    <div className="mt-4 flex flex-wrap gap-2 justify-center">
                         {currentDua.tag.map((tag, idx) => (
                             <span
                                 key={idx}
-                                className="px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                                className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
                             >
                                 #{tag}
                             </span>
                         ))}
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }

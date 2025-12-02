@@ -82,59 +82,65 @@ export function NearbyMosqueCard() {
         <div className="w-full">
             <div className="flex items-center justify-between mb-4 px-1">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-blue-500" />
-                    <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    <MapPin className="h-5 w-5 text-emerald-500" />
+                    <span className="bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
                         Nearest Mosque
                     </span>
                 </h3>
-                <Link href="/mosques" className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                <Link href="/mosques" className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors">
                     View All
                 </Link>
             </div>
 
-            <Card className="overflow-hidden border-none shadow-lg bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800">
-                <CardContent className="p-0">
-                    <div className="relative h-24 bg-blue-200 dark:bg-blue-900/20 w-full overflow-hidden">
+            <div className="overflow-hidden rounded-3xl glass shadow-lg">
+                <div className="p-0">
+                    <div className="relative h-28 bg-emerald-500/5 w-full overflow-hidden">
                         {/* Abstract map pattern background */}
                         <div className="absolute inset-0 opacity-20 dark:opacity-10"
                             style={{
-                                backgroundImage: 'radial-gradient(#3b82f6 1px, transparent 1px)',
-                                backgroundSize: '10px 10px'
+                                backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)',
+                                backgroundSize: '12px 12px'
                             }}
                         />
+
+                        {/* Decorative gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md animate-bounce">
-                                <MapPin className="h-6 w-6 text-blue-600" />
+                            <div className="relative">
+                                <div className="absolute -inset-4 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
+                                <div className="bg-white dark:bg-gray-900 p-2.5 rounded-full shadow-lg border border-emerald-500/20 relative z-10">
+                                    <MapPin className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-4">
-                        <div className="flex justify-between items-start mb-2">
+                    <div className="p-5">
+                        <div className="flex justify-between items-start mb-4">
                             <div>
-                                <h4 className="font-bold text-gray-900 dark:text-gray-100 line-clamp-1">
+                                <h4 className="font-bold text-lg text-foreground dark:text-white line-clamp-1">
                                     {mosque.tags.name || "Masjid / Musholla"}
                                 </h4>
-                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
                                     {mosque.tags["addr:street"] || mosque.tags["addr:city"] || "Address not available"}
                                 </p>
                             </div>
-                            <div className="bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-md text-xs font-bold text-blue-700 dark:text-blue-300 whitespace-nowrap">
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
                                 {mosque.distance} km
                             </div>
                         </div>
 
                         <Button
-                            className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200 dark:shadow-none"
-                            size="sm"
+                            className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/20 border-0"
                             onClick={openDirections}
                         >
-                            <Navigation className="h-3.5 w-3.5 mr-2" />
+                            <Navigation className="h-4 w-4 mr-2" />
                             Get Directions
                         </Button>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     )
 }
