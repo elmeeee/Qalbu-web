@@ -9,6 +9,7 @@ import { MiniPlayer } from '@/components/audio/mini-player'
 import { NotificationManager } from '@/components/prayer/notification-manager'
 import { PWALayout } from '@/components/pwa/pwa-layout'
 import { Suspense } from 'react'
+import { Analytics } from '@vercel/analytics/next'
 
 const inter = Inter({
     subsets: ['latin'],
@@ -137,6 +138,7 @@ export default function RootLayout({
                         </Suspense>
                     </QueryProvider>
                 </ThemeProvider>
+                <Analytics />
             </body>
         </html>
     )
