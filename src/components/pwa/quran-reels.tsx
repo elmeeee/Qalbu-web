@@ -454,7 +454,7 @@ export function QuranReels() {
                                 {ayahs[currentIndex].translation && (
                                     <div className="max-w-4xl mx-auto flex-shrink-0">
                                         <p className="text-4xl text-emerald-50/90 text-center leading-relaxed font-light tracking-wide">
-                                            "{ayahs[currentIndex].translation}"
+                                            &ldquo;{ayahs[currentIndex].translation}&rdquo;
                                         </p>
                                     </div>
                                 )}
