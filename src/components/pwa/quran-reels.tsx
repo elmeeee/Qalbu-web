@@ -441,7 +441,7 @@ export function QuranReels() {
 
                                 {/* Arabic Text - Main Focus */}
                                 <div className="w-full px-8 flex-shrink-0">
-                                    <p
+                                    <div
                                         className="text-[5.5rem] font-arabic text-white leading-[2.2] text-center drop-shadow-2xl"
                                         dir="rtl"
                                         style={{
@@ -449,8 +449,8 @@ export function QuranReels() {
                                             textShadow: '0 4px 20px rgba(0,0,0,0.3)'
                                         }}
                                     >
-                                        {ayahs[currentIndex].tajweed ? parseTajweed(ayahs[currentIndex].tajweed, setSelectedTajweed) : ayahs[currentIndex].text}
-                                    </p>
+                                        {ayahs[currentIndex].tajweed ? parseTajweed(ayahs[currentIndex].tajweed) : ayahs[currentIndex].text}
+                                    </div>
                                 </div>
 
                                 {/* Translation */}
