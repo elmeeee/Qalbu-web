@@ -10,6 +10,8 @@ interface AudioContextType {
     progress: number
     duration: number
     isLoading: boolean
+    selectedReciter: string
+    changeReciter: (reciterId: string) => void
     playAyah: (surah: SurahDetail, ayah: Ayah) => void
     togglePlay: () => void
     playNext: () => void
@@ -36,7 +38,19 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const [progress, setProgress] = useState(0)
     const [duration, setDuration] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
+    const [selectedReciter, setSelectedReciter] = useState('ar.alafasy')
     const audioRef = useRef<HTMLAudioElement | null>(null)
+
+    // Load saved reciter
+    useEffect(() => {
+        const saved = localStorage.getItem('selectedReciter')
+        if (saved) setSelectedReciter(saved)
+    }, [])
+
+    const changeReciter = useCallback((reciterId: string) => {
+        setSelectedReciter(reciterId)
+        localStorage.setItem('selectedReciter', reciterId)
+    }, [])
 
     // Initialize audio element
     useEffect(() => {
@@ -45,17 +59,32 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
         // Important for background audio on some devices
         audio.preload = 'auto'
+        // @ts-ignore - playsInline is not in standard definition but helps on some iOS versions
+        audio.playsInline = true
 
         const handleTimeUpdate = () => setProgress(audio.currentTime)
         const handleLoadedMetadata = () => setDuration(audio.duration)
         const handleEnded = () => {
             setIsPlaying(false)
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'none'
+            }
             playNext()
         }
         const handleCanPlay = () => setIsLoading(false)
         const handleWaiting = () => setIsLoading(true)
-        const handlePlay = () => setIsPlaying(true)
-        const handlePause = () => setIsPlaying(false)
+        const handlePlay = () => {
+            setIsPlaying(true)
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'playing'
+            }
+        }
+        const handlePause = () => {
+            setIsPlaying(false)
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'paused'
+            }
+        }
 
         audio.addEventListener('timeupdate', handleTimeUpdate)
         audio.addEventListener('loadedmetadata', handleLoadedMetadata)
@@ -85,7 +114,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             setCurrentSurah(surah)
             setCurrentAyah(ayah)
 
-            audioRef.current.src = ayah.audio
+            // Use the selected reciter's audio URL
+            const audioUrl = `https://cdn.islamic.network/quran/audio/128/${selectedReciter}/${String(surah.number).padStart(3, '0')}${String(ayah.numberInSurah).padStart(3, '0')}.mp3`
+
+            audioRef.current.src = audioUrl
             await audioRef.current.play()
             setIsPlaying(true)
 
@@ -102,6 +134,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
                         { src: '/icons/qalbuIcon.png', sizes: '512x512', type: 'image/png' },
                     ]
                 })
+                navigator.mediaSession.playbackState = 'playing'
             }
         } catch (error) {
             console.error('Failed to play audio:', error)
@@ -109,7 +142,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [selectedReciter])
 
     const togglePlay = useCallback(() => {
         if (!audioRef.current || !currentAyah) return
@@ -257,6 +290,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             progress,
             duration,
             isLoading,
+            selectedReciter,
+            changeReciter,
             playAyah,
             togglePlay,
             playNext: () => playNextRef.current(),

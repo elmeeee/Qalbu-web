@@ -5,6 +5,7 @@ import { Play, Pause, SkipBack, SkipForward, X, Loader2 } from 'lucide-react'
 import { useAudio } from '@/contexts/audio-context'
 import { useLanguage } from '@/contexts/language-context'
 import { usePWAMode } from '@/hooks/use-pwa-mode'
+import { ReciterSelector } from './reciter-selector'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useEffect, useState } from 'react'
@@ -123,14 +124,15 @@ export function MiniPlayer() {
 
                         {/* Close / Extra Actions */}
                         <div className="flex flex-1 justify-end">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setIsVisible(false)}
-                                className="text-muted-foreground hover:text-foreground"
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <ReciterSelector />
+                                <button
+                                    onClick={() => setIsVisible(false)}
+                                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                                >
+                                    <X className="w-5 h-5 text-foreground/60" />
+                                </button>
+                            </div>
                         </div>
                     </div>
 

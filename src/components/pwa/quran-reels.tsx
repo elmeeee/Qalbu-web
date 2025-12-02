@@ -4,6 +4,17 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
+import { useAudio } from '@/contexts/audio-context'
+import { ReciterSelector } from '@/components/audio/reciter-selector'
+import { Switch } from '@/components/ui/switch'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 import html2canvas from 'html2canvas'
 
 interface Ayah {
@@ -142,6 +153,7 @@ const SURAHS = [
 
 export function QuranReels() {
     const { language } = useLanguage()
+    const { selectedReciter } = useAudio()
     const [ayahs, setAyahs] = useState<Ayah[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isPlaying, setIsPlaying] = useState(false)
@@ -150,6 +162,7 @@ export function QuranReels() {
     const [currentSurah, setCurrentSurah] = useState(1)
     const [currentAyah, setCurrentAyah] = useState(1)
     const [showTranslation, setShowTranslation] = useState(true)
+    const [showTransliteration, setShowTransliteration] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
     const [showSurahSelector, setShowSurahSelector] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
@@ -197,8 +210,8 @@ export function QuranReels() {
 
     // Load initial ayahs
     useEffect(() => {
-        loadAyahs(1, 1)
-    }, [])
+        loadAyahs(currentSurah, currentAyah, true)
+    }, [selectedReciter])
 
     // Auto-play audio when ayah changes
     useEffect(() => {
@@ -262,7 +275,7 @@ export function QuranReels() {
     const loadAyahs = async (surah: number, startAyah: number, reset: boolean = false) => {
         setIsLoading(true)
         try {
-            const response = await fetch(`/api/quran/ayahs?surah=${surah}&startAyah=${startAyah}&count=10&edition=en.asad`)
+            const response = await fetch(`/api/quran/ayahs?surah=${surah}&startAyah=${startAyah}&count=10&edition=en.asad&audioEdition=${selectedReciter}`)
             const data = await response.json()
 
             if (reset) {
@@ -540,44 +553,61 @@ export function QuranReels() {
                                             {ayah.surah?.revelationType}
                                         </span>
                                     </div>
-                                    {/* Menu Button */}
-                                    <button
-                                        onClick={() => setShowMenu(!showMenu)}
-                                        className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center hover:bg-black/30 transition-all border border-white/5"
-                                    >
-                                        <MoreVertical className="h-5 w-5 text-white" />
-                                    </button>
+                                    {/* Menu Dropdown */}
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center hover:bg-black/30 transition-all border border-white/5"
+                                            >
+                                                <MoreVertical className="h-5 w-5 text-white" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-72 p-4 z-[100] bg-slate-900/95 backdrop-blur-xl border-white/10 text-white">
+                                            <DropdownMenuLabel className="text-lg font-bold mb-2">Settings</DropdownMenuLabel>
+                                            <DropdownMenuSeparator className="bg-white/10" />
+
+                                            <div className="flex items-center justify-between py-3">
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-medium">Translation</span>
+                                                    <span className="text-xs text-slate-400">Show English translation</span>
+                                                </div>
+                                                <Switch
+                                                    checked={showTranslation}
+                                                    onCheckedChange={setShowTranslation}
+                                                    className="data-[state=checked]:bg-emerald-500"
+                                                />
+                                            </div>
+
+                                            <div className="flex items-center justify-between py-3">
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-medium">Latin</span>
+                                                    <span className="text-xs text-slate-400">Show transliteration</span>
+                                                </div>
+                                                <Switch
+                                                    checked={showTransliteration}
+                                                    onCheckedChange={setShowTransliteration}
+                                                    className="data-[state=checked]:bg-emerald-500"
+                                                />
+                                            </div>
+
+                                            <DropdownMenuSeparator className="bg-white/10 my-2" />
+
+                                            <div className="flex items-center justify-between py-2">
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-medium">Reciter</span>
+                                                    <span className="text-xs text-slate-400">Choose audio reciter</span>
+                                                </div>
+                                                <ReciterSelector />
+                                            </div>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </motion.div>
                         </div>
 
                         {/* Content */}
                         <div className="relative z-20 w-full h-full flex flex-col items-center justify-center px-6 pt-24 pb-32 pointer-events-none">
-                            {/* Menu Dropdown */}
-                            <AnimatePresence>
-                                {showMenu && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        className="absolute top-16 right-6 bg-slate-900/90 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl border border-white/10 z-50 pointer-events-auto min-w-[200px]"
-                                    >
-                                        {/* Show Translation Toggle */}
-                                        <button
-                                            onClick={() => {
-                                                setShowTranslation(!showTranslation)
-                                                setShowMenu(false)
-                                            }}
-                                            className="w-full px-6 py-4 text-left text-white hover:bg-white/5 transition-colors flex items-center justify-between gap-4"
-                                        >
-                                            <span className="text-sm font-medium">Show Translation</span>
-                                            <div className={`w-10 h-6 rounded-full transition-colors ${showTranslation ? 'bg-emerald-500' : 'bg-slate-700'} relative`}>
-                                                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${showTranslation ? 'translate-x-4' : ''}`} />
-                                            </div>
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            {/* Removed old modal code */}
 
                             {/* Arabic Text with Tajweed - Scrollable for long content */}
                             <motion.div
@@ -596,7 +626,7 @@ export function QuranReels() {
                                     </div>
 
                                     {/* Transliteration */}
-                                    {ayah.transliteration && (
+                                    {showTransliteration && ayah.transliteration && (
                                         <p className="text-base text-emerald-200/90 italic leading-relaxed font-medium">
                                             {ayah.transliteration}
                                         </p>
