@@ -18,7 +18,7 @@
 
 ---
 
-## ✨ Why Qalbu?
+## Why Qalbu?
 
 **Qalbu** (Heart) is designed to be more than just a utility app. It's a spiritual companion built with a focus on **beauty**, **serenity**, and **modern user experience**. 
 
@@ -26,19 +26,20 @@ We believe that interacting with your faith should be a delightful experience. T
 
 ---
 
-## 📱 Gallery
+## Gallery
 
-<div align="center" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-  <img src="https://placehold.co/300x600/0f172a/10b981?text=Home+Screen" alt="Home Screen" style="border-radius: 16px;">
-  <img src="https://placehold.co/300x600/0f172a/10b981?text=Quran+Reels" alt="Quran Reels" style="border-radius: 16px;">
-  <img src="https://placehold.co/300x600/0f172a/10b981?text=Qibla+AR" alt="Qibla AR" style="border-radius: 16px;">
+<div align="center" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+  <img src="public/icons/home.PNG" alt="Home Screen" style="border-radius: 16px; width: 100%; object-fit: cover;">
+  <img src="public/icons/quran.PNG" alt="Quran Reels" style="border-radius: 16px; width: 100%; object-fit: cover;">
+  <img src="public/icons/qibla.PNG" alt="Qibla AR" style="border-radius: 16px; width: 100%; object-fit: cover;">
+  <img src="public/icons/ramadan.PNG" alt="Ramadan" style="border-radius: 16px; width: 100%; object-fit: cover;">
 </div>
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 🕌 Prayer & Worship
+### Prayer & Worship
 - **Smart Prayer Times**: Auto-detected location with accurate timings from Aladhan API.
 - **Next Prayer Countdown**: Beautiful countdown timer to help you prepare.
 - **Hijri Calendar**: Integrated Islamic calendar.
@@ -46,7 +47,7 @@ We believe that interacting with your faith should be a delightful experience. T
   - **Compass Mode**: Smooth, accurate digital compass.
   - **AR Mode**: Augmented Reality camera overlay to visualize the Qibla in the real world.
 
-### 📖 The Holy Quran
+### The Holy Quran
 - **Complete Quran**: All 114 Surahs with clear, beautiful Arabic typography (*Scheherazade New*).
 - **Quran Reels**: An immersive, TikTok-style vertical scrolling experience for reading and listening.
 - **Audio Recitations**: 
@@ -56,7 +57,7 @@ We believe that interacting with your faith should be a delightful experience. T
 - **Share Ayah**: Generate beautiful, watermarked images of Ayahs to share on social media.
 - **Transliteration & Translation**: Toggleable English translation and Latin transliteration.
 
-### 💎 Design & Experience
+### Design & Experience
 - **Premium Aesthetic**: "Modern Spiritual" theme with Teal/Navy gradients and glass effects.
 - **PWA Support**: Installable on iOS and Android for a native app-like experience.
 - **Offline Capable**: Works even when you lose internet connection.
@@ -64,7 +65,7 @@ We believe that interacting with your faith should be a delightful experience. T
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 Built with the latest and greatest web technologies for performance and developer experience.
 
@@ -81,7 +82,7 @@ Built with the latest and greatest web technologies for performance and develope
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 We are constantly improving Qalbu. Here's what we've done and what's coming next:
 
@@ -93,13 +94,13 @@ We are constantly improving Qalbu. Here's what we've done and what's coming next
 - [x] **Social Sharing** (Beautiful Ayah Images)
 - [ ] **Tafsir Integration** (Deep dive into meanings)
 - [ ] **Bookmarks & History** (Save your progress)
-- [ ] **Dua Collection** (Daily supplications)
+- [x] **Dua Collection** (Daily supplications)
 - [ ] **Digital Tasbih** (Counter)
 - [ ] **Push Notifications** (Adhan alerts)
 
 ---
 
-## ⚡ Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -128,7 +129,7 @@ We are constantly improving Qalbu. Here's what we've done and what's coming next
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 Ensure code quality with our comprehensive test suite.
 
@@ -142,7 +143,7 @@ npm run test:coverage
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
