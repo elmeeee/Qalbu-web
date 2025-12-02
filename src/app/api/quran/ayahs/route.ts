@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const startAyah = parseInt(searchParams.get('startAyah') || '1')
     const count = parseInt(searchParams.get('count') || '5')
     const edition = searchParams.get('edition') || 'en.asad'
+    const audioEdition = searchParams.get('audioEdition') || 'ar.alafasy'
 
     try {
         // Fetch the full surah to get total ayahs
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
                 const [arabicResponse, audioResponse, translationResponse, transliterationResponse] = await Promise.all([
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/quran-uthmani`, { cache: 'force-cache' }),
-                    fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/ar.alafasy`, { cache: 'force-cache' }),
+                    fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/${audioEdition}`, { cache: 'force-cache' }),
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/${edition}`, { cache: 'force-cache' }),
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/en.transliteration`, { cache: 'force-cache' }),
                 ])
