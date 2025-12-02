@@ -426,55 +426,46 @@ export function QuranReels() {
                             </div>
 
                             {/* Main Content */}
-                            <div className="flex-1 flex flex-col gap-10 overflow-hidden">
+                            <div className="flex-1 flex flex-col items-center justify-center gap-16 overflow-hidden py-10">
                                 {/* Surah Info Badge */}
                                 <div className="text-center flex-shrink-0">
-                                    <div className="inline-block bg-white/10 backdrop-blur-2xl px-10 py-4 rounded-full border border-white/10 shadow-xl">
-                                        <span className="text-3xl font-bold text-white">
+                                    <div className="inline-block bg-white/10 backdrop-blur-2xl px-12 py-5 rounded-full border border-white/20 shadow-2xl">
+                                        <span className="text-4xl font-bold text-white tracking-wide">
                                             {ayahs[currentIndex].surah?.englishName} • {ayahs[currentIndex].numberInSurah}
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* Arabic Text - Main Focus */}
-                                <div className="bg-white/5 backdrop-blur-2xl rounded-[50px] p-12 border border-white/10 shadow-2xl flex-shrink-0">
+                                <div className="w-full px-8 flex-shrink-0">
                                     <p
-                                        className="text-[3.5rem] font-arabic text-white leading-[1.9] text-center"
+                                        className="text-[5.5rem] font-arabic text-white leading-[2.2] text-center drop-shadow-2xl"
                                         dir="rtl"
                                         style={{
                                             fontFamily: "'Scheherazade New', serif",
-                                            textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                                            textShadow: '0 4px 20px rgba(0,0,0,0.3)'
                                         }}
                                     >
                                         {ayahs[currentIndex].text}
                                     </p>
                                 </div>
 
-                                {/* Transliteration */}
-                                {ayahs[currentIndex].transliteration && (
-                                    <div className="bg-white/5 backdrop-blur-xl rounded-[40px] px-12 py-8 border border-white/5 shadow-xl flex-shrink-0">
-                                        <p className="text-2xl font-medium italic text-emerald-100/90 text-center leading-relaxed">
-                                            {ayahs[currentIndex].transliteration}
-                                        </p>
-                                    </div>
-                                )}
-
                                 {/* Translation */}
                                 {ayahs[currentIndex].translation && (
-                                    <div className="bg-white/5 backdrop-blur-xl rounded-[40px] px-12 py-8 border border-white/5 shadow-xl flex-shrink-0">
-                                        <p className="text-2xl text-white/90 text-center leading-relaxed font-medium">
-                                            {ayahs[currentIndex].translation}
+                                    <div className="max-w-4xl mx-auto flex-shrink-0">
+                                        <p className="text-4xl text-emerald-50/90 text-center leading-relaxed font-light tracking-wide">
+                                            "{ayahs[currentIndex].translation}"
                                         </p>
                                     </div>
                                 )}
                             </div>
 
                             {/* Footer - App Promotion */}
-                            <div className="mt-8 text-center pt-8 border-t border-white/10 flex-shrink-0">
-                                <p className="text-3xl font-semibold text-white mb-2">
-                                    Download Qalbu App
+                            <div className="mt-auto text-center pt-10 border-t border-white/10 flex-shrink-0">
+                                <p className="text-3xl font-bold text-white mb-3">
+                                    Read & Listen on Qalbu App
                                 </p>
-                                <p className="text-2xl text-emerald-200/70">
+                                <p className="text-2xl text-emerald-200/80 font-medium">
                                     Your Daily Islamic Companion 🤲
                                 </p>
                             </div>

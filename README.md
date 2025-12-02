@@ -1,360 +1,154 @@
-# Qalbu - For nurturing your faith
+<div align="center">
+  <img src="public/icons/qalbuIcon.png" alt="Qalbu Logo" width="120" height="120" style="border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
 
-![Coverage](https://img.shields.io/badge/coverage-25.90%25-red)
+  <h1 style="font-size: 3rem; margin-top: 1rem; margin-bottom: 0.5rem;">Qalbu</h1>
+  
+  <p style="font-size: 1.25rem; color: #64748b; margin-bottom: 2rem;">
+    <em>Your Modern, Elegant Islamic Companion</em>
+  </p>
 
-## Testing
-
-This project uses **Vitest** for unit testing.
-
-### Coverage Report
-| Type | Percentage |
-|------|------------|
-| Statements | 25.90% |
-| Branches | 72.28% |
-| Functions | 45.68% |
-| Lines | 25.90% |
-
-To run tests:
-```bash
-npm run test
-```
-
-To generate coverage:
-```bash
-npm run test:coverage
-```
-
-
-A modern, elegant, and production-ready Islamic web application built with Next.js 15, featuring prayer times, the complete Holy Quran with audio recitation, Qibla direction finder with AR camera mode, and more.
-
-![Qalbu Banner](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css)
+  <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 2rem;">
+    <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js 15">
+    <img src="https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript" alt="TypeScript">
+    <img src="https://img.shields.io/badge/TailwindCSS-3.4-38bdf8?style=for-the-badge&logo=tailwind-css" alt="TailwindCSS">
+    <img src="https://img.shields.io/badge/PWA-Ready-purple?style=for-the-badge&logo=pwa" alt="PWA Ready">
+    <img src="https://img.shields.io/badge/coverage-25%25-red?style=for-the-badge" alt="Coverage">
+  </div>
+</div>
 
 ---
 
-## Features
+## ✨ Why Qalbu?
 
-### Prayer Times
-- **Automatic location detection** using browser geolocation
-- **Real-time prayer times** from Aladhan API
-- **Next prayer countdown** with time remaining
-- **Hijri calendar** integration
-- **Beautiful widget** with gradient design
-- Auto-refresh every hour
+**Qalbu** (Heart) is designed to be more than just a utility app. It's a spiritual companion built with a focus on **beauty**, **serenity**, and **modern user experience**. 
 
-### Holy Quran
-- **All 114 Surahs** with Arabic text
-- **Audio recitation** by Mishary Rashid Alafasy
-- **Ayah-by-ayah playback** with individual audio controls
-- **Sticky mini audio player** with progress bar
-- **30 Juz navigation** support
-- **Search functionality** across all surahs
-- **Beautiful Arabic typography** using Scheherazade New font
-- **Bookmark support** (coming soon)
-- **Tafsir integration** (coming soon)
-
-### Qibla Direction
-- **Dual mode support:**
-  - **Compass Mode**: Real-time compass with rotating needle
-  - **AR Camera Mode**: Live camera overlay with Qibla direction
-- **DeviceOrientation API** for accurate compass heading
-- **WebRTC camera access** for AR experience
-- **Kaaba coordinates** (21.4225°N, 39.8262°E)
-- **iOS permission handling** for device orientation
-- **Calibration feedback**
-
-### Design & UX
-- **Premium Apple-like aesthetic** - clean, minimal, elegant
-- **Islamic color palette** - Sand, Gold, and neutral tones
-- **Dark/Light mode** with smooth transitions
-- **Framer Motion animations** - smooth, delightful interactions
-- **Glass morphism effects** for modern UI
-- **Fully responsive** - mobile-first design
-- **WCAG compliant** accessibility
-- **High readability** for Qur'an text
-
-### PWA Support
-- **Installable** on mobile and desktop
-- **Offline support** with service workers
-- **App shortcuts** for quick access
-- **Standalone mode** for native app feel
-- **Push notifications** (coming soon)
+We believe that interacting with your faith should be a delightful experience. That's why we've crafted every pixel to feel premium, using glass-morphism, smooth animations, and a calming color palette inspired by Islamic art and nature.
 
 ---
 
-## Tech Stack
+## 📱 Gallery
 
-| Category | Technology |
-|----------|-----------|
-| **Framework** | Next.js 15+ (App Router) |
-| **Language** | TypeScript 5.7 |
-| **Styling** | TailwindCSS 3.4 + shadcn/ui |
-| **Animations** | Framer Motion 11 |
-| **Data Fetching** | TanStack Query (React Query) |
-| **State Management** | Zustand |
-| **Icons** | Lucide React |
-| **Fonts** | Inter (UI), Scheherazade New (Arabic) |
-| **Code Quality** | ESLint + Prettier |
-| **APIs** | Aladhan (Prayer), AlQuran Cloud (Quran) |
+<div align="center" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+  <img src="https://placehold.co/300x600/0f172a/10b981?text=Home+Screen" alt="Home Screen" style="border-radius: 16px;">
+  <img src="https://placehold.co/300x600/0f172a/10b981?text=Quran+Reels" alt="Quran Reels" style="border-radius: 16px;">
+  <img src="https://placehold.co/300x600/0f172a/10b981?text=Qibla+AR" alt="Qibla AR" style="border-radius: 16px;">
+</div>
 
 ---
 
-## Installation
+## 🚀 Key Features
+
+### 🕌 Prayer & Worship
+- **Smart Prayer Times**: Auto-detected location with accurate timings from Aladhan API.
+- **Next Prayer Countdown**: Beautiful countdown timer to help you prepare.
+- **Hijri Calendar**: Integrated Islamic calendar.
+- **Qibla Finder**: 
+  - **Compass Mode**: Smooth, accurate digital compass.
+  - **AR Mode**: Augmented Reality camera overlay to visualize the Qibla in the real world.
+
+### 📖 The Holy Quran
+- **Complete Quran**: All 114 Surahs with clear, beautiful Arabic typography (*Scheherazade New*).
+- **Quran Reels**: An immersive, TikTok-style vertical scrolling experience for reading and listening.
+- **Audio Recitations**: 
+  - Crystal clear audio from world-renowned reciters.
+  - **Multiple Reciters**: Choose your favorite voice (Mishary Alafasy, and more).
+  - **Background Playback**: Listen while using other apps or with the screen off.
+- **Share Ayah**: Generate beautiful, watermarked images of Ayahs to share on social media.
+- **Transliteration & Translation**: Toggleable English translation and Latin transliteration.
+
+### 💎 Design & Experience
+- **Premium Aesthetic**: "Modern Spiritual" theme with Teal/Navy gradients and glass effects.
+- **PWA Support**: Installable on iOS and Android for a native app-like experience.
+- **Offline Capable**: Works even when you lose internet connection.
+- **Smooth Animations**: Powered by Framer Motion for a fluid feel.
+
+---
+
+## 🛠️ Tech Stack
+
+Built with the latest and greatest web technologies for performance and developer experience.
+
+| Category | Technology | Description |
+|----------|-----------|-------------|
+| **Framework** | [Next.js 15](https://nextjs.org/) | App Router, Server Components |
+| **Language** | [TypeScript 5.7](https://www.typescriptlang.org/) | Type safety and developer experience |
+| **Styling** | [TailwindCSS 3.4](https://tailwindcss.com/) | Utility-first CSS |
+| **UI Library** | [shadcn/ui](https://ui.shadcn.com/) | Reusable, accessible components |
+| **Animations** | [Framer Motion](https://www.framer.com/motion/) | Production-ready animation library |
+| **State** | [Zustand](https://github.com/pmndrs/zustand) | Minimalist state management |
+| **Data** | [TanStack Query](https://tanstack.com/query) | Async state management |
+| **Testing** | [Vitest](https://vitest.dev/) | Blazing fast unit testing |
+
+---
+
+## 🗺️ Roadmap
+
+We are constantly improving Qalbu. Here's what we've done and what's coming next:
+
+- [x] **Core Features** (Prayer Times, Quran, Qibla)
+- [x] **PWA Support** (Installable, Offline)
+- [x] **Unit Testing** (Home Components, Audio Context)
+- [x] **Language Support** (English/Indonesian Switcher)
+- [x] **Multiple Reciters** (API Integration)
+- [x] **Social Sharing** (Beautiful Ayah Images)
+- [ ] **Tafsir Integration** (Deep dive into meanings)
+- [ ] **Bookmarks & History** (Save your progress)
+- [ ] **Dua Collection** (Daily supplications)
+- [ ] **Digital Tasbih** (Counter)
+- [ ] **Push Notifications** (Adhan alerts)
+
+---
+
+## ⚡ Getting Started
 
 ### Prerequisites
-- Node.js 18.0.0 or higher
-- npm, yarn, pnpm, or bun
+- Node.js 18+
+- npm, pnpm, or yarn
 
-### Steps
+### Installation
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/qalbu.git
-cd qalbu
-```
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/yourusername/qalbu.git
+   cd qalbu
+   ```
 
 2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the dev server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Visit `http://localhost:3000` to see the app in action.
+
+---
+
+## 🧪 Running Tests
+
+Ensure code quality with our comprehensive test suite.
+
 ```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
+# Run unit tests
+npm run test
+
+# Generate coverage report
+npm run test:coverage
 ```
-
-3. **Run development server**
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-4. **Open in browser**
-```
-http://localhost:3000
-```
-
----
-
-## Project Structure
-
-```
-qalbu/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── layout.tsx          # Root layout with providers
-│   │   ├── page.tsx            # Home page
-│   │   ├── quran/              # Quran pages
-│   │   │   ├── page.tsx        # Surah list
-│   │   │   └── [id]/           # Surah detail
-│   │   │       └── page.tsx
-│   │   └── qibla/              # Qibla page
-│   │       └── page.tsx
-│   ├── components/             # React components
-│   │   ├── ui/                 # shadcn/ui components
-│   │   │   ├── button.tsx
-│   │   │   └── card.tsx
-│   │   ├── prayer/             # Prayer-related components
-│   │   │   └── prayer-times-widget.tsx
-│   │   └── providers/          # Context providers
-│   │       ├── theme-provider.tsx
-│   │       └── query-provider.tsx
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── use-prayer-times.ts
-│   │   ├── use-quran.ts
-│   │   └── use-qibla.ts
-│   ├── lib/                    # Utilities and APIs
-│   │   ├── api/                # API services
-│   │   │   ├── prayer-times.ts
-│   │   │   └── quran.ts
-│   │   └── utils.ts            # Helper functions
-│   └── globals.css             # Global styles
-├── public/                     # Static assets
-│   ├── manifest.json           # PWA manifest
-│   ├── icon-192.png
-│   └── icon-512.png
-├── package.json
-├── tsconfig.json
-├── tailwind.config.js
-├── next.config.js
-└── README.md
-```
-
----
-
-## Core APIs Used
-
-### Prayer Times - Aladhan API
-- **Endpoint**: `https://api.aladhan.com/v1/timings`
-- **Features**: Prayer times, Hijri calendar, multiple calculation methods
-- **Documentation**: [aladhan.com/prayer-times-api](https://aladhan.com/prayer-times-api)
-
-### Quran - AlQuran Cloud API
-- **Endpoint**: `https://api.alquran.cloud/v1`
-- **Features**: All 114 surahs, multiple editions, audio recitation
-- **Documentation**: [alquran.cloud/api](https://alquran.cloud/api)
-
-### Audio Recitation
-- **Source**: Islamic Network CDN
-- **Reciter**: Mishary Rashid Alafasy
-- **Format**: MP3, 128kbps
-
----
-
-## Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-
----
-
-## Deployment
-
-### Vercel (Recommended)
-
-1. **Push to GitHub**
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
-```
-
-2. **Deploy to Vercel**
-- Go to [vercel.com](https://vercel.com)
-- Import your repository
-- Vercel will auto-detect Next.js
-- Click "Deploy"
-
-3. **Environment Variables** (if needed)
-- No environment variables required for basic functionality
-- All APIs are public and free
-
-### Other Platforms
-- **Netlify**: Supports Next.js with adapter
-- **Railway**: Docker deployment
-- **AWS Amplify**: Serverless deployment
-
----
-
-## Performance
-
-Target Lighthouse scores:
-
-| Metric | Target | Status |
-|--------|--------|--------|
-| Performance | 95+ | ✅ |
-| Accessibility | 95+ | ✅ |
-| Best Practices | 95+ | ✅ |
-| SEO | 95+ | ✅ |
-| PWA | ✓ | ✅ |
-
-Optimizations:
-- Image optimization with Next.js Image
-- Font optimization with next/font
-- Code splitting and lazy loading
-- TanStack Query caching
-- Service worker caching
-
----
-
-## Design System
-
-### Colors
-- **Sand**: Warm neutral tones (50-900)
-- **Gold**: Accent color (#e9a84a)
-- **Semantic**: Primary, Secondary, Muted, Destructive
-
-### Typography
-- **UI Font**: Inter (Google Fonts)
-- **Arabic Font**: Scheherazade New (Google Fonts)
-- **Line Height**: 2.0 for Arabic text
-
-### Spacing
-- **Border Radius**: 1rem (16px) for cards
-- **Shadows**: Soft, layered shadows
-- **Animations**: 300ms ease-out transitions
-
----
-
-## Privacy & Permissions
-
-### Location Access
-- Required for prayer times and Qibla direction
-- Uses browser's Geolocation API
-- Falls back to Mecca coordinates if denied
-
-### Camera Access
-- Optional for AR Qibla mode
-- Uses WebRTC getUserMedia API
-- Only accessed when user activates AR mode
-
-### Device Orientation
-- Required for compass functionality
-- Uses DeviceOrientation API
-- Requires permission on iOS 13+
-
-**No data is stored or transmitted to third parties.**
-
----
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 🙏 Acknowledgments
-
-- **Aladhan API** for prayer times data
-- **AlQuran Cloud** for Quran text and audio
-- **Mishary Rashid Alafasy** for beautiful Quran recitation
-- **shadcn/ui** for beautiful component system
-- **Vercel** for hosting and deployment
-
----
-
-## 📞 Support
-
-For support, email support@qalbu.ai or open an issue on GitHub.
-
----
-
-## 🌟 Roadmap
-
-- [ ] Tafsir (Quran commentary) integration
-- [ ] Bookmark and reading history
-- [ ] Multiple reciters support
-- [ ] Dua collection
-- [ ] Digital Tasbih counter
-- [ ] Islamic calendar events
-- [ ] Hadith of the day
-- [ ] Multi-language support (Arabic, Indonesian)
-- [ ] Offline Quran reading
-- [ ] Push notifications for prayer times
-
----
-
-Made with ❤️ for the Muslim community
-
-**Qalbu**
-# Qalbu-web
+<div align="center">
+  <p>Made with ❤️ for the Ummah</p>
+  <p><strong>Qalbu Team</strong></p>
+</div>
