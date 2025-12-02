@@ -28,19 +28,21 @@ export async function GET(request: NextRequest) {
                     currentAyah = 1
                 }
 
-                const [arabicResponse, audioResponse, translationResponse, transliterationResponse] = await Promise.all([
+                const [arabicResponse, audioResponse, translationResponse, transliterationResponse, tajweedResponse] = await Promise.all([
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/quran-uthmani`, { cache: 'force-cache' }),
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/${audioEdition}`, { cache: 'force-cache' }),
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/${edition}`, { cache: 'force-cache' }),
                     fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/en.transliteration`, { cache: 'force-cache' }),
+                    fetch(`${BASE_URL}/ayah/${currentSurah}:${currentAyah}/quran-tajweed`, { cache: 'force-cache' }),
                 ])
 
                 if (arabicResponse.ok) {
-                    const [arabicData, audioData, translationData, transliterationData] = await Promise.all([
+                    const [arabicData, audioData, translationData, transliterationData, tajweedData] = await Promise.all([
                         arabicResponse.json(),
                         audioResponse.json(),
                         translationResponse.json(),
                         transliterationResponse.json(),
+                        tajweedResponse.json(),
                     ])
 
                     ayahs.push({
@@ -48,6 +50,7 @@ export async function GET(request: NextRequest) {
                         audio: audioData.data.audio,
                         translation: translationData.data.text,
                         transliteration: transliterationData.data.text,
+                        tajweed: tajweedData.data.text,
                         surah: arabicData.data.surah
                     })
                 }

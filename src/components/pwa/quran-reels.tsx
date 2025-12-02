@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import html2canvas from 'html2canvas'
+import { parseTajweed, TAJWEED_META } from '@/lib/tajweed'
 
 interface Ayah {
     number: number
@@ -24,6 +25,7 @@ interface Ayah {
     transliteration?: string
     numberInSurah: number
     audio: string
+    tajweed?: string
     surah?: {
         number: number
         name: string
@@ -168,6 +170,7 @@ export function QuranReels() {
     const [searchQuery, setSearchQuery] = useState('')
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
     const [showEndSurahAlert, setShowEndSurahAlert] = useState(false)
+    const [selectedTajweed, setSelectedTajweed] = useState<typeof TAJWEED_META[string] | null>(null)
     const audioRef = useRef<HTMLAudioElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
@@ -446,7 +449,7 @@ export function QuranReels() {
                                             textShadow: '0 4px 20px rgba(0,0,0,0.3)'
                                         }}
                                     >
-                                        {ayahs[currentIndex].text}
+                                        {ayahs[currentIndex].tajweed ? parseTajweed(ayahs[currentIndex].tajweed, setSelectedTajweed) : ayahs[currentIndex].text}
                                     </p>
                                 </div>
 
@@ -613,7 +616,7 @@ export function QuranReels() {
                                         className="text-4xl leading-[2] text-white font-arabic drop-shadow-md"
                                         style={{ fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}
                                     >
-                                        {ayah.text}
+                                        {ayah.tajweed ? parseTajweed(ayah.tajweed, setSelectedTajweed) : ayah.text}
                                     </div>
 
                                     {/* Transliteration */}
@@ -708,6 +711,63 @@ export function QuranReels() {
                                     className="w-full py-4 bg-white/5 hover:bg-white/10 text-white rounded-xl font-semibold transition-colors"
                                 >
                                     Stay Here
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Tajweed Explanation Modal */}
+            <AnimatePresence>
+                {selectedTajweed && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6"
+                        onClick={() => setSelectedTajweed(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="bg-slate-900/95 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full border border-white/10 text-center relative overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Background Glow */}
+                            <div
+                                className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                                style={{ backgroundColor: selectedTajweed.color }}
+                            />
+                            <div
+                                className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20"
+                                style={{ backgroundColor: selectedTajweed.color }}
+                            />
+
+                            <div className="relative z-10">
+                                <div
+                                    className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg"
+                                    style={{ backgroundColor: `${selectedTajweed.color}20`, border: `1px solid ${selectedTajweed.color}40` }}
+                                >
+                                    <span className="text-3xl font-bold" style={{ color: selectedTajweed.color }}>
+                                        Aa
+                                    </span>
+                                </div>
+
+                                <h3 className="text-2xl font-bold text-white mb-2">
+                                    {selectedTajweed.description}
+                                </h3>
+
+                                <p className="text-slate-400 mb-8">
+                                    {selectedTajweed.details}
+                                </p>
+
+                                <button
+                                    onClick={() => setSelectedTajweed(null)}
+                                    className="w-full py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold transition-colors border border-white/5"
+                                >
+                                    Got it
                                 </button>
                             </div>
                         </motion.div>
