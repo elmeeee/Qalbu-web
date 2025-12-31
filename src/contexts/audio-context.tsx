@@ -104,7 +104,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             audio.removeEventListener('pause', handlePause)
             audio.pause()
         }
-    }, []) // Empty dependency array is intentional
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []) // Empty dependency array is intentional - we use playNextRef for the callback
 
     const playAyah = useCallback(async (surah: SurahDetail, ayah: Ayah) => {
         if (!audioRef.current) return

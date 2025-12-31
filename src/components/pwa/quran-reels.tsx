@@ -304,6 +304,7 @@ export function QuranReels() {
         }
 
         loadAyahs(currentSurah, currentAyah, true)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedReciter])
 
     // Auto-play audio when ayah changes
