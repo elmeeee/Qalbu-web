@@ -202,7 +202,7 @@ export function PrayerTimesWidgetPWA() {
                 {/* Hijri Date - Compact but Clear */}
                 <div className="mb-4 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/30 border border-teal-200/50 dark:border-teal-500/20 p-3 text-center">
                     <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
-                        Today's Hijri Date
+                        Today&apos;s Hijri Date
                     </p>
                     <p className="text-base font-bold bg-gradient-to-r from-teal-700 to-emerald-700 dark:from-teal-300 dark:to-emerald-300 bg-clip-text text-transparent">
                         {formattedHijri}
@@ -223,32 +223,32 @@ export function PrayerTimesWidgetPWA() {
                                 transition={{ delay: index * 0.06 }}
                                 whileHover={!isSunrise ? { scale: 1.02, y: -2 } : {}}
                                 className={`relative overflow-hidden rounded-xl p-3 transition-all duration-300 ${isNext
-                                        ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
-                                        : isSunrise
-                                            ? 'bg-slate-100/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 opacity-60'
-                                            : 'bg-slate-100/90 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 hover:shadow-md'
+                                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
+                                    : isSunrise
+                                        ? 'bg-slate-100/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 opacity-60'
+                                        : 'bg-slate-100/90 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 hover:shadow-md'
                                     }`}
                             >
                                 {/* Icon - Larger for visibility */}
                                 <div className={`flex items-center justify-center w-9 h-9 rounded-full mb-2 mx-auto ${isNext
-                                        ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300'
-                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                    ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
                                     }`}>
                                     {getPrayerIcon(prayer.name)}
                                 </div>
 
                                 {/* Prayer Name - Clear & Readable */}
                                 <p className={`text-xs font-bold text-center mb-1.5 uppercase tracking-wide ${isNext
-                                        ? 'text-emerald-800 dark:text-emerald-200'
-                                        : 'text-slate-700 dark:text-slate-300'
+                                    ? 'text-emerald-800 dark:text-emerald-200'
+                                    : 'text-slate-700 dark:text-slate-300'
                                     }`}>
                                     {getTranslatedPrayerName(prayer.name)}
                                 </p>
 
                                 {/* Prayer Time - Large & Bold */}
                                 <p className={`text-base font-bold text-center tabular-nums ${isNext
-                                        ? 'text-emerald-900 dark:text-emerald-100'
-                                        : 'text-slate-900 dark:text-slate-100'
+                                    ? 'text-emerald-900 dark:text-emerald-100'
+                                    : 'text-slate-900 dark:text-slate-100'
                                     }`}>
                                     {prayer.time}
                                 </p>
@@ -257,8 +257,8 @@ export function PrayerTimesWidgetPWA() {
                                 {!isSunrise && (
                                     <motion.button
                                         className={`mt-2 mx-auto flex items-center justify-center w-7 h-7 rounded-full transition-all ${isNext
-                                                ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                                                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-600'
+                                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-600'
                                             }`}
                                         whileHover={{ scale: 1.15 }}
                                         whileTap={{ scale: 0.9 }}
