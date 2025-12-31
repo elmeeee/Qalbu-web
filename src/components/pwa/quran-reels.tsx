@@ -310,7 +310,7 @@ export function QuranReels() {
             setCurrentIndex(newIndex)
 
             // Load more when near the end
-            if (newIndex >= ayahs.length - 3) {
+            if (newIndex >= ayahs.length - 3 && !isLoading) {
                 loadAyahs(currentSurah, currentAyah)
             }
         }
