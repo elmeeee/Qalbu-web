@@ -172,6 +172,7 @@ export function QuranReels() {
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
     const [showEndSurahAlert, setShowEndSurahAlert] = useState(false)
     const [selectedTajweed, setSelectedTajweed] = useState<TajweedMeta | null>(null)
+    const [likedAyahs, setLikedAyahs] = useState<Set<string>>(new Set())
 
     // New User Settings
     const [fontSize, setFontSize] = useState(3) // Default 3rem (~text-5xl)
@@ -193,6 +194,18 @@ export function QuranReels() {
                 if (typeof autoPlay === 'boolean') setAutoPlay(autoPlay)
             } catch (e) {
                 console.error('Failed to parse settings', e)
+            }
+        }
+    }, [])
+
+    // Load liked ayahs from localStorage
+    useEffect(() => {
+        const savedLikes = localStorage.getItem('liked-ayahs')
+        if (savedLikes) {
+            try {
+                setLikedAyahs(new Set(JSON.parse(savedLikes)))
+            } catch (e) {
+                console.error('Failed to parse liked ayahs', e)
             }
         }
     }, [])
@@ -254,6 +267,23 @@ export function QuranReels() {
         } catch (error) {
             console.error('Error sharing:', error)
         }
+    }
+
+    const toggleLike = () => {
+        const currentAyahData = ayahs[currentIndex]
+        if (!currentAyahData) return
+
+        const ayahKey = `${currentAyahData.surah?.number}-${currentAyahData.numberInSurah}`
+        const newLikedAyahs = new Set(likedAyahs)
+
+        if (newLikedAyahs.has(ayahKey)) {
+            newLikedAyahs.delete(ayahKey)
+        } else {
+            newLikedAyahs.add(ayahKey)
+        }
+
+        setLikedAyahs(newLikedAyahs)
+        localStorage.setItem('liked-ayahs', JSON.stringify(Array.from(newLikedAyahs)))
     }
 
     // Load initial ayahs
@@ -554,8 +584,20 @@ export function QuranReels() {
                     )}
                 </div>
 
-                {/* Bottom Actions - Share/Mute */}
-                <div className="absolute bottom-28 right-6 z-30 flex flex-col gap-4 pointer-events-auto">
+                {/* Bottom Actions - Like/Share/Mute */}
+                <div className="absolute bottom-32 right-6 z-30 flex flex-col gap-3 pointer-events-auto">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); toggleLike() }}
+                        className={`p-3 rounded-full backdrop-blur-md border transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`)
+                                ? 'bg-rose-500/30 border-rose-500/50 text-rose-400'
+                                : 'bg-black/20 border-white/10 text-white hover:bg-rose-500/20 hover:border-rose-500/30'
+                            }`}
+                    >
+                        <Heart
+                            className={`w-6 h-6 transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`) ? 'fill-rose-400' : ''
+                                }`}
+                        />
+                    </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleMute() }}
                         className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
