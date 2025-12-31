@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, forwardRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import html2canvas from 'html2canvas'
 import { parseTajweed, TAJWEED_META, type TajweedMeta } from '@/lib/tajweed'
+import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso'
 
 interface Ayah {
     number: number
@@ -166,7 +167,6 @@ export function QuranReels() {
     const [currentAyah, setCurrentAyah] = useState(1)
     const [showTranslation, setShowTranslation] = useState(false)
     const [showTransliteration, setShowTransliteration] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
     const [showSurahSelector, setShowSurahSelector] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
@@ -177,7 +177,7 @@ export function QuranReels() {
     const [fontSize, setFontSize] = useState(3) // Default 3rem (~text-5xl)
     const [autoPlay, setAutoPlay] = useState(true) // Default to auto-play audio
     const audioRef = useRef<HTMLAudioElement>(null)
-    const containerRef = useRef<HTMLDivElement>(null)
+    const virtuosoRef = useRef<VirtuosoHandle>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
     const searchParams = useSearchParams()
 
@@ -303,20 +303,19 @@ export function QuranReels() {
                         return
                     }
 
-                    if (containerRef.current && currentIndex < ayahs.length - 1) {
-                        const nextIndex = currentIndex + 1
-                        containerRef.current.scrollTo({
-                            top: nextIndex * window.innerHeight,
+                    // Move to next ayah in virtualization
+                    if (currentIndex < ayahs.length - 1) {
+                        virtuosoRef.current?.scrollToIndex({
+                            index: currentIndex + 1,
+                            align: 'start',
                             behavior: 'smooth'
                         })
                     }
                 }
 
-                // Wait for audio to be ready before playing
                 const handleCanPlay = () => {
                     if (!isMuted) {
                         audio.play().catch(err => {
-                            // Ignore AbortError as it's expected when switching ayahs quickly
                             if (err.name !== 'AbortError') {
                                 console.error('Audio play error:', err)
                             }
@@ -328,7 +327,13 @@ export function QuranReels() {
                 }
 
                 audio.addEventListener('ended', handleAudioEnd)
-                audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+
+                // Check if already ready to play (e.g. from cache)
+                if (audio.readyState >= 3) {
+                    handleCanPlay()
+                } else {
+                    audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+                }
 
                 return () => {
                     audio.removeEventListener('ended', handleAudioEnd)
@@ -362,22 +367,6 @@ export function QuranReels() {
             console.error('Error loading ayahs:', error)
         } finally {
             setIsLoading(false)
-        }
-    }
-
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const container = e.currentTarget
-        const scrollTop = container.scrollTop
-        const itemHeight = container.clientHeight
-        const newIndex = Math.round(scrollTop / itemHeight)
-
-        if (newIndex !== currentIndex) {
-            setCurrentIndex(newIndex)
-
-            // Load more when near the end
-            if (newIndex >= ayahs.length - 3 && !isLoading) {
-                loadAyahs(currentSurah, currentAyah)
-            }
         }
     }
 
@@ -428,14 +417,11 @@ export function QuranReels() {
         loadAyahs(surahNumber, 1, true)
 
         // Scroll to top
-        if (containerRef.current) {
-            containerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
-        }
+        virtuosoRef.current?.scrollToIndex({ index: 0 })
     }
 
     const handleNextSurah = () => {
         // Use the current ayah's surah number to determine the next one
-        // This prevents skipping surahs if currentSurah state is ahead (due to pre-fetching)
         const currentDisplayedSurah = ayahs[currentIndex]?.surah?.number || currentSurah
         const nextSurahNum = currentDisplayedSurah + 1
 
@@ -445,12 +431,147 @@ export function QuranReels() {
         }
     }
 
-    // Filter surahs based on search
     const filteredSurahs = SURAHS.filter(surah =>
         surah.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         surah.translation.toLowerCase().includes(searchQuery.toLowerCase()) ||
         surah.number.toString().includes(searchQuery)
     )
+
+    const renderAyah = (index: number, ayah: Ayah) => {
+        return (
+            <div className="h-[100vh] w-full snap-center relative flex items-center justify-center bg-black hardware-accelerated">
+                {/* Dynamic Gradient Background */}
+                <div className="absolute inset-0 bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950" />
+
+                {/* Animated Pattern Overlay - Simplified for performance */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)]" />
+                </div>
+
+                <div onClick={handleTap} className="absolute inset-0 z-10 cursor-pointer" />
+
+                {/* Play/Pause Overlay Icon */}
+                <AnimatePresence>
+                    {showOverlayIcon && (
+                        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                            <motion.div
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 1.5, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="bg-black/40 backdrop-blur-md p-6 rounded-full"
+                            >
+                                {showOverlayIcon === 'play' ? (
+                                    <Play className="h-12 w-12 text-white fill-white" />
+                                ) : (
+                                    <Pause className="h-12 w-12 text-white fill-white" />
+                                )}
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* Top Header - Controls */}
+                <div className="absolute top-0 left-0 right-0 z-30 p-6 pt-12 pointer-events-none flex justify-between items-start">
+                    <div className="pointer-events-auto" onClick={() => setShowSurahSelector(true)}>
+                        <div className="flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+                            <BookOpen className="h-4 w-4 text-emerald-400" />
+                            <span className="text-white font-medium">{ayah.surah?.englishName}</span>
+                            <span className="text-emerald-400 font-bold">{ayah.numberInSurah}</span>
+                        </div>
+                    </div>
+
+                    <div className="pointer-events-auto flex gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className="p-2 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white">
+                                    <MoreVertical className="w-5 h-5" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-64 bg-slate-900/95 backdrop-blur-xl border-white/10">
+                                <DropdownMenuLabel className="text-emerald-500">Settings</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-white/10" />
+
+                                <div className="p-2 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-gray-300">Translation</span>
+                                        <Switch checked={showTranslation} onCheckedChange={setShowTranslation} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-gray-300">Transliteration</span>
+                                        <Switch checked={showTransliteration} onCheckedChange={setShowTransliteration} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-gray-300">Auto Play</span>
+                                        <Switch checked={autoPlay} onCheckedChange={setAutoPlay} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <span className="text-sm text-gray-300">Font Size</span>
+                                        <div className="flex items-center gap-2 bg-black/20 rounded-lg p-1">
+                                            <button onClick={() => setFontSize(Math.max(2, fontSize - 0.5))} className="flex-1 p-1 text-white hover:bg-white/10 rounded">-</button>
+                                            <span className="text-xs text-emerald-400">{fontSize}x</span>
+                                            <button onClick={() => setFontSize(Math.min(6, fontSize + 0.5))} className="flex-1 p-1 text-white hover:bg-white/10 rounded">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <DropdownMenuSeparator className="bg-white/10" />
+                                <DropdownMenuLabel className="text-emerald-500">Reciter</DropdownMenuLabel>
+                                <div className="p-2">
+                                    <ReciterSelector />
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="w-full px-6 flex flex-col items-center gap-8 z-10">
+                    {/* Arabic */}
+                    <div
+                        className="text-white text-center leading-relaxed drop-shadow-lg"
+                        dir="rtl"
+                        style={{
+                            fontSize: `${fontSize}rem`,
+                            fontFamily: "'Scheherazade New', serif"
+                        }}
+                    >
+                        {ayah.tajweed ? parseTajweed(ayah.tajweed, (meta) => setSelectedTajweed(meta), language) : ayah.text}
+                    </div>
+
+                    {/* Translateration */}
+                    {showTransliteration && ayah.transliteration && (
+                        <div className="text-emerald-200/80 text-lg text-center font-medium italic max-w-2xl">
+                            {ayah.transliteration}
+                        </div>
+                    )}
+
+                    {/* Translation */}
+                    {showTranslation && ayah.translation && (
+                        <div className="text-white/90 text-lg text-center leading-relaxed max-w-2xl font-light">
+                            {ayah.translation}
+                        </div>
+                    )}
+                </div>
+
+                {/* Bottom Actions - Share/Mute */}
+                <div className="absolute bottom-10 right-6 z-30 flex flex-col gap-4 pointer-events-auto">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); toggleMute() }}
+                        className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
+                    >
+                        {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); handleShare() }}
+                        className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
+                    >
+                        <Share2 className="w-6 h-6" />
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     if (isLoading && ayahs.length === 0) {
         return (
@@ -542,251 +663,33 @@ export function QuranReels() {
                 )}
             </div>
 
-            {/* Scrollable Container */}
-            <div
-                ref={containerRef}
-                onScroll={handleScroll}
-                className="h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-                {ayahs.map((ayah, index) => (
-                    <div
-                        key={`${ayah.surah?.number || 0}-${ayah.numberInSurah || index}`}
-                        className="h-screen w-full snap-start snap-always relative flex items-center justify-center"
-                    >
-                        {/* Dynamic Gradient Background */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950" />
-
-                        {/* Animated Pattern Overlay */}
-                        <div className="absolute inset-0 opacity-10">
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_50%)]" />
-                        </div>
-
-                        {/* Tap Area for Play/Pause */}
+            {/* Scrollable Container with Virtuoso */}
+            <Virtuoso
+                ref={virtuosoRef}
+                style={{ height: '100vh', width: '100%' }}
+                totalCount={ayahs.length}
+                data={ayahs}
+                itemContent={renderAyah}
+                rangeChanged={({ startIndex }) => {
+                    if (startIndex !== currentIndex) {
+                        setCurrentIndex(startIndex)
+                        // Load more when near the end
+                        if (startIndex >= ayahs.length - 3 && !isLoading) {
+                            loadAyahs(currentSurah, currentAyah)
+                        }
+                    }
+                }}
+                components={{
+                    Scroller: forwardRef((props, ref) => (
                         <div
-                            onClick={handleTap}
-                            className="absolute inset-0 z-10 cursor-pointer"
+                            {...props}
+                            ref={ref}
+                            className="snap-y snap-mandatory scrollbar-hide h-full overflow-y-scroll"
+                            style={{ ...props.style, scrollbarWidth: 'none' }}
                         />
-
-                        {/* Play/Pause Overlay Icon */}
-                        <AnimatePresence>
-                            {showOverlayIcon && (
-                                <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-                                    <motion.div
-                                        initial={{ scale: 0.5, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        exit={{ scale: 1.5, opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="bg-black/40 backdrop-blur-md p-6 rounded-full"
-                                    >
-                                        {showOverlayIcon === 'play' ? (
-                                            <Play className="h-12 w-12 text-white fill-white" />
-                                        ) : (
-                                            <Pause className="h-12 w-12 text-white fill-white" />
-                                        )}
-                                    </motion.div>
-                                </div>
-                            )}
-                        </AnimatePresence>
-
-                        {/* Fixed Header - Added pt-12 for mobile safe area */}
-                        <div className="absolute top-0 left-0 right-0 z-30 p-6 pt-12 pointer-events-none">
-                            <motion.div
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="w-full flex items-center justify-between pointer-events-auto"
-                            >
-                                {/* Clickable Surah Name */}
-                                <button
-                                    onClick={() => setShowSurahSelector(true)}
-                                    className="flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full hover:bg-black/30 transition-all border border-white/5"
-                                >
-                                    <BookOpen className="h-4 w-4 text-emerald-400" />
-                                    <span className="text-white text-sm font-medium">
-                                        {ayah.surah?.englishName} • {ayah.numberInSurah}
-                                    </span>
-                                </button>
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/5">
-                                        <span className="text-emerald-400 text-sm font-medium">
-                                            {ayah.surah?.revelationType}
-                                        </span>
-                                    </div>
-                                    {/* Menu Dropdown */}
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button
-                                                className="w-10 h-10 rounded-full bg-black/20 backdrop-blur-md flex items-center justify-center hover:bg-black/30 transition-all border border-white/5"
-                                            >
-                                                <MoreVertical className="h-5 w-5 text-white" />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-72 p-4 z-[100] bg-slate-900/95 backdrop-blur-xl border-white/10 text-white">
-                                            <DropdownMenuLabel className="text-lg font-bold mb-2">Settings</DropdownMenuLabel>
-                                            <DropdownMenuSeparator className="bg-white/10" />
-
-                                            <div className="flex items-center justify-between py-3">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm font-medium">Translation</span>
-                                                    <span className="text-xs text-slate-400">Show English translation</span>
-                                                </div>
-                                                <Switch
-                                                    checked={showTranslation}
-                                                    onCheckedChange={setShowTranslation}
-                                                    className="data-[state=checked]:bg-emerald-500"
-                                                />
-                                            </div>
-
-                                            <div className="flex items-center justify-between py-3">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm font-medium">Latin</span>
-                                                    <span className="text-xs text-slate-400">Show transliteration</span>
-                                                </div>
-                                                <Switch
-                                                    checked={showTransliteration}
-                                                    onCheckedChange={setShowTransliteration}
-                                                    className="data-[state=checked]:bg-emerald-500"
-                                                />
-                                            </div>
-
-                                            <div className="flex items-center justify-between py-3">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm font-medium">Auto Play</span>
-                                                    <span className="text-xs text-slate-400">Play audio on scroll</span>
-                                                </div>
-                                                <Switch
-                                                    checked={autoPlay}
-                                                    onCheckedChange={setAutoPlay}
-                                                    className="data-[state=checked]:bg-emerald-500"
-                                                />
-                                            </div>
-
-                                            <div className="py-3">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="text-sm font-medium">Arabic Size</span>
-                                                        <span className="text-xs text-slate-400">Adjust font size</span>
-                                                    </div>
-                                                    <span className="text-xs bg-white/10 px-2 py-1 rounded text-emerald-400 font-mono">
-                                                        {fontSize}x
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
-                                                    <button
-                                                        onClick={() => setFontSize(Math.max(2, fontSize - 0.5))}
-                                                        className="flex-1 flex items-center justify-center h-8 hover:bg-white/10 rounded-md transition-colors"
-                                                        disabled={fontSize <= 2}
-                                                    >
-                                                        <span className="text-sm font-medium text-white">-</span>
-                                                    </button>
-                                                    <div className="w-px h-4 bg-white/10" />
-                                                    <button
-                                                        onClick={() => setFontSize(Math.min(6, fontSize + 0.5))}
-                                                        className="flex-1 flex items-center justify-center h-8 hover:bg-white/10 rounded-md transition-colors"
-                                                        disabled={fontSize >= 6}
-                                                    >
-                                                        <span className="text-lg font-medium text-white">+</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <DropdownMenuSeparator className="bg-white/10 my-2" />
-
-                                            <div className="flex items-center justify-between py-2">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm font-medium">Reciter</span>
-                                                    <span className="text-xs text-slate-400">Choose audio reciter</span>
-                                                </div>
-                                                <ReciterSelector />
-                                            </div>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </motion.div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="relative z-20 w-full h-full flex flex-col items-center justify-center px-6 pt-24 pb-32 pointer-events-none">
-                            {/* Removed old modal code */}
-
-                            {/* Arabic Text with Tajweed - Scrollable for long content */}
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.1 }}
-                                className="w-full max-w-2xl overflow-y-auto scrollbar-hide pointer-events-auto"
-                            >
-                                <div className="text-center space-y-6 px-4 py-4">
-                                    {/* Arabic Text */}
-                                    <div
-                                        className="leading-[2] text-white font-arabic drop-shadow-md transition-all duration-300"
-                                        style={{
-                                            fontFamily: "'Scheherazade New', serif",
-                                            direction: 'rtl',
-                                            fontSize: `${fontSize}rem`,
-                                            lineHeight: 2.2
-                                        }}
-                                    >
-                                        {ayah.tajweed ? parseTajweed(ayah.tajweed, setSelectedTajweed, language) : ayah.text}
-                                    </div>
-
-                                    {/* Transliteration */}
-                                    {showTransliteration && ayah.transliteration && (
-                                        <p className="text-base text-emerald-200/90 italic leading-relaxed font-medium">
-                                            {ayah.transliteration}
-                                        </p>
-                                    )}
-
-                                    {/* Translation - Toggleable */}
-                                    {showTranslation && ayah.translation && (
-                                        <p className="text-base text-white/90 leading-relaxed max-w-xl mx-auto font-light">
-                                            {ayah.translation}
-                                        </p>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </div>
-
-                        {/* Fixed Action Buttons - Bottom Right */}
-                        <div className="fixed right-6 bottom-32 flex flex-col gap-4 z-40 pointer-events-auto">
-                            {/* Like - Liquid Glass Effect */}
-                            <button className="flex flex-col items-center gap-1 group">
-                                <div className="relative w-12 h-12 rounded-full overflow-hidden transition-transform active:scale-95">
-                                    {/* Liquid glass background */}
-                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-                                    {/* Border */}
-                                    <div className="absolute inset-0 rounded-full border border-white/20" />
-                                    {/* Icon */}
-                                    <div className="relative w-full h-full flex items-center justify-center">
-                                        <Heart className="h-6 w-6 text-white drop-shadow-md" />
-                                    </div>
-                                </div>
-                            </button>
-
-                            {/* Share - Liquid Glass Effect */}
-                            <button onClick={handleShare} className="flex flex-col items-center gap-1 group">
-                                <div className="relative w-12 h-12 rounded-full overflow-hidden transition-transform active:scale-95">
-                                    {/* Liquid glass background */}
-                                    <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-                                    {/* Border */}
-                                    <div className="absolute inset-0 rounded-full border border-white/20" />
-                                    {/* Icon */}
-                                    <div className="relative w-full h-full flex items-center justify-center">
-                                        <Share2 className="h-6 w-6 text-white drop-shadow-md" />
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                ))}
-
-                {/* Loading More */}
-                {isLoading && ayahs.length > 0 && (
-                    <div className="h-screen w-full snap-start flex items-center justify-center bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950">
-                        <Loader2 className="h-12 w-12 animate-spin text-emerald-500" />
-                    </div>
-                )}
-            </div>
+                    ))
+                }}
+            />
 
             {/* End of Surah Alert */}
             <AnimatePresence>
@@ -795,7 +698,7 @@ export function QuranReels() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
+                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-6 point-events-auto"
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
@@ -836,7 +739,7 @@ export function QuranReels() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6 point-events-auto"
                         onClick={() => setSelectedTajweed(null)}
                     >
                         <motion.div
@@ -893,7 +796,7 @@ export function QuranReels() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4 point-events-auto"
                         onClick={() => setShowSurahSelector(false)}
                     >
                         <motion.div
@@ -990,6 +893,6 @@ export function QuranReels() {
                     font-family: 'Scheherazade New', serif;
                 }
             `}</style>
-        </div >
+        </div>
     )
 }

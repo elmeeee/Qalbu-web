@@ -61,7 +61,7 @@ export function PrayerTimesWidgetPWA() {
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(new Date())
-        }, 1000)
+        }, 5000)
 
         return () => clearInterval(interval)
     }, [])

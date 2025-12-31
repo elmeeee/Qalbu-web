@@ -213,10 +213,9 @@ export function DailyDuaSlider() {
                         exit="exit"
                         transition={{
                             x: { type: "spring", stiffness: 300, damping: 30 },
-                            opacity: { duration: 0.2 },
-                            scale: { duration: 0.2 }
+                            opacity: { duration: 0.2 }
                         }}
-                        className="absolute w-full h-full"
+                        className="absolute w-full h-full hardware-accelerated"
                     >
                         <div className="h-full rounded-3xl glass shadow-2xl overflow-hidden relative">
                             {/* Animated Background Orbs */}

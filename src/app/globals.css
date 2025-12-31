@@ -6,17 +6,32 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
   .mt-safe {
     margin-top: env(safe-area-inset-top);
   }
+
   .mb-safe {
     margin-bottom: env(safe-area-inset-bottom);
   }
+
   .h-safe {
     height: env(safe-area-inset-top);
+  }
+
+  .hardware-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+  }
+
+  .touch-manipulation {
+    touch-action: manipulation;
   }
 }
 
@@ -220,6 +235,7 @@ html {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
