@@ -163,7 +163,7 @@ export function QuranReels() {
     const [isLoading, setIsLoading] = useState(true)
     const [currentSurah, setCurrentSurah] = useState(1)
     const [currentAyah, setCurrentAyah] = useState(1)
-    const [showTranslation, setShowTranslation] = useState(true)
+    const [showTranslation, setShowTranslation] = useState(false)
     const [showTransliteration, setShowTransliteration] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
     const [showSurahSelector, setShowSurahSelector] = useState(false)
@@ -171,6 +171,10 @@ export function QuranReels() {
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
     const [showEndSurahAlert, setShowEndSurahAlert] = useState(false)
     const [selectedTajweed, setSelectedTajweed] = useState<typeof TAJWEED_META[string] | null>(null)
+
+    // New User Settings
+    const [fontSize, setFontSize] = useState(3) // Default 3rem (~text-5xl)
+    const [autoPlay, setAutoPlay] = useState(true) // Default to auto-play audio
     const audioRef = useRef<HTMLAudioElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
@@ -229,51 +233,56 @@ export function QuranReels() {
             audio.src = ayahs[currentIndex].audio
             audio.load()
 
-            // Auto-play and auto-scroll to next ayah when audio ends
-            const handleAudioEnd = () => {
-                const currentAyahData = ayahs[currentIndex]
-                const currentSurahData = SURAHS.find(s => s.number === currentAyahData.surah?.number)
+            // Only auto-play if enabled
+            if (autoPlay) {
+                // Auto-play and auto-scroll to next ayah when audio ends
+                const handleAudioEnd = () => {
+                    const currentAyahData = ayahs[currentIndex]
+                    const currentSurahData = SURAHS.find(s => s.number === currentAyahData.surah?.number)
 
-                // Check if this is the last ayah of the surah
-                if (currentSurahData && currentAyahData.numberInSurah === currentSurahData.verses) {
-                    setIsPlaying(false)
-                    setShowEndSurahAlert(true)
-                    return
+                    // Check if this is the last ayah of the surah
+                    if (currentSurahData && currentAyahData.numberInSurah === currentSurahData.verses) {
+                        setIsPlaying(false)
+                        setShowEndSurahAlert(true)
+                        return
+                    }
+
+                    if (containerRef.current && currentIndex < ayahs.length - 1) {
+                        const nextIndex = currentIndex + 1
+                        containerRef.current.scrollTo({
+                            top: nextIndex * window.innerHeight,
+                            behavior: 'smooth'
+                        })
+                    }
                 }
 
-                if (containerRef.current && currentIndex < ayahs.length - 1) {
-                    const nextIndex = currentIndex + 1
-                    containerRef.current.scrollTo({
-                        top: nextIndex * window.innerHeight,
-                        behavior: 'smooth'
-                    })
+                // Wait for audio to be ready before playing
+                const handleCanPlay = () => {
+                    if (!isMuted) {
+                        audio.play().catch(err => {
+                            // Ignore AbortError as it's expected when switching ayahs quickly
+                            if (err.name !== 'AbortError') {
+                                console.error('Audio play error:', err)
+                            }
+                        })
+                        setIsPlaying(true)
+                    } else {
+                        setIsPlaying(false)
+                    }
                 }
-            }
 
-            // Wait for audio to be ready before playing
-            const handleCanPlay = () => {
-                if (!isMuted) {
-                    audio.play().catch(err => {
-                        // Ignore AbortError as it's expected when switching ayahs quickly
-                        if (err.name !== 'AbortError') {
-                            console.error('Audio play error:', err)
-                        }
-                    })
-                    setIsPlaying(true)
-                } else {
-                    setIsPlaying(false)
+                audio.addEventListener('ended', handleAudioEnd)
+                audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+
+                return () => {
+                    audio.removeEventListener('ended', handleAudioEnd)
+                    audio.removeEventListener('canplaythrough', handleCanPlay)
                 }
-            }
-
-            audio.addEventListener('ended', handleAudioEnd)
-            audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
-
-            return () => {
-                audio.removeEventListener('ended', handleAudioEnd)
-                audio.removeEventListener('canplaythrough', handleCanPlay)
+            } else {
+                setIsPlaying(false)
             }
         }
-    }, [currentIndex, ayahs, isMuted])
+    }, [currentIndex, ayahs, isMuted, autoPlay])
 
     const loadAyahs = async (surah: number, startAyah: number, reset: boolean = false) => {
         setIsLoading(true)
@@ -584,6 +593,47 @@ export function QuranReels() {
                                                 />
                                             </div>
 
+                                            <div className="flex items-center justify-between py-3">
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-sm font-medium">Auto Play</span>
+                                                    <span className="text-xs text-slate-400">Play audio on scroll</span>
+                                                </div>
+                                                <Switch
+                                                    checked={autoPlay}
+                                                    onCheckedChange={setAutoPlay}
+                                                    className="data-[state=checked]:bg-emerald-500"
+                                                />
+                                            </div>
+
+                                            <div className="py-3">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="text-sm font-medium">Arabic Size</span>
+                                                        <span className="text-xs text-slate-400">Adjust font size</span>
+                                                    </div>
+                                                    <span className="text-xs bg-white/10 px-2 py-1 rounded text-emerald-400 font-mono">
+                                                        {fontSize}x
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 bg-white/5 p-1 rounded-lg border border-white/5">
+                                                    <button
+                                                        onClick={() => setFontSize(Math.max(2, fontSize - 0.5))}
+                                                        className="flex-1 flex items-center justify-center h-8 hover:bg-white/10 rounded-md transition-colors"
+                                                        disabled={fontSize <= 2}
+                                                    >
+                                                        <span className="text-sm font-medium text-white">-</span>
+                                                    </button>
+                                                    <div className="w-px h-4 bg-white/10" />
+                                                    <button
+                                                        onClick={() => setFontSize(Math.min(6, fontSize + 0.5))}
+                                                        className="flex-1 flex items-center justify-center h-8 hover:bg-white/10 rounded-md transition-colors"
+                                                        disabled={fontSize >= 6}
+                                                    >
+                                                        <span className="text-lg font-medium text-white">+</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
                                             <DropdownMenuSeparator className="bg-white/10 my-2" />
 
                                             <div className="flex items-center justify-between py-2">
@@ -613,8 +663,13 @@ export function QuranReels() {
                                 <div className="text-center space-y-6 px-4 py-4">
                                     {/* Arabic Text */}
                                     <div
-                                        className="text-4xl leading-[2] text-white font-arabic drop-shadow-md"
-                                        style={{ fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}
+                                        className="leading-[2] text-white font-arabic drop-shadow-md transition-all duration-300"
+                                        style={{
+                                            fontFamily: "'Scheherazade New', serif",
+                                            direction: 'rtl',
+                                            fontSize: `${fontSize}rem`,
+                                            lineHeight: 2.2
+                                        }}
                                     >
                                         {ayah.tajweed ? parseTajweed(ayah.tajweed, setSelectedTajweed) : ayah.text}
                                     </div>
