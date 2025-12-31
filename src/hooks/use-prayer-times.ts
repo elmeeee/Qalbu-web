@@ -65,7 +65,7 @@ export function usePrayerTimes() {
     }, [])
 
     const { data, isLoading, error, refetch } = useQuery<PrayerTimesResponse>({
-        queryKey: ['prayerTimes', coordinates, settings],
+        queryKey: ['prayerTimes', coordinates, settings, 'v2'], // Versioned to force refresh for tune updates
         queryFn: () => getPrayerTimes(coordinates!, settings),
         enabled: !!coordinates,
         staleTime: 1000 * 60 * 60, // 1 hour

@@ -77,30 +77,72 @@ export interface PrayerSettings {
 
 // Calculation Methods
 export const CALCULATION_METHODS = [
-    { id: 0, name: 'Shia Ithna-Ashari' },
-    { id: 1, name: 'University of Islamic Sciences, Karachi' },
-    { id: 2, name: 'Islamic Society of North America (ISNA)' },
-    { id: 3, name: 'Muslim World League' },
-    { id: 4, name: 'Umm Al-Qura University, Makkah' },
-    { id: 5, name: 'Egyptian General Authority of Survey' },
-    { id: 7, name: 'Institute of Geophysics, University of Tehran' },
+    // User requested methods (prioritized)
+    { id: 19, name: 'Algerian Minister of Religious Affairs and Wakfs' }, // 18 / 17
+    { id: 100, name: 'Basque Country' }, // 15 / 15
+    { id: 99, name: 'Custom Angles' }, // 16 / 14
+    { id: 13, name: 'Diyanet İşleri Başkanlığı' }, // 18 / 17
+    { id: 5, name: 'Egyptian General Authority' }, // 19.5 / 17.5
+    { id: 101, name: 'Egyptian General Authority (Bis)' }, // 20 / 18
+    { id: 102, name: 'Fixed Isha Angle Interval' }, // 19.5 / 90 min
+    { id: 103, name: 'France - Angle 15°' }, // 15 / 15
+    { id: 104, name: 'France - Angle 18°' }, // 18 / 18
+    { id: 1, name: 'Islamic University, Karachi' }, // 18 / 18
+    { id: 17, name: 'JAKIM (Jabatan Kemajuan Islam Malaysia)' }, // 20 / 18
+    { id: 105, name: 'London Unified Islamic Prayer Timetable' }, // Fallback to 12
+    { id: 11, name: 'MUIS (Majlis Ugama Islam Singapura)' }, // 20 / 18
+    { id: 3, name: 'Muslim World League (MWL)' }, // 18 / 17
+    { id: 12, name: 'Musulmans de France (ex-UOIF) - Angle 12°' }, // 12 / 12
+    { id: 2, name: 'North America (ISNA)' }, // 15 / 15
+    { id: 0, name: 'Shia Ithna Ashari (Jafari)' }, // 16 / 14
+    { id: 20, name: 'SIHAT/KEMENAG (Kementerian Agama RI)' }, // 20 / 18
+    { id: 18, name: 'Tunisian Ministry of Religious Affairs' }, // 18 / 18
+    { id: 106, name: 'UAE General Authority of Islamic Affairs And Endowments' }, // 19.5 / 90 min
+    { id: 4, name: 'Umm Al-Qura, Makkah' }, // 18.5 / 90 min
+    { id: 7, name: 'University of Tehran' }, // 17.7 / 14
+
+    // Other Standard Methods
     { id: 8, name: 'Gulf Region' },
     { id: 9, name: 'Kuwait' },
     { id: 10, name: 'Qatar' },
-    { id: 11, name: 'Majlis Ugama Islam Singapura, Singapore' },
-    { id: 12, name: 'Union Organization Islamic de France' },
-    { id: 13, name: 'Diyanet İşleri Başkanlığı, Turkey' },
     { id: 14, name: 'Spiritual Administration of Muslims of Russia' },
     { id: 15, name: 'Moonsighting Committee Worldwide' },
     { id: 16, name: 'Dubai (unofficial)' },
-    { id: 17, name: 'Jabatan Kemajuan Islam Malaysia (JAKIM)' },
-    { id: 18, name: 'Tunisia' },
-    { id: 19, name: 'Algeria' },
-    { id: 20, name: 'Kementerian Agama Republik Indonesia' },
     { id: 21, name: 'Morocco' },
     { id: 22, name: 'Comunidade Islamica de Lisboa' },
     { id: 23, name: 'Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan' },
 ]
+
+// Custom Method Parameters Map
+const CUSTOM_PARAMS: Record<number, string> = {
+    100: '&method=99&fajrAngle=15&ishaAngle=15', // Basque Country
+    99: '&method=99&fajrAngle=16&ishaAngle=14', // Custom Angles default
+    101: '&method=99&fajrAngle=20&ishaAngle=18', // Egyptian (Bis)
+    102: '&method=8', // Fixed Isha Angle Interval (Gulf 19.5/90)
+    103: '&method=99&fajrAngle=15&ishaAngle=15', // France 15
+    104: '&method=99&fajrAngle=18&ishaAngle=18', // France 18
+    105: '&method=12', // London Unified -> Fallback to UOIF
+    106: '&method=8', // UAE -> Gulf
+}
+
+// Method Offsets (Tune)
+// comma separated values for: Imsak,Fajr,Sunrise,Dhuhr,Asr,Maghrib,Sunset,Isha,Midnight
+const METHOD_OFFSETS: Record<number, string> = {
+    // Kemenag RI: User reports +4 mins difference (~18:11 vs 18:15). 
+    // Increasing ihtiyat/safety margin to match common local schedules.
+    20: '4,4,4,4,4,4,4,4,0',
+}
+
+function getMethodParams(method: number): string {
+    let params = CUSTOM_PARAMS[method] || `&method=${method}`
+
+    // Add tune if exists
+    if (METHOD_OFFSETS[method]) {
+        params += `&tune=${METHOD_OFFSETS[method]}`
+    }
+
+    return params
+}
 
 // Juristic Schools
 export const JURISTIC_SCHOOLS = [
@@ -156,24 +198,57 @@ export const COUNTRIES = [
 export async function getReverseGeocoding(coordinates: Coordinates): Promise<LocationData> {
     const { latitude, longitude } = coordinates
     try {
+        // Try BigDataCloud first (CORS friendly)
         const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=en`
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
         )
-        if (!response.ok) throw new Error('Failed to fetch location name')
-
-        const data = await response.json()
-        const address = data.address
-
-        return {
-            city: address.city || address.town || address.village || address.county,
-            region: address.state || address.region,
-            country: address.country,
-            countryCode: address.country_code?.toUpperCase(),
-            formatted: data.display_name
+        if (response.ok) {
+            const data = await response.json()
+            return {
+                city: data.city || data.locality || data.principalSubdivision,
+                region: data.principalSubdivision,
+                country: data.countryName,
+                countryCode: data.countryCode,
+                formatted: [
+                    data.city || data.locality,
+                    data.principalSubdivision,
+                    data.countryName
+                ].filter(Boolean).join(', ')
+            }
         }
-    } catch (error) {
-        console.error('Reverse geocoding error:', error)
-        return {}
+    } catch (e) {
+        // Silent fail for first attempt
+    }
+
+    try {
+        // Fallback to Nominatim
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=en`,
+            {
+                headers: {
+                    'User-Agent': 'MuslimPrayerApp/1.0',
+                    'Accept-Language': 'en'
+                }
+            }
+        )
+        if (response.ok) {
+            const data = await response.json()
+            const address = data.address
+            return {
+                city: address.city || address.town || address.village || address.county,
+                region: address.state || address.region,
+                country: address.country,
+                countryCode: address.country_code?.toUpperCase(),
+                formatted: data.display_name
+            }
+        }
+    } catch (e) {
+        // Silent fail for second attempt
+    }
+
+    return {
+        formatted: 'Unknown Location',
+        city: 'Current Location'
     }
 }
 
@@ -195,7 +270,7 @@ export async function getPrayerTimes(
 
     const finalSettings = { ...defaultSettings, ...settings }
 
-    const url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=${finalSettings.method}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
+    const url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}${getMethodParams(finalSettings.method)}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
 
     const response = await fetch(url, {
         next: { revalidate: 3600 }, // Cache for 1 hour
@@ -281,7 +356,7 @@ export async function getCalendar(
 
     const finalSettings = { ...defaultSettings, ...settings }
 
-    const url = `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}&method=${finalSettings.method}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
+    const url = `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}${getMethodParams(finalSettings.method)}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
 
     const response = await fetch(url, {
         next: { revalidate: 86400 }, // Cache for 24 hours
@@ -314,7 +389,7 @@ export async function getRamadanCalendar(
     const finalSettings = { ...defaultSettings, ...settings }
 
     // Ramadan is the 9th month in Hijri calendar
-    const url = `https://api.aladhan.com/v1/hijriCalendar/${hijriYear}/9?latitude=${latitude}&longitude=${longitude}&method=${finalSettings.method}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
+    const url = `https://api.aladhan.com/v1/hijriCalendar/${hijriYear}/9?latitude=${latitude}&longitude=${longitude}${getMethodParams(finalSettings.method)}&school=${finalSettings.school}&latitudeAdjustmentMethod=${finalSettings.latitudeAdjustment}&midnightMode=${finalSettings.midnightMode}`
 
     const response = await fetch(url, {
         next: { revalidate: 86400 * 30 }, // Cache for 30 days
