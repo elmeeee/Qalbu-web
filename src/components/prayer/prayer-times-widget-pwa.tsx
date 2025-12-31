@@ -10,59 +10,27 @@ import { useLanguage } from '@/contexts/language-context'
 
 const prayerNames = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']
 
-// Prayer icons - slightly larger for better visibility
+// Solid icons for the list view
 const getPrayerIcon = (name: string) => {
-    const icons: Record<string, React.ReactElement> = {
-        Fajr: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v6m0 6v10M23 12h-6m-4 0H1" />
-            </svg>
-        ),
-        Sunrise: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41M8 18h8" />
-            </svg>
-        ),
-        Dhuhr: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L15 8L12 14L9 8L12 2Z" />
-                <circle cx="12" cy="12" r="2" />
-            </svg>
-        ),
-        Asr: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2m0 16v2m10-10h-2M4 12H2" />
-            </svg>
-        ),
-        Maghrib: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M17 18a5 5 0 0 0-10 0" />
-                <line x1="12" y1="9" x2="12" y2="2" />
-                <circle cx="12" cy="9" r="4" />
-            </svg>
-        ),
-        Isha: (
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-        ),
-    }
-    return icons[name] || icons.Fajr
+    return (
+        <svg className="w-5 h-5 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="12" cy="12" r="3" fill="currentColor" className="opacity-20" />
+            <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07-6.93l-1.41 1.41M6.34 17.66l-1.41 1.41M19.07 17.66l-1.41-1.41M6.34 6.34l-1.41-1.41" />
+        </svg>
+    )
 }
 
 export function PrayerTimesWidgetPWA() {
     const { prayerTimes, isLoading, error, coordinates, locationName } = usePrayerTimes()
     const [currentTime, setCurrentTime] = useState(new Date())
     const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string } | null>(null)
+    const [timeRemaining, setTimeRemaining] = useState('')
     const { t } = useLanguage()
 
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentTime(new Date())
-        }, 5000)
-
+        }, 1000)
         return () => clearInterval(interval)
     }, [])
 
@@ -73,23 +41,28 @@ export function PrayerTimesWidgetPWA() {
         }
     }, [prayerTimes, currentTime])
 
+    useEffect(() => {
+        if (nextPrayer) {
+            const updateTimer = () => {
+                const now = new Date()
+                const [hours, minutes] = nextPrayer.time.split(':').map(Number)
+                let targetDate = new Date()
+                targetDate.setHours(hours, minutes, 0, 0)
+                if (targetDate <= now && nextPrayer.name === 'Fajr') {
+                    targetDate.setDate(targetDate.getDate() + 1)
+                }
+                setTimeRemaining(getTimeUntil(targetDate))
+            }
+            updateTimer()
+            const timer = setInterval(updateTimer, 60000)
+            return () => clearInterval(timer)
+        }
+    }, [nextPrayer])
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-16">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                    <Loader2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-                </motion.div>
-            </div>
-        )
-    }
-
-    if (error) {
-        return (
-            <div className="rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-red-200 dark:border-red-800/30 p-5 text-center">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">{error.toString()}</p>
+                <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
             </div>
         )
     }
@@ -101,193 +74,106 @@ export function PrayerTimesWidgetPWA() {
         time: prayerTimes.timings[name as keyof typeof prayerTimes.timings],
     }))
 
-    const getTranslatedPrayerName = (name: string) => {
-        const key = name.toLowerCase() as keyof typeof t.prayer
-        return t.prayer[key] || name
-    }
-
     const displayLocation = locationName
         ? [locationName.city, locationName.country].filter(Boolean).join(', ')
         : coordinates
             ? `${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)}`
             : t.prayer.unknown
 
-    const hijriDate = prayerTimes.date.hijri
-    const formattedHijri = `${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`
-
-    const timeUntilNext = nextPrayer ? (() => {
-        const now = new Date()
-        const [hours, minutes] = nextPrayer.time.split(':').map(Number)
-
-        let targetDate = new Date()
-        targetDate.setHours(hours, minutes, 0, 0)
-
-        if (targetDate <= now && nextPrayer.name === 'Fajr') {
-            targetDate.setDate(targetDate.getDate() + 1)
-        }
-
-        return getTimeUntil(targetDate)
-    })() : ''
-
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-emerald-200/50 dark:border-emerald-500/20 shadow-2xl shadow-emerald-500/10"
-        >
-            <div className="relative z-10 p-5">
-                {/* Location Header - Simplified */}
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{displayLocation}</span>
-                    </div>
-                    <motion.button
-                        onClick={() => {
-                            if ('Notification' in window) {
-                                Notification.requestPermission().then(status => {
-                                    if (status === 'granted') {
-                                        new Notification('Qalbu Notifications Enabled')
-                                    }
-                                })
-                            }
-                        }}
-                        className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-emerald-600 dark:text-emerald-400"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <Bell className="h-4 w-4" />
-                    </motion.button>
-                </div>
-
-                {/* Next Prayer - Large & Clear */}
-                {nextPrayer && (
-                    <motion.div
-                        key={nextPrayer.time}
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                        className="mb-4 relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 p-5 text-white shadow-xl shadow-emerald-500/30"
-                    >
-                        {/* Subtle animated glow */}
-                        <motion.div
-                            className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: [0.3, 0.5, 0.3],
-                            }}
-                            transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                ease: "easeInOut"
+        <div className="space-y-6">
+            {/* Top Section: Semi-Circular Gauge & Countdown */}
+            {nextPrayer && (
+                <div className="relative flex flex-col items-center pt-8 pb-4">
+                    <div className="relative w-64 h-32 overflow-hidden flex justify-center">
+                        {/* This creates the semi-circle effect */}
+                        <div className="absolute top-0 w-64 h-64 rounded-full border-[14px] border-emerald-100 dark:border-emerald-900/40 box-border" />
+                        <div className="absolute top-0 w-64 h-64 rounded-full border-[14px] border-emerald-500 box-border"
+                            style={{
+                                strokeDasharray: '100 100', // Fill half
+                                clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)' // Cut bottom half
                             }}
                         />
 
-                        <div className="relative z-10 flex items-center justify-between">
-                            <div>
-                                <p className="text-xs font-medium text-white/80 uppercase tracking-wider mb-1">Next Prayer</p>
-                                <div className="flex items-baseline gap-3">
-                                    <h3 className="text-4xl md:text-5xl font-bold tracking-tight">{nextPrayer.time}</h3>
-                                    <span className="text-lg font-semibold text-white/95">{getTranslatedPrayerName(nextPrayer.name)}</span>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-xs text-white/70 mb-1">in</p>
-                                <p className="text-2xl font-bold">{timeUntilNext}</p>
+                        {/* Centered Content inside Arc */}
+                        <div className="absolute top-8 flex flex-col items-center justify-center z-10 w-full text-center">
+                            <span className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
+                                {nextPrayer.time}
+                            </span>
+                            <div className="flex items-center gap-1.5 justify-center opacity-70 mt-1">
+                                <MapPin className="w-3 h-3 text-emerald-500" />
+                                <span className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate max-w-[150px]">
+                                    {displayLocation}
+                                </span>
                             </div>
                         </div>
-                    </motion.div>
-                )}
+                    </div>
 
-                {/* Hijri Date - Compact but Clear */}
-                <div className="mb-4 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-950/30 dark:to-emerald-950/30 border border-teal-200/50 dark:border-teal-500/20 p-3 text-center">
-                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
-                        Today&apos;s Hijri Date
-                    </p>
-                    <p className="text-base font-bold bg-gradient-to-r from-teal-700 to-emerald-700 dark:from-teal-300 dark:to-emerald-300 bg-clip-text text-transparent">
-                        {formattedHijri}
-                    </p>
+                    {/* Next Prayer Label below Arc */}
+                    <div className="mt-[-10px] text-center">
+                        <span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-emerald-500/30">
+                            {nextPrayer.name} in {timeRemaining}
+                        </span>
+                    </div>
                 </div>
+            )}
 
-                {/* Prayer Times - 3 Column Grid with Better Spacing */}
-                <div className="grid grid-cols-3 gap-2.5">
-                    {prayers.map((prayer, index) => {
-                        const isNext = nextPrayer?.name === prayer.name
-                        const isSunrise = prayer.name === 'Sunrise'
+            {/* Prayer List - Vertical Cards */}
+            <div className="space-y-3">
+                {prayers.map((prayer, index) => {
+                    const isNext = nextPrayer?.name === prayer.name
+                    const isSunrise = prayer.name === 'Sunrise'
 
-                        return (
-                            <motion.div
-                                key={prayer.name}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.06 }}
-                                whileHover={!isSunrise ? { scale: 1.02, y: -2 } : {}}
-                                className={`relative overflow-hidden rounded-xl p-3 transition-all duration-300 ${isNext
-                                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-2 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
-                                    : isSunrise
-                                        ? 'bg-slate-100/60 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 opacity-60'
-                                        : 'bg-slate-100/90 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 hover:shadow-md'
-                                    }`}
-                            >
-                                {/* Icon - Larger for visibility */}
-                                <div className={`flex items-center justify-center w-9 h-9 rounded-full mb-2 mx-auto ${isNext
-                                    ? 'bg-emerald-500/30 text-emerald-700 dark:text-emerald-300'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    return (
+                        <motion.div
+                            key={prayer.name}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className={`relative flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${isNext
+                                ? 'bg-white dark:bg-slate-800 shadow-xl shadow-emerald-500/10 border-l-4 border-l-emerald-500 transform scale-[1.02]'
+                                : 'bg-white/60 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800'
+                                }`}
+                        >
+                            <div className="flex items-center gap-4">
+                                {/* Icon Container */}
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${isNext
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 dark:text-indigo-400'
                                     }`}>
                                     {getPrayerIcon(prayer.name)}
                                 </div>
 
-                                {/* Prayer Name - Clear & Readable */}
-                                <p className={`text-xs font-bold text-center mb-1.5 uppercase tracking-wide ${isNext
-                                    ? 'text-emerald-800 dark:text-emerald-200'
-                                    : 'text-slate-700 dark:text-slate-300'
-                                    }`}>
-                                    {getTranslatedPrayerName(prayer.name)}
-                                </p>
+                                {/* Text Info */}
+                                <div className="flex flex-col">
+                                    <span className={`text-sm font-bold ${isNext ? 'text-slate-800 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'}`}>
+                                        {prayer.name}
+                                    </span>
+                                    <span className={`text-xs ${isNext ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
+                                        {isNext ? 'Unknown Time' : `${prayer.name} Time`}
+                                    </span>
+                                </div>
+                            </div>
 
-                                {/* Prayer Time - Large & Bold */}
-                                <p className={`text-base font-bold text-center tabular-nums ${isNext
-                                    ? 'text-emerald-900 dark:text-emerald-100'
-                                    : 'text-slate-900 dark:text-slate-100'
-                                    }`}>
+                            {/* Time & Action */}
+                            <div className="flex items-center gap-4">
+                                <span className={`text-base font-bold tabular-nums ${isNext ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
                                     {prayer.time}
-                                </p>
+                                </span>
 
-                                {/* Sound Icon - Accessible Size */}
                                 {!isSunrise && (
-                                    <motion.button
-                                        className={`mt-2 mx-auto flex items-center justify-center w-7 h-7 rounded-full transition-all ${isNext
-                                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
-                                            : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-600'
-                                            }`}
-                                        whileHover={{ scale: 1.15 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        aria-label="Toggle adhan notification"
-                                    >
-                                        <Volume2 className="h-3.5 w-3.5" />
-                                    </motion.button>
+                                    <button className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${isNext
+                                            ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'
+                                        }`}>
+                                        <Volume2 className="w-4 h-4" />
+                                    </button>
                                 )}
-
-                                {/* Active indicator - Subtle pulse */}
-                                {isNext && (
-                                    <motion.div
-                                        className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full"
-                                        animate={{
-                                            scale: [1, 1.3, 1],
-                                            opacity: [1, 0.7, 1],
-                                        }}
-                                        transition={{
-                                            duration: 2,
-                                            repeat: Infinity,
-                                            ease: "easeInOut"
-                                        }}
-                                    />
-                                )}
-                            </motion.div>
-                        )
-                    })}
-                </div>
+                            </div>
+                        </motion.div>
+                    )
+                })}
             </div>
-        </motion.div>
+        </div>
     )
 }

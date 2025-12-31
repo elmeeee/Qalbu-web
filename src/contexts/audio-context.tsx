@@ -10,6 +10,8 @@ interface AudioContextType {
     progress: number
     duration: number
     isLoading: boolean
+    isMuted: boolean
+    setIsMuted: (muted: boolean) => void
     selectedReciter: string
     changeReciter: (reciterId: string) => void
     playAyah: (surah: SurahDetail, ayah: Ayah) => void
@@ -33,6 +35,7 @@ const AudioContext = createContext<AudioContextType | undefined>(undefined)
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
     const [isPlaying, setIsPlaying] = useState(false)
+    const [isMuted, setIsMuted] = useState(false)
     const [currentSurah, setCurrentSurah] = useState<SurahDetail | null>(null)
     const [currentAyah, setCurrentAyah] = useState<Ayah | null>(null)
     const [progress, setProgress] = useState(0)
@@ -61,6 +64,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         audio.preload = 'auto'
         // @ts-ignore - playsInline is not in standard definition but helps on some iOS versions
         audio.playsInline = true
+        audio.muted = isMuted
 
         const handleTimeUpdate = () => setProgress(audio.currentTime)
         const handleLoadedMetadata = () => setDuration(audio.duration)
@@ -278,10 +282,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
         audio.addEventListener('ended', handleEnded)
         return () => audio.removeEventListener('ended', handleEnded)
-    }, [currentSurah, currentAyah]) // Re-bind when state changes so playNextRef is fresh? 
-    // Actually playNextRef.current is always fresh. We just need to bind it once?
-    // No, playNextRef.current is a mutable ref, so the function inside it changes.
-    // The listener calls the function stored in ref.
+    }, [currentSurah, currentAyah])
+
+    // Sync isMuted state to audio element
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = isMuted
+        }
+    }, [isMuted])
 
     return (
         <AudioContext.Provider value={{
@@ -291,6 +299,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             progress,
             duration,
             isLoading,
+            isMuted,
+            setIsMuted,
             selectedReciter,
             changeReciter,
             playAyah,
