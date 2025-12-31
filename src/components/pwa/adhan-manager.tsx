@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { getNextPrayer } from '@/lib/api/prayer-times'
 import { Bell, BellOff, Volume2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { toast } from 'sonner' // Assuming sonner or use standard alert
 
 export function AdhanManager() {
     const { prayerTimes } = usePrayerTimes()
@@ -61,6 +60,36 @@ export function AdhanManager() {
         }
     }
 
+    const playAdhan = useCallback((prayerName: string) => {
+        // 1. Play Audio
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0
+            audioRef.current.play().catch(e => console.error('Error playing adhan:', e))
+        }
+
+        // 2. Send Notification
+        if (permission === 'granted') {
+            // Service Worker Notification (Better for PWA)
+            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(`Time for ${prayerName}`, {
+                        body: 'Hayya \'ala-s-Salah (Come to Prayer)',
+                        icon: '/icons/icon-192x192.png',
+                        vibrate: [200, 100, 200],
+                        tag: 'adhan-notification',
+                        requireInteraction: true // Keeps notification visible
+                    })
+                })
+            } else {
+                // Fallback standard notification
+                new Notification(`Time for ${prayerName}`, {
+                    body: 'Hayya \'ala-s-Salah (Come to Prayer)',
+                    icon: '/icons/icon-192x192.png',
+                })
+            }
+        }
+    }, [permission])
+
     // Check for prayer times
     useEffect(() => {
         if (!prayerTimes?.timings) return
@@ -89,37 +118,7 @@ export function AdhanManager() {
         }, 10000) // Check every 10 seconds
 
         return () => clearInterval(checkInterval)
-    }, [prayerTimes])
-
-    const playAdhan = (prayerName: string) => {
-        // 1. Play Audio
-        if (audioRef.current) {
-            audioRef.current.currentTime = 0
-            audioRef.current.play().catch(e => console.error('Error playing adhan:', e))
-        }
-
-        // 2. Send Notification
-        if (permission === 'granted') {
-            // Service Worker Notification (Better for PWA)
-            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification(`Time for ${prayerName}`, {
-                        body: 'Hayya \'ala-s-Salah (Come to Prayer)',
-                        icon: '/icons/icon-192x192.png',
-                        vibrate: [200, 100, 200],
-                        tag: 'adhan-notification',
-                        requireInteraction: true // Keeps notification visible
-                    })
-                })
-            } else {
-                // Fallback standard notification
-                new Notification(`Time for ${prayerName}`, {
-                    body: 'Hayya \'ala-s-Salah (Come to Prayer)',
-                    icon: '/icons/icon-192x192.png',
-                })
-            }
-        }
-    }
+    }, [prayerTimes, playAdhan])
 
     // Render a hidden element or a small control if needed.
     // Ideally this component is headless but we can return null.
