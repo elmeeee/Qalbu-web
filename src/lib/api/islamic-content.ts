@@ -50,8 +50,8 @@ const prophetNames = [
 
 // Mapping for Wikipedia slugs if they differ significantly or for specific languages
 const prophetSlugs: { [key: string]: { [key in Language]?: string } } = {
-    'Adam': { en: 'Adam_in_Islam', id: 'Adam_dalam_Islam', ms: 'Nabi_Adam_a.s.', vi: 'Adam_trong_Hồi_giáo', th: 'อาดัม_ในศาสนาอิสลาม' },
-    'Muhammad': { en: 'Muhammad', id: 'Muhammad', ms: 'Nabi_Muhammad_SAW', vi: 'Muhammad', th: 'มุฮัมมัด' },
+    'Adam': { en: 'Adam_in_Islam', id: 'Adam_dalam_Islam', ms: 'Nabi_Adam_a.s.' },
+    'Muhammad': { en: 'Muhammad', id: 'Muhammad', ms: 'Nabi_Muhammad_SAW' },
     // Add more mappings as needed, otherwise fallback to English or simple translation
 };
 
@@ -68,7 +68,6 @@ export async function getProphetStories(language: Language = 'en'): Promise<Prop
                 // For 'en', it's usually "Name_in_Islam" or just "Name"
                 if (language === 'en') slug = `${name}_in_Islam`;
                 else if (language === 'id' || language === 'ms') slug = `Nabi_${name}`;
-                else if (language === 'vi') slug = `${name}_trong_Hồi_giáo`; // Heuristic for Vietnamese
                 else slug = name; // Fallback
             }
 
@@ -76,9 +75,6 @@ export async function getProphetStories(language: Language = 'en'): Promise<Prop
             // But user wants "support all language".
             // Let's try the language specific URL first.
             let langCode = language;
-            // No special mapping needed for current supported languages (zh, ko, ja, th, vi, id, ms, en, nl)
-            // Wikipedia codes usually match ISO codes
-            if (language === 'zh') langCode = 'zh'; // Wikipedia uses zh
 
             let url = `https://${langCode}.wikipedia.org/api/rest_v1/page/summary/${slug}`;
 
