@@ -78,8 +78,8 @@ export default function RamadanCalendarPage() {
                     setSelectedCountry(closestCountry)
                 },
                 (error) => {
-                    console.error('Geolocation error:', error)
-                    // Keep default country
+                    // Silently handle geolocation errors (permission denied, etc.)
+                    // Keep default country selection
                 }
             )
         }

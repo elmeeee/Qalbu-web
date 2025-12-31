@@ -126,14 +126,21 @@ export function PrayerTimesWidgetPWA() {
     })
 
     // Calculate time until next prayer
-    const timeUntilNext = nextPrayer ? getTimeUntil(
-        new Date(
-            new Date().setHours(
-                parseInt(nextPrayer.time.split(':')[0]),
-                parseInt(nextPrayer.time.split(':')[1])
-            )
-        )
-    ) : ''
+    const timeUntilNext = nextPrayer ? (() => {
+        const now = new Date()
+        const [hours, minutes] = nextPrayer.time.split(':').map(Number)
+
+        // Create target date for the prayer time
+        let targetDate = new Date()
+        targetDate.setHours(hours, minutes, 0, 0)
+
+        // If the prayer time has already passed today AND it's Fajr, it means we need tomorrow's Fajr
+        if (targetDate <= now && nextPrayer.name === 'Fajr') {
+            targetDate.setDate(targetDate.getDate() + 1)
+        }
+
+        return getTimeUntil(targetDate)
+    })() : ''
 
     return (
         <motion.div
