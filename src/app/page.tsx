@@ -76,7 +76,8 @@ export default function HomePage() {
                     {/* PWA Header - Fixed & Premium Glass */}
                     <motion.div
                         variants={{ hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0 } }}
-                        className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/10 shadow-sm shadow-emerald-500/5 flex items-center justify-between transition-all duration-300"
+                        className="fixed top-0 left-0 right-0 z-50 px-6 pb-4 pt-safe mt-safe-top bg-white/80 dark:bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/10 shadow-sm shadow-emerald-500/5 flex items-center justify-between transition-all duration-300"
+                        style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
                     >
                         <div>
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
@@ -94,7 +95,7 @@ export default function HomePage() {
                     </motion.div>
 
                     {/* Spacer for Fixed Header */}
-                    <div className="h-20" />
+                    <div className="h-20 pt-safe" />
 
                     {/* 0. Last Read Widget (Visible if history exists) */}
                     <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
