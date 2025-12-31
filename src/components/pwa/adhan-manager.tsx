@@ -24,12 +24,25 @@ export function AdhanManager() {
         }
 
         // Audio Unlocker for iOS (one-time)
+        // Audio Unlocker for iOS (one-time)
         const unlockAudio = () => {
             if (audioRef.current) {
-                audioRef.current.play().then(() => {
-                    audioRef.current?.pause()
-                    audioRef.current!.currentTime = 0
-                }).catch(() => { })
+                const audio = audioRef.current
+                const originalVolume = audio.volume
+
+                // Mute briefly for unlock
+                audio.muted = true
+
+                audio.play().then(() => {
+                    audio.pause()
+                    audio.currentTime = 0
+                    // Restore state
+                    audio.muted = false
+                }).catch(() => {
+                    // If failed, still ensure muted is reset
+                    audio.muted = false
+                })
+
                 document.removeEventListener('click', unlockAudio)
                 document.removeEventListener('touchstart', unlockAudio)
             }
