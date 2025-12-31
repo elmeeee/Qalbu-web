@@ -103,6 +103,7 @@ export function DailyDuaWidget() {
                         <div className="relative z-10 h-full flex flex-col p-16">
                             {/* Header */}
                             <div className="flex items-center gap-5 mb-12">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="/icons/qalbuIcon.png"
                                     alt="Qalbu"

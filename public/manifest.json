@@ -4,8 +4,14 @@
     "description": "Your daily Islamic companion for prayer times, Quran, and more.",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#d97706",
+    "background_color": "#020617",
+    "theme_color": "#020617",
+    "orientation": "portrait",
+    "categories": [
+        "education",
+        "lifestyle",
+        "religious"
+    ],
     "icons": [
         {
             "src": "/icons/AppIcon.png",

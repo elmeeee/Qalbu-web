@@ -21,6 +21,27 @@ export function AdhanManager() {
         if ('Notification' in window) {
             setPermission(Notification.permission)
         }
+
+        // ONE-TIME Audio Unlocker for iOS
+        const unlockAudio = () => {
+            if (audioRef.current) {
+                audioRef.current.play().then(() => {
+                    audioRef.current?.pause()
+                    audioRef.current!.currentTime = 0
+                }).catch(() => { })
+                // Remove listeners once unlocked
+                document.removeEventListener('click', unlockAudio)
+                document.removeEventListener('touchstart', unlockAudio)
+            }
+        }
+
+        document.addEventListener('click', unlockAudio)
+        document.addEventListener('touchstart', unlockAudio)
+
+        return () => {
+            document.removeEventListener('click', unlockAudio)
+            document.removeEventListener('touchstart', unlockAudio)
+        }
     }, [])
 
     const requestPermission = async () => {

@@ -603,6 +603,7 @@ export function QuranReels() {
                         <div className="relative z-10 h-full flex flex-col p-16">
                             {/* Header - Logo & Branding */}
                             <div className="flex items-center gap-5 mb-12">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="/icons/qalbuIcon.png"
                                     alt="Qalbu"
@@ -680,7 +681,8 @@ export function QuranReels() {
                     }
                 }}
                 components={{
-                    Scroller: forwardRef((props, ref) => (
+                    // eslint-disable-next-line react/display-name
+                    Scroller: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { context?: any }>((props, ref) => (
                         <div
                             {...props}
                             ref={ref}
