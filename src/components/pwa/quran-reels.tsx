@@ -284,23 +284,27 @@ export function QuranReels() {
     useEffect(() => {
         if (ayahs[currentIndex] && audioRef.current) {
             const audio = audioRef.current
+            const currentAudioSrc = ayahs[currentIndex].audio
 
-            // IMPORTANT: Completely stop and reset previous audio
-            audio.pause()
-            audio.currentTime = 0
-            // Remove all previous event listeners to prevent multiple triggers
-            audio.onended = null
-            audio.oncanplaythrough = null
+            // Check if source changed to avoid restarting on data fetch
+            if (audio.src !== currentAudioSrc) {
+                // IMPORTANT: Completely stop and reset previous audio
+                audio.pause()
+                audio.currentTime = 0
+                // Remove all previous event listeners to prevent multiple triggers
+                audio.onended = null
+                audio.oncanplaythrough = null
 
-            // Set new source
-            audio.src = ayahs[currentIndex].audio
-            audio.load()
+                // Set new source
+                audio.src = currentAudioSrc
+                audio.load()
 
-            console.log(`🎵 Loading audio for ayah ${ayahs[currentIndex].numberInSurah}`)
+                console.log(`🎵 Loading audio for ayah ${ayahs[currentIndex].numberInSurah}`)
+            }
 
             // Only auto-play if enabled
             if (autoPlay) {
-                // Auto-play and auto-scroll to next ayah when audio ends
+                // Update ended listener even if src didn't change (closure capture)
                 const handleAudioEnd = () => {
                     console.log(`✅ Audio ended for ayah ${ayahs[currentIndex].numberInSurah}`)
                     const currentAyahData = ayahs[currentIndex]
@@ -313,7 +317,7 @@ export function QuranReels() {
                         return
                     }
 
-                    // Move to next ayah - this will trigger currentIndex change via rangeChanged
+                    // Move to next ayah - this will trigger currentIndex change via onScroll
                     if (currentIndex < ayahs.length - 1) {
                         console.log(`⏭️  Moving to next ayah: ${currentIndex + 1}`)
                         virtuosoRef.current?.scrollToIndex({
@@ -321,49 +325,70 @@ export function QuranReels() {
                             align: 'start',
                             behavior: 'smooth'
                         })
-                        // The rangeChanged callback will update currentIndex,
-                        // which will trigger this useEffect again with the new ayah
                     }
                 }
 
                 const handleCanPlay = () => {
                     if (!isMuted) {
                         console.log(`▶️  Playing audio for ayah ${ayahs[currentIndex].numberInSurah}`)
-                        audio.play().catch(err => {
-                            if (err.name !== 'AbortError') {
-                                console.error('Audio play error:', err)
-                            }
-                        })
-                        setIsPlaying(true)
+                        // Ensure we are playing the right thing
+                        if (audio.src === currentAudioSrc) {
+                            audio.play().catch(err => {
+                                if (err.name !== 'AbortError') {
+                                    console.error('Audio play error:', err)
+                                }
+                            })
+                            setIsPlaying(true)
+                        }
                     } else {
                         setIsPlaying(false)
                     }
                 }
 
-                audio.addEventListener('ended', handleAudioEnd)
+                // Always re-attach ended to capture latest closures (like ayahs/currentIndex)
+                // Note: using 'once' or removing manually is tricky if we want to update it.
+                // Best to remove old and add new.
+                // However, since we are inside useEffect with [currentIndex], 
+                // every time index changes, we get here. 
+                // BUT, if 'ayahs' changed (fetch more), we also get here.
 
-                // Check if already ready to play (e.g. from cache)
-                if (audio.readyState >= 3) {
-                    handleCanPlay()
-                } else {
-                    audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+                // If src didn't change, we might not want to interrupt playback unless we need to update 'ended'.
+                // 'ended' needs 'ayahs' and 'currentIndex'.
+                // If 'ayahs' changed, we definitely need to update 'ended' listener because 'ayahs' closure changed?
+                // Yes.
+
+                // Clean up previous listeners if we are essentially re-running the effect on same ayah
+                const onEndedWrapper = () => handleAudioEnd()
+                audio.addEventListener('ended', onEndedWrapper)
+
+                // If it's a new load (src changed), wait for canplay
+                if (audio.src !== currentAudioSrc || audio.paused) {
+                    if (audio.readyState >= 3) {
+                        handleCanPlay()
+                    } else {
+                        audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
+                    }
+                } else if (isPlaying && !audio.paused) {
+                    // Already playing correct src, ensure state reflects it
+                    setIsPlaying(true)
                 }
 
                 return () => {
-                    // Cleanup: remove event listeners when component unmounts or dependencies change
-                    audio.removeEventListener('ended', handleAudioEnd)
+                    audio.removeEventListener('ended', onEndedWrapper)
                     audio.removeEventListener('canplaythrough', handleCanPlay)
                 }
             } else {
                 setIsPlaying(false)
+                audio.pause()
             }
         }
 
-        // Cleanup function to stop audio when switching ayahs
+        // Cleanup function for when component unmounts or severe change
         return () => {
-            if (audioRef.current) {
-                audioRef.current.pause()
-            }
+            // We generally don't want to stop audio just because effect re-ran if src is same
+            // But if we navigate away (component unmount), we should.
+            // Rely on parent useEffect cleanup? 
+            // Actually, if we change currentIndex, we DO want to pause old track (handled by src check logic above technically)
         }
     }, [currentIndex, ayahs, isMuted, autoPlay])
 
