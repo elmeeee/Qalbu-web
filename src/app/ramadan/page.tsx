@@ -186,10 +186,30 @@ export default function RamadanCalendarPage() {
 
     return (
         <div className={cn(
-            "min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/20 via-slate-950 to-slate-950 py-8 px-4",
+            "min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-emerald-50/30 to-teal-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 px-4",
             isPwa ? 'pb-24' : ''
         )}>
-            <div className="container mx-auto max-w-3xl">
+            {/* Animated Background Pattern */}
+            <div className="fixed inset-0 pointer-events-none opacity-[0.015] dark:opacity-[0.025]">
+                <motion.div
+                    className="absolute inset-0"
+                    style={{
+                        backgroundImage: `radial-gradient(circle at 25% 25%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
+                                         radial-gradient(circle at 75% 75%, rgba(20, 184, 166, 0.3) 0%, transparent 50%)`,
+                    }}
+                    animate={{
+                        scale: [1, 1.1, 1],
+                        rotate: [0, 5, 0],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                />
+            </div>
+
+            <div className="container mx-auto max-w-3xl relative z-10">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
