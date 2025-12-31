@@ -17,7 +17,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import html2canvas from 'html2canvas'
-import { parseTajweed, TAJWEED_META } from '@/lib/tajweed'
+import { parseTajweed, TAJWEED_META, type TajweedMeta } from '@/lib/tajweed'
 
 interface Ayah {
     number: number
@@ -37,7 +37,7 @@ interface Ayah {
 }
 
 // List of all 114 Surahs
-const SURAHS = [
+export const SURAHS = [
     { number: 1, name: 'Al-Fatihah', translation: 'The Opening', verses: 7, revelation: 'Mecca' },
     { number: 2, name: 'Al-Baqarah', translation: 'The Cow', verses: 286, revelation: 'Medina' },
     { number: 3, name: 'Ali \'Imran', translation: 'Family of Imran', verses: 200, revelation: 'Medina' },
@@ -171,7 +171,7 @@ export function QuranReels() {
     const [searchQuery, setSearchQuery] = useState('')
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
     const [showEndSurahAlert, setShowEndSurahAlert] = useState(false)
-    const [selectedTajweed, setSelectedTajweed] = useState<typeof TAJWEED_META[string] | null>(null)
+    const [selectedTajweed, setSelectedTajweed] = useState<TajweedMeta | null>(null)
 
     // New User Settings
     const [fontSize, setFontSize] = useState(3) // Default 3rem (~text-5xl)
@@ -180,6 +180,31 @@ export function QuranReels() {
     const containerRef = useRef<HTMLDivElement>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
     const searchParams = useSearchParams()
+
+    // Persist Settings
+    useEffect(() => {
+        const savedSettings = localStorage.getItem('quran-reels-settings')
+        if (savedSettings) {
+            try {
+                const { showTranslation, showTransliteration, fontSize, autoPlay } = JSON.parse(savedSettings)
+                if (typeof showTranslation === 'boolean') setShowTranslation(showTranslation)
+                if (typeof showTransliteration === 'boolean') setShowTransliteration(showTransliteration)
+                if (typeof fontSize === 'number') setFontSize(fontSize)
+                if (typeof autoPlay === 'boolean') setAutoPlay(autoPlay)
+            } catch (e) {
+                console.error('Failed to parse settings', e)
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem('quran-reels-settings', JSON.stringify({
+            showTranslation,
+            showTransliteration,
+            fontSize,
+            autoPlay
+        }))
+    }, [showTranslation, showTransliteration, fontSize, autoPlay])
 
     // Save Last Read
     useEffect(() => {
@@ -702,7 +727,7 @@ export function QuranReels() {
                                             lineHeight: 2.2
                                         }}
                                     >
-                                        {ayah.tajweed ? parseTajweed(ayah.tajweed, setSelectedTajweed) : ayah.text}
+                                        {ayah.tajweed ? parseTajweed(ayah.tajweed, setSelectedTajweed, language) : ayah.text}
                                     </div>
 
                                     {/* Transliteration */}
