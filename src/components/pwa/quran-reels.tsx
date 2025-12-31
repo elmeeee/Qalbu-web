@@ -311,18 +311,24 @@ export function QuranReels() {
         if (ayahs[currentIndex] && audioRef.current) {
             const audio = audioRef.current
 
-            // Pause current audio first to prevent interruption
+            // IMPORTANT: Completely stop and reset previous audio
             audio.pause()
             audio.currentTime = 0
+            // Remove all previous event listeners to prevent multiple triggers
+            audio.onended = null
+            audio.oncanplaythrough = null
 
             // Set new source
             audio.src = ayahs[currentIndex].audio
             audio.load()
 
+            console.log(`🎵 Loading audio for ayah ${ayahs[currentIndex].numberInSurah}`)
+
             // Only auto-play if enabled
             if (autoPlay) {
                 // Auto-play and auto-scroll to next ayah when audio ends
                 const handleAudioEnd = () => {
+                    console.log(`✅ Audio ended for ayah ${ayahs[currentIndex].numberInSurah}`)
                     const currentAyahData = ayahs[currentIndex]
                     const currentSurahData = SURAHS.find(s => s.number === currentAyahData.surah?.number)
 
@@ -333,18 +339,22 @@ export function QuranReels() {
                         return
                     }
 
-                    // Move to next ayah in virtualization
+                    // Move to next ayah - this will trigger currentIndex change via rangeChanged
                     if (currentIndex < ayahs.length - 1) {
+                        console.log(`⏭️  Moving to next ayah: ${currentIndex + 1}`)
                         virtuosoRef.current?.scrollToIndex({
                             index: currentIndex + 1,
                             align: 'start',
                             behavior: 'smooth'
                         })
+                        // The rangeChanged callback will update currentIndex,
+                        // which will trigger this useEffect again with the new ayah
                     }
                 }
 
                 const handleCanPlay = () => {
                     if (!isMuted) {
+                        console.log(`▶️  Playing audio for ayah ${ayahs[currentIndex].numberInSurah}`)
                         audio.play().catch(err => {
                             if (err.name !== 'AbortError') {
                                 console.error('Audio play error:', err)
@@ -366,11 +376,19 @@ export function QuranReels() {
                 }
 
                 return () => {
+                    // Cleanup: remove event listeners when component unmounts or dependencies change
                     audio.removeEventListener('ended', handleAudioEnd)
                     audio.removeEventListener('canplaythrough', handleCanPlay)
                 }
             } else {
                 setIsPlaying(false)
+            }
+        }
+
+        // Cleanup function to stop audio when switching ayahs
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause()
             }
         }
     }, [currentIndex, ayahs, isMuted, autoPlay])
@@ -589,8 +607,8 @@ export function QuranReels() {
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleLike() }}
                         className={`p-3 rounded-full backdrop-blur-md border transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`)
-                                ? 'bg-rose-500/30 border-rose-500/50 text-rose-400'
-                                : 'bg-black/20 border-white/10 text-white hover:bg-rose-500/20 hover:border-rose-500/30'
+                            ? 'bg-rose-500/30 border-rose-500/50 text-rose-400'
+                            : 'bg-black/20 border-white/10 text-white hover:bg-rose-500/20 hover:border-rose-500/30'
                             }`}
                     >
                         <Heart
