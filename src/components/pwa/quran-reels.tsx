@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 import { useAudio } from '@/contexts/audio-context'
+import { useSearchParams } from 'next/navigation'
 import { ReciterSelector } from '@/components/audio/reciter-selector'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -178,6 +179,21 @@ export function QuranReels() {
     const audioRef = useRef<HTMLAudioElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const shareCardRef = useRef<HTMLDivElement>(null)
+    const searchParams = useSearchParams()
+
+    // Save Last Read
+    useEffect(() => {
+        if (ayahs[currentIndex]) {
+            const currentAyahData = ayahs[currentIndex]
+            if (currentAyahData.surah) {
+                localStorage.setItem('quran-last-read', JSON.stringify({
+                    surah: currentAyahData.surah.number,
+                    ayah: currentAyahData.numberInSurah,
+                    timestamp: Date.now()
+                }))
+            }
+        }
+    }, [currentIndex, ayahs])
 
     const handleShare = async () => {
         if (!shareCardRef.current || !ayahs[currentIndex]) return
@@ -217,6 +233,21 @@ export function QuranReels() {
 
     // Load initial ayahs
     useEffect(() => {
+        // Check for resume params first
+        const resumeSurah = searchParams.get('surah')
+        const resumeAyah = searchParams.get('ayah')
+
+        if (resumeSurah && resumeAyah) {
+            const surahNum = parseInt(resumeSurah)
+            const ayahNum = parseInt(resumeAyah)
+            if (!isNaN(surahNum) && !isNaN(ayahNum)) {
+                setCurrentSurah(surahNum)
+                setCurrentAyah(ayahNum)
+                loadAyahs(surahNum, ayahNum, true)
+                return
+            }
+        }
+
         loadAyahs(currentSurah, currentAyah, true)
     }, [selectedReciter])
 

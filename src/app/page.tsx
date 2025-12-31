@@ -20,7 +20,7 @@ import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
 import { usePWAMode } from '@/hooks/use-pwa-mode'
-import { DailyDuaSlider, NearbyMosqueCard } from '@/components/pwa'
+import { DailyDuaSlider, NearbyMosqueCard, LastReadWidget } from '@/components/pwa'
 
 // Animation variants
 const fadeInUp = {
@@ -78,6 +78,9 @@ export default function HomePage() {
 
                     {/* Spacer for Fixed Header */}
                     <div className="h-20" />
+
+                    {/* 0. Last Read Widget (Visible if history exists) */}
+                    <LastReadWidget />
 
                     {/* 1. Prayer Times Widget */}
                     <PrayerTimesWidgetPWA />
