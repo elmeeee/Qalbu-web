@@ -8,7 +8,7 @@ import { PrayerTimesWidgetPWA } from '@/components/prayer/prayer-times-widget-pw
 import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
 import { DailyDuaWidget } from '@/components/dua/daily-dua-widget'
 import { IslamicHolidaysWidgetPWA } from '@/components/islamic/islamic-holidays-widget-pwa'
-import { DailyDuaSlider, NearbyMosqueCard, LastReadWidget } from '@/components/pwa'
+import { DailyDuaSlider, NearbyMosqueCard, LastReadWidget, FavoriteAyahsWidget } from '@/components/pwa'
 import { useLanguage } from '@/contexts/language-context'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { AdhanManager } from '@/components/pwa/adhan-manager'
@@ -61,6 +61,11 @@ export default function PWAHome() {
                 {/* 0. Last Read Widget (Visible if history exists) */}
                 <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
                     <LastReadWidget />
+                </motion.div>
+
+                {/* 0.5. Favorite Ayahs Widget */}
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                    <FavoriteAyahsWidget />
                 </motion.div>
 
                 {/* 1. Prayer Times Widget */}

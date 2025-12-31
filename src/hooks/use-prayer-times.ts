@@ -40,10 +40,25 @@ export function usePrayerTimes() {
 
     // Get location
     useEffect(() => {
+        // Try to get cached location first
+        const cachedCoords = localStorage.getItem('cached-location')
+        if (cachedCoords) {
+            try {
+                const coords = JSON.parse(cachedCoords)
+                setCoordinates(coords)
+                getReverseGeocoding(coords).then(setLocationName)
+            } catch (e) {
+                // Invalid cache, continue to get fresh location
+            }
+        }
+
         getCurrentLocation()
             .then((coords) => {
                 setCoordinates(coords)
                 setLocationError(null)
+                // Cache the location
+                localStorage.setItem('cached-location', JSON.stringify(coords))
+
                 // Fetch location name
                 getReverseGeocoding(coords).then((location) => {
                     setLocationName(location)
@@ -55,12 +70,43 @@ export function usePrayerTimes() {
                     }
                 })
             })
-            .catch((error) => {
-                setLocationError(error.message)
-                // Default to Mecca coordinates if location fails
-                const meccaCoords = { latitude: 21.4225, longitude: 39.826206 }
-                setCoordinates(meccaCoords)
-                getReverseGeocoding(meccaCoords).then(setLocationName)
+            .catch(async (error) => {
+                // Try IP-based geolocation as fallback
+                try {
+                    const response = await fetch('https://ipapi.co/json/')
+                    if (response.ok) {
+                        const data = await response.json()
+                        const coords = { latitude: data.latitude, longitude: data.longitude }
+                        setCoordinates(coords)
+                        setLocationName({
+                            city: data.city,
+                            country: data.country_name,
+                            countryCode: data.country_code,
+                        })
+                        localStorage.setItem('cached-location', JSON.stringify(coords))
+                        setLocationError(null)
+                        return
+                    }
+                } catch (ipError) {
+                    // IP geolocation also failed
+                }
+
+                // Final fallback: Use timezone-based default location
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+                let fallbackCoords = { latitude: 21.4225, longitude: 39.826206 } // Mecca default
+
+                // Common timezone fallbacks
+                if (timezone.includes('Jakarta') || timezone.includes('Asia/Jakarta')) {
+                    fallbackCoords = { latitude: -6.2088, longitude: 106.8456 } // Jakarta
+                } else if (timezone.includes('Singapore')) {
+                    fallbackCoords = { latitude: 1.3521, longitude: 103.8198 } // Singapore
+                } else if (timezone.includes('Kuala_Lumpur')) {
+                    fallbackCoords = { latitude: 3.1390, longitude: 101.6869 } // KL
+                }
+
+                setLocationError('Using approximate location based on timezone')
+                setCoordinates(fallbackCoords)
+                getReverseGeocoding(fallbackCoords).then(setLocationName)
             })
     }, [])
 
