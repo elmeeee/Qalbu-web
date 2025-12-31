@@ -155,7 +155,18 @@ export function PrayerTimesWidgetPWA() {
                         </div>
                         <span className="text-sm font-medium text-foreground/80 dark:text-white/90 tracking-wide">{displayLocation}</span>
                     </div>
-                    <button className="p-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all text-foreground/70 dark:text-white/80 hover:text-emerald-600 dark:hover:text-emerald-400">
+                    <button
+                        onClick={() => {
+                            if ('Notification' in window) {
+                                Notification.requestPermission().then(status => {
+                                    if (status === 'granted') {
+                                        new Notification('Qalbu Notifications Enabled')
+                                    }
+                                })
+                            }
+                        }}
+                        className="p-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all text-foreground/70 dark:text-white/80 hover:text-emerald-600 dark:hover:text-emerald-400"
+                    >
                         <Bell className="h-4 w-4" />
                     </button>
                 </div>

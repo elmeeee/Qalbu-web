@@ -11,12 +11,14 @@ import { IslamicHolidaysWidgetPWA } from '@/components/islamic/islamic-holidays-
 import { DailyDuaSlider, NearbyMosqueCard, LastReadWidget } from '@/components/pwa'
 import { useLanguage } from '@/contexts/language-context'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
+import { AdhanManager } from '@/components/pwa/adhan-manager'
 
 export default function PWAHome() {
     const { settings, updateSettings } = usePrayerTimes()
 
     return (
         <main className="min-h-screen bg-background pb-24">
+            <AdhanManager />
             <motion.div
                 className="container mx-auto px-4 py-6 space-y-6"
                 initial="hidden"
