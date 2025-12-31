@@ -488,13 +488,13 @@ export function QuranReels() {
 
     const renderAyah = (index: number, ayah: Ayah) => {
         return (
-            <div className="h-[100vh] w-full snap-center relative flex items-center justify-center bg-black hardware-accelerated">
-                {/* Dynamic Gradient Background */}
-                <div className="absolute inset-0 bg-slate-950" />
+            <div className="h-[100vh] w-full snap-center relative flex items-center justify-center bg-slate-50 dark:bg-black hardware-accelerated transition-colors duration-500">
+                {/* Dynamic Gradient Background matching Home */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/40 dark:from-slate-950 dark:via-black dark:to-slate-950" />
 
                 {/* Animated Pattern Overlay - Simplified for performance */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)]" />
+                <div className="absolute inset-0 opacity-[0.03] dark:opacity-10 pointer-events-none">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.2),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)]" />
                 </div>
 
                 <div onClick={handleTap} className="absolute inset-0 z-10 cursor-pointer" />
@@ -523,17 +523,17 @@ export function QuranReels() {
                 {/* Top Header - Controls */}
                 <div className="absolute top-0 left-0 right-0 z-30 p-6 pt-12 pointer-events-none flex justify-between items-start">
                     <div className="pointer-events-auto" onClick={() => setShowSurahSelector(true)}>
-                        <div className="flex items-center gap-2 bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-                            <BookOpen className="h-4 w-4 text-emerald-400" />
-                            <span className="text-white font-medium">{ayah.surah?.englishName}</span>
-                            <span className="text-emerald-400 font-bold">{ayah.numberInSurah}</span>
+                        <div className="flex items-center gap-2 bg-white/80 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-slate-200/50 dark:border-white/10 shadow-sm">
+                            <BookOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-slate-700 dark:text-white font-medium">{ayah.surah?.englishName}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">{ayah.numberInSurah}</span>
                         </div>
                     </div>
 
                     <div className="pointer-events-auto flex gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="p-2 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white">
+                                <button className="p-2 rounded-full bg-white/80 dark:bg-black/20 backdrop-blur-md border border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-white shadow-sm">
                                     <MoreVertical className="w-5 h-5" />
                                 </button>
                             </DropdownMenuTrigger>
@@ -578,7 +578,7 @@ export function QuranReels() {
                 <div className="w-full px-6 flex flex-col items-center gap-8 z-10">
                     {/* Arabic */}
                     <div
-                        className="text-white text-center leading-relaxed drop-shadow-lg"
+                        className="text-slate-900 dark:text-white text-center leading-relaxed drop-shadow-sm dark:drop-shadow-lg transition-colors duration-500"
                         dir="rtl"
                         style={{
                             fontSize: `${fontSize}rem`,
@@ -590,14 +590,14 @@ export function QuranReels() {
 
                     {/* Translateration */}
                     {showTransliteration && ayah.transliteration && (
-                        <div className="text-emerald-200/80 text-lg text-center font-medium italic max-w-2xl">
+                        <div className="text-emerald-700 dark:text-emerald-200/80 text-lg text-center font-medium italic max-w-2xl transition-colors duration-500">
                             {ayah.transliteration}
                         </div>
                     )}
 
                     {/* Translation */}
                     {showTranslation && ayah.translation && (
-                        <div className="text-white/90 text-lg text-center leading-relaxed max-w-2xl font-light">
+                        <div className="text-slate-700 dark:text-white/90 text-lg text-center leading-relaxed max-w-2xl font-light transition-colors duration-500">
                             {ayah.translation}
                         </div>
                     )}
@@ -607,25 +607,25 @@ export function QuranReels() {
                 <div className="absolute bottom-32 right-6 z-30 flex flex-col gap-3 pointer-events-auto">
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleLike() }}
-                        className={`p-3 rounded-full backdrop-blur-md border transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`)
-                            ? 'bg-rose-500/30 border-rose-500/50 text-rose-400'
-                            : 'bg-black/20 border-white/10 text-white hover:bg-rose-500/20 hover:border-rose-500/30'
+                        className={`p-3 rounded-full backdrop-blur-md border transition-all shadow-sm ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`)
+                            ? 'bg-rose-500/10 border-rose-500/50 text-rose-500'
+                            : 'bg-white/80 dark:bg-black/20 border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-white hover:bg-rose-500/10 hover:border-rose-500/30 dark:hover:bg-rose-500/20'
                             }`}
                     >
                         <Heart
-                            className={`w-6 h-6 transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`) ? 'fill-rose-400' : ''
+                            className={`w-6 h-6 transition-all ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`) ? 'fill-rose-500 text-rose-500' : ''
                                 }`}
                         />
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleMute() }}
-                        className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
+                        className="p-3 rounded-full bg-white/80 dark:bg-black/20 backdrop-blur-md border border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-white hover:bg-emerald-500/10 hover:text-emerald-600 transition-colors shadow-sm"
                     >
                         {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); handleShare() }}
-                        className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
+                        className="p-3 rounded-full bg-white/80 dark:bg-black/20 backdrop-blur-md border border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-white hover:bg-emerald-500/10 hover:text-emerald-600 transition-colors shadow-sm"
                     >
                         <Share2 className="w-6 h-6" />
                     </button>
@@ -733,24 +733,37 @@ export function QuranReels() {
                 data={ayahs}
                 itemContent={renderAyah}
                 rangeChanged={({ startIndex }) => {
-                    if (startIndex !== currentIndex) {
-                        setCurrentIndex(startIndex)
-                        // Load more when near the end
-                        if (startIndex >= ayahs.length - 3 && !isLoading) {
-                            loadAyahs(currentSurah, currentAyah)
-                        }
+                    // Load more when near the end
+                    if (startIndex >= ayahs.length - 3 && !isLoading) {
+                        loadAyahs(currentSurah, currentAyah)
                     }
                 }}
                 components={{
                     // eslint-disable-next-line react/display-name
-                    Scroller: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { context?: any }>((props, ref) => (
-                        <div
-                            {...props}
-                            ref={ref}
-                            className="snap-y snap-mandatory scrollbar-hide h-full overflow-y-scroll"
-                            style={{ ...props.style, scrollbarWidth: 'none' }}
-                        />
-                    ))
+                    Scroller: forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { context?: any }>((props, ref) => {
+                        return (
+                            <div
+                                {...props}
+                                ref={ref}
+                                className="snap-y snap-mandatory scrollbar-hide h-full overflow-y-scroll"
+                                style={{ ...props.style, scrollbarWidth: 'none' }}
+                                onScroll={(e) => {
+                                    // Call original onScroll from Virtuoso
+                                    props.onScroll?.(e)
+
+                                    // Custom index calculation for accurate snap tracking
+                                    const target = e.target as HTMLDivElement
+                                    const height = target.clientHeight
+                                    if (height > 0) {
+                                        const newIndex = Math.round(target.scrollTop / height)
+                                        if (newIndex !== currentIndex && newIndex >= 0 && newIndex < ayahs.length) {
+                                            setCurrentIndex(newIndex)
+                                        }
+                                    }
+                                }}
+                            />
+                        )
+                    })
                 }}
             />
 
