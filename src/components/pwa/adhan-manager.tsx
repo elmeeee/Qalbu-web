@@ -75,10 +75,13 @@ export function AdhanManager() {
                     registration.showNotification(`Time for ${prayerName}`, {
                         body: 'Hayya \'ala-s-Salah (Come to Prayer)',
                         icon: '/icons/icon-192x192.png',
-                        vibrate: [200, 100, 200],
                         tag: 'adhan-notification',
                         requireInteraction: true // Keeps notification visible
                     })
+                    // Trigger vibration separately
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate([200, 100, 200])
+                    }
                 })
             } else {
                 // Fallback standard notification
