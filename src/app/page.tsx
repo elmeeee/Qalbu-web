@@ -58,9 +58,26 @@ export default function HomePage() {
     if (isPwa) {
         return (
             <main className="min-h-screen bg-background pb-24">
-                <div className="container mx-auto px-4 py-6 space-y-6">
+                <motion.div
+                    className="container mx-auto px-4 py-6 space-y-6"
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: {
+                                staggerChildren: 0.15,
+                                delayChildren: 0.2
+                            }
+                        }
+                    }}
+                >
                     {/* PWA Header - Fixed & Premium Glass */}
-                    <div className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/10 shadow-sm shadow-emerald-500/5 flex items-center justify-between transition-all duration-300">
+                    <motion.div
+                        variants={{ hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0 } }}
+                        className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 dark:bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/10 shadow-sm shadow-emerald-500/5 flex items-center justify-between transition-all duration-300"
+                    >
                         <div>
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 dark:from-teal-400 dark:to-emerald-400 bg-clip-text text-transparent">
                                 Qalbu
@@ -74,28 +91,37 @@ export default function HomePage() {
                             <ModeToggle />
                             <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="icon" />
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Spacer for Fixed Header */}
                     <div className="h-20" />
 
                     {/* 0. Last Read Widget (Visible if history exists) */}
-                    <LastReadWidget />
+                    <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <LastReadWidget />
+                    </motion.div>
 
                     {/* 1. Prayer Times Widget */}
-                    <PrayerTimesWidgetPWA />
+                    <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <PrayerTimesWidgetPWA />
+                    </motion.div>
 
                     {/* 2. Daily Dua Slider */}
-                    <DailyDuaSlider />
+                    <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <DailyDuaSlider />
+                    </motion.div>
 
                     {/* 3. Nearby Mosque Card */}
-                    <NearbyMosqueCard />
+                    <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <NearbyMosqueCard />
+                    </motion.div>
 
                     {/* 4. Islamic Holidays Widget */}
-                    <IslamicHolidaysWidgetPWA />
+                    <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
+                        <IslamicHolidaysWidgetPWA />
+                    </motion.div>
 
-
-                </div>
+                </motion.div>
             </main>
         )
     }
