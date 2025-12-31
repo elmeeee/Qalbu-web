@@ -441,7 +441,7 @@ export function QuranReels() {
         return (
             <div className="h-[100vh] w-full snap-center relative flex items-center justify-center bg-black hardware-accelerated">
                 {/* Dynamic Gradient Background */}
-                <div className="absolute inset-0 bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950" />
+                <div className="absolute inset-0 bg-slate-950" />
 
                 {/* Animated Pattern Overlay - Simplified for performance */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -555,7 +555,7 @@ export function QuranReels() {
                 </div>
 
                 {/* Bottom Actions - Share/Mute */}
-                <div className="absolute bottom-10 right-6 z-30 flex flex-col gap-4 pointer-events-auto">
+                <div className="absolute bottom-28 right-6 z-30 flex flex-col gap-4 pointer-events-auto">
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleMute() }}
                         className="p-3 rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white hover:bg-emerald-500/20 transition-colors"
@@ -575,7 +575,7 @@ export function QuranReels() {
 
     if (isLoading && ayahs.length === 0) {
         return (
-            <div className="h-screen flex items-center justify-center bg-gradient-to-b from-teal-950 via-slate-900 to-emerald-950">
+            <div className="h-screen flex items-center justify-center bg-slate-950">
                 <Loader2 className="h-12 w-12 animate-spin text-emerald-500" />
             </div>
         )
