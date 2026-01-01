@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect, useRef, forwardRef } from 'react'
+import { useState, useEffect, useRef, forwardRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search, Check } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 import { useAudio } from '@/contexts/audio-context'
+import { useQuranScript } from '@/contexts/quran-script-context'
 import { useSearchParams } from 'next/navigation'
 import { ReciterSelector } from '@/components/audio/reciter-selector'
+import { QuranScriptSelector } from '@/components/quran/quran-script-selector'
 import { Switch } from '@/components/ui/switch'
 import {
     DropdownMenu,
@@ -168,6 +170,7 @@ Scroller.displayName = 'Scroller'
 export function QuranReels() {
     const { t, language } = useLanguage()
     const { isMuted: contextMuted, setIsMuted: setContextMuted, selectedReciter } = useAudio()
+    const { currentScript } = useQuranScript()
     const searchParams = useSearchParams()
     const virtuosoRef = useRef<VirtuosoHandle>(null)
     const isProgrammaticScroll = useRef(false)
@@ -228,13 +231,14 @@ export function QuranReels() {
     }, [])
 
     // Load initial data
-    const loadAyahs = async (surahCheck: number, ayahStart: number, reset: boolean = false) => {
+    const loadAyahs = useCallback(async (surahCheck: number, ayahStart: number, reset: boolean = false) => {
+        // Use a ref check to prevent concurrent loads without adding isLoading to deps
         if (isLoading) return
         setIsLoading(true)
 
         try {
             // Fetch batch of ayahs (e.g. 10 at a time)
-            const response = await fetch(`/api/quran/ayahs?surah=${surahCheck}&startAyah=${ayahStart}&count=10&audioEdition=${selectedReciter}`)
+            const response = await fetch(`/api/quran/ayahs?surah=${surahCheck}&startAyah=${ayahStart}&count=10&audioEdition=${selectedReciter}&quranEdition=${currentScript.apiEdition}`)
             const data = await response.json()
 
             if (data.ayahs && data.ayahs.length > 0) {
@@ -263,8 +267,9 @@ export function QuranReels() {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [selectedReciter, currentScript.apiEdition]) // Removed isLoading from deps
 
+    // Initial load from URL params
     useEffect(() => {
         const surahParam = searchParams.get('surah')
         const ayahParam = searchParams.get('ayah')
@@ -278,8 +283,21 @@ export function QuranReels() {
         } else {
             loadAyahs(1, 1, true)
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedReciter])
+    }, []) // Only run on mount
+
+    // Reload when script or reciter changes
+    useEffect(() => {
+        // Skip initial render
+        if (ayahs.length === 0) return
+
+        // Reload current position with new script/reciter
+        const currentAyahData = ayahs[currentIndex]
+        if (currentAyahData?.surah) {
+            setAyahs([]) // Clear current ayahs
+            setCurrentIndex(0)
+            loadAyahs(currentAyahData.surah.number, currentAyahData.numberInSurah, true)
+        }
+    }, [selectedReciter, currentScript.apiEdition])
 
     // Refs to latest state to avoid closure staleness
     const stateRef = useRef({
@@ -579,6 +597,12 @@ export function QuranReels() {
                                             <button onClick={() => setFontSize(Math.min(6, fontSize + 0.5))} className="flex-1 p-1 text-white hover:bg-white/10 rounded">+</button>
                                         </div>
                                     </div>
+                                </div>
+
+                                <DropdownMenuSeparator className="bg-white/10" />
+                                <DropdownMenuLabel className="text-emerald-500">Quran Script</DropdownMenuLabel>
+                                <div className="p-2">
+                                    <QuranScriptSelector />
                                 </div>
 
                                 <DropdownMenuSeparator className="bg-white/10" />

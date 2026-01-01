@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { AudioProvider } from '@/contexts/audio-context'
 import { LanguageProvider } from '@/contexts/language-context'
+import { QuranScriptProvider } from '@/contexts/quran-script-context'
 import { MiniPlayer } from '@/components/audio/mini-player'
 import { NotificationManager } from '@/components/prayer/notification-manager'
 import { PWALayout } from '@/components/pwa/pwa-layout'
@@ -128,13 +129,15 @@ export default function RootLayout({
                     <QueryProvider>
                         <Suspense fallback={null}>
                             <LanguageProvider>
-                                <AudioProvider>
-                                    <PWALayout>
-                                        {children}
-                                    </PWALayout>
-                                    <MiniPlayer />
-                                    <NotificationManager />
-                                </AudioProvider>
+                                <QuranScriptProvider>
+                                    <AudioProvider>
+                                        <PWALayout>
+                                            {children}
+                                        </PWALayout>
+                                        <MiniPlayer />
+                                        <NotificationManager />
+                                    </AudioProvider>
+                                </QuranScriptProvider>
                             </LanguageProvider>
                         </Suspense>
                     </QueryProvider>

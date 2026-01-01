@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const count = parseInt(searchParams.get('count') || '5')
     const edition = searchParams.get('edition') || 'en.asad'
+    const quranEdition = searchParams.get('quranEdition') || 'quran-tajweed'
 
     try {
         const totalAyahs = 6236
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
         const promises = randomIndices.map(async (index) => {
             try {
                 const [arabicResponse, audioResponse, translationResponse, transliterationResponse] = await Promise.all([
-                    fetch(`${BASE_URL}/ayah/${index}/quran-tajweed`, { cache: 'no-store' }),
+                    fetch(`${BASE_URL}/ayah/${index}/${quranEdition}`, { cache: 'no-store' }),
                     fetch(`${BASE_URL}/ayah/${index}/ar.alafasy`, { cache: 'no-store' }),
                     fetch(`${BASE_URL}/ayah/${index}/${edition}`, { cache: 'no-store' }),
                     fetch(`${BASE_URL}/ayah/${index}/en.transliteration`, { cache: 'no-store' }),

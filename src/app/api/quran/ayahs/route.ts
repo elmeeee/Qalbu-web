@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const count = parseInt(searchParams.get('count') || '5')
     const edition = searchParams.get('edition') || 'en.asad'
     const audioEdition = searchParams.get('audioEdition') || 'ar.alafasy'
+    const quranEdition = searchParams.get('quranEdition') || 'quran-tajweed'
 
     try {
         // 1. Get Surah Info to know total verses
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
             `${BASE_URL}/surah/${currentSurahNum}/${audioEdition}?offset=${offset}&limit=${limit}`,
             `${BASE_URL}/surah/${currentSurahNum}/${edition}?offset=${offset}&limit=${limit}`,
             `${BASE_URL}/surah/${currentSurahNum}/en.transliteration?offset=${offset}&limit=${limit}`,
-            `${BASE_URL}/surah/${currentSurahNum}/quran-tajweed?offset=${offset}&limit=${limit}`
+            `${BASE_URL}/surah/${currentSurahNum}/${quranEdition}?offset=${offset}&limit=${limit}`
         ];
 
         const responses = await Promise.all(endpoints.map(url => fetch(url, { cache: 'force-cache' })));
