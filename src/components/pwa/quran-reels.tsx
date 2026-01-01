@@ -181,7 +181,7 @@ export function QuranReels() {
 
     // UI State
     const [showOverlayIcon, setShowOverlayIcon] = useState<'play' | 'pause' | null>(null)
-    const [likedAyahs, setLikedAyahs] = useState<Set<string>>(new Set())
+    // const [likedAyahs, setLikedAyahs] = useState<Set<string>>(new Set()) // Removed Like feature
     const [showSurahSelector, setShowSurahSelector] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [isPlaying, setIsPlaying] = useState(false)
@@ -384,24 +384,47 @@ export function QuranReels() {
 
     // Sync Scroll with Current Index
     useEffect(() => {
-        if (virtuosoRef.current) {
+        if (virtuosoRef.current && ayahs.length > 0) {
             // Re-assert lock to be safe
             isProgrammaticScroll.current = true
 
-            virtuosoRef.current.scrollToIndex({
-                index: currentIndex,
-                align: 'start',
-                behavior: 'smooth'
+            // Use requestAnimationFrame to ensure the scroll happens in the next frame
+            requestAnimationFrame(() => {
+                virtuosoRef.current?.scrollToIndex({
+                    index: currentIndex,
+                    align: 'center', // Align center to match snap-center behavior
+                    // Use instant jump for start of surah to avoid interference, smooth for auto-scroll
+                    behavior: currentIndex === 0 ? 'auto' : 'smooth'
+                })
             })
 
-            // Release lock after scroll animation
+            // Release lock after scroll animation (slightly longer buffer)
             const timer = setTimeout(() => {
                 isProgrammaticScroll.current = false
-            }, 1000)
+            }, 1200)
 
             return () => clearTimeout(timer)
         }
-    }, [currentIndex])
+    }, [currentIndex, ayahs])
+
+    // Save Last Read
+    useEffect(() => {
+        const currentAyahData = ayahs[currentIndex]
+        if (!currentAyahData) return
+
+        const timer = setTimeout(() => {
+            if (currentAyahData.surah && currentAyahData.numberInSurah) {
+                const lastReadData = {
+                    surah: currentAyahData.surah.number,
+                    ayah: currentAyahData.numberInSurah,
+                    timestamp: Date.now()
+                }
+                localStorage.setItem('quran-last-read', JSON.stringify(lastReadData))
+            }
+        }, 1000)
+
+        return () => clearTimeout(timer)
+    }, [currentIndex, ayahs])
 
     const handleTap = () => {
         if (!audioRef.current) return
@@ -419,6 +442,7 @@ export function QuranReels() {
         setTimeout(() => setShowOverlayIcon(null), 1000)
     }
 
+    /* Like Feature Removed
     const toggleLike = () => {
         const currentAyahData = ayahs[currentIndex]
         if (!currentAyahData) return
@@ -432,6 +456,7 @@ export function QuranReels() {
         }
         setLikedAyahs(newLiked)
     }
+    */
 
     const handleShare = async () => {
         const currentAyahData = ayahs[currentIndex]
@@ -452,6 +477,7 @@ export function QuranReels() {
     }
 
     const handleChangeSurah = (surahNumber: number) => {
+        isProgrammaticScroll.current = true
         setCurrentSurah(surahNumber)
         setCurrentAyah(1)
         setAyahs([]) // Clear current list
@@ -596,6 +622,8 @@ export function QuranReels() {
 
                 {/* Bottom Actions - Like/Share/Mute */}
                 <div className="absolute bottom-32 right-6 z-30 flex flex-col gap-3 pointer-events-auto">
+                    {/* Like Button Removed */}
+                    {/*
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleLike() }}
                         className={`p-3 rounded-full backdrop-blur-md border transition-all shadow-sm ${likedAyahs.has(`${ayah.surah?.number}-${ayah.numberInSurah}`)
@@ -608,6 +636,7 @@ export function QuranReels() {
                                 }`}
                         />
                     </button>
+                    */}
                     <button
                         onClick={(e) => { e.stopPropagation(); toggleMute() }}
                         className="p-3 rounded-full bg-white/80 dark:bg-black/20 backdrop-blur-md border border-slate-200/50 dark:border-white/10 text-slate-700 dark:text-white hover:bg-emerald-500/10 hover:text-emerald-600 transition-colors shadow-sm"
