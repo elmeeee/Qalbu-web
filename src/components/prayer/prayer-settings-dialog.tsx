@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Settings } from 'lucide-react'
+import { Settings, Search, MapPin, Loader2 } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -19,24 +19,58 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import {
     CALCULATION_METHODS,
     JURISTIC_SCHOOLS,
     LATITUDE_ADJUSTMENTS,
     MIDNIGHT_MODES,
     type PrayerSettings,
+    type Coordinates,
+    type LocationData,
+    searchCity,
 } from '@/lib/api/prayer-times'
 import { useLanguage } from '@/contexts/language-context'
 
 interface PrayerSettingsDialogProps {
     settings: PrayerSettings
     onSettingsChange: (settings: Partial<PrayerSettings>) => void
+    onLocationChange?: (coords: Coordinates, location: LocationData) => void
     variant?: 'icon' | 'button' // icon for compact, button for full
 }
 
-export function PrayerSettingsDialog({ settings, onSettingsChange, variant = 'icon' }: PrayerSettingsDialogProps) {
+export function PrayerSettingsDialog({ settings, onSettingsChange, onLocationChange, variant = 'icon' }: PrayerSettingsDialogProps) {
     const [open, setOpen] = useState(false)
     const { t } = useLanguage()
+    const [searchQuery, setSearchQuery] = useState('')
+    const [isSearching, setIsSearching] = useState(false)
+    const [searchResults, setSearchResults] = useState<(LocationData & Coordinates)[]>([])
+
+    const handleSearch = async () => {
+        if (!searchQuery.trim()) return
+        setIsSearching(true)
+        const results = await searchCity(searchQuery)
+        setSearchResults(results)
+        setIsSearching(false)
+    }
+
+    const handleLocationSelect = (result: LocationData & Coordinates) => {
+        if (onLocationChange) {
+            onLocationChange(
+                { latitude: result.latitude, longitude: result.longitude },
+                {
+                    city: result.city,
+                    region: result.region,
+                    country: result.country,
+                    countryCode: result.countryCode,
+                    formatted: result.formatted
+                }
+            )
+            setOpen(false)
+            setSearchResults([])
+            setSearchQuery('')
+        }
+    }
 
     const handleSettingChange = (newSettings: Partial<PrayerSettings>) => {
         onSettingsChange(newSettings)
@@ -78,6 +112,56 @@ export function PrayerSettingsDialog({ settings, onSettingsChange, variant = 'ic
                     {/* Content - Scrollable */}
                     <div className="overflow-y-auto p-6 min-h-0">
                         <div className="grid grid-cols-1 gap-6">
+                            {/* Location Search */}
+                            <div className="space-y-3 p-5 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-500/30 transition-colors group">
+                                <Label className="text-base font-semibold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">
+                                    {t.prayer?.changeLocation || 'Location'}
+                                </Label>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                                    {t.prayer?.locationDescription || 'Search and select your city manually if autodetection is inaccurate'}
+                                </p>
+                                <div className="space-y-3">
+                                    <div className="relative">
+                                        <Input
+                                            placeholder="Search city (e.g. South Tangerang)"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                            className="pr-10 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-white/10"
+                                        />
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            className="absolute right-1 top-1 h-9 w-9 text-slate-500 hover:text-emerald-600"
+                                            onClick={handleSearch}
+                                            disabled={isSearching}
+                                        >
+                                            {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                                        </Button>
+                                    </div>
+
+                                    {searchResults.length > 0 && (
+                                        <div className="border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-slate-900/50">
+                                            {searchResults.map((result, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => handleLocationSelect(result)}
+                                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors border-b border-slate-100 dark:border-white/5 last:border-0"
+                                                >
+                                                    <div className="font-medium text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                                                        <MapPin className="h-3 w-3 text-emerald-500" />
+                                                        {result.formatted?.split(',')[0]}
+                                                    </div>
+                                                    <div className="text-xs text-slate-500 dark:text-slate-400 pl-5 truncate">
+                                                        {result.formatted}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                             {/* Calculation Method */}
                             <div className="space-y-3 p-5 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-500/30 transition-colors group">
                                 <Label htmlFor="method" className="text-base font-semibold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">

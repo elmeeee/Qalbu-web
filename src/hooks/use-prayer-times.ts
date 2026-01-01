@@ -124,6 +124,17 @@ export function usePrayerTimes() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
     }
 
+    const setLocation = (coords: Coordinates, location?: LocationData) => {
+        setCoordinates(coords)
+        if (location) {
+            setLocationName(location)
+        } else {
+            getReverseGeocoding(coords).then(setLocationName)
+        }
+        localStorage.setItem('cached-location', JSON.stringify(coords))
+        setLocationError(null)
+    }
+
     return {
         prayerTimes: data,
         isLoading,
@@ -132,6 +143,7 @@ export function usePrayerTimes() {
         locationName,
         settings,
         updateSettings,
+        setLocation,
         refetch,
     }
 }

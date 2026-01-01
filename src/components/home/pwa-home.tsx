@@ -6,9 +6,9 @@ import { ModeToggle } from '@/components/ui/mode-toggle'
 import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { PrayerTimesWidgetPWA } from '@/components/prayer/prayer-times-widget-pwa'
 import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
-import { DailyDuaWidget } from '@/components/dua/daily-dua-widget'
+
 import { IslamicHolidaysWidgetPWA } from '@/components/islamic/islamic-holidays-widget-pwa'
-import { DailyDuaSlider, NearbyMosqueCard, LastReadWidget, FavoriteAyahsWidget } from '@/components/pwa'
+import { NearbyMosqueCard, LastReadWidget, FavoriteAyahsWidget } from '@/components/pwa'
 import { useLanguage } from '@/contexts/language-context'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { AdhanManager } from '@/components/pwa/adhan-manager'
@@ -137,10 +137,7 @@ export default function PWAHome() {
                     <PrayerTimesWidgetPWA />
                 </motion.div>
 
-                {/* 2. Daily Dua Slider */}
-                <motion.div variants={itemVariants}>
-                    <DailyDuaSlider />
-                </motion.div>
+
 
                 {/* 3. Nearby Mosque Card */}
                 <motion.div variants={itemVariants}>

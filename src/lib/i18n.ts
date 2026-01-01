@@ -58,6 +58,8 @@ export const translations = {
             midnightMode: 'Midnight Calculation Mode',
             midnightDescription: 'Determines how midnight is calculated, which affects the end time of Isha',
             currentSettings: 'Current Settings',
+            changeLocation: 'Change Location',
+            locationDescription: 'Search and select your city manually if autodetection is inaccurate',
         },
         qiblaPage: {
             title: 'Qibla Direction',
@@ -132,6 +134,10 @@ export const translations = {
                 ios: 'Download for iOS',
                 android: 'Download for Android',
                 copyright: '© 2025 Qalbu. Made with peace and love.',
+                ctaTitle: 'Take Qalbu with you.',
+                ctaDescription: 'Download our mobile app to get accurate prayer times, Quran, and more wherever you go.',
+                newsletterTitle: 'Stay Connected',
+                newsletterDescription: 'Join our newsletter for updates on new features and Islamic insights.',
             },
         },
         ramadan: {
@@ -241,6 +247,8 @@ export const translations = {
             midnightMode: 'Midnight Calculation Mode',
             midnightDescription: 'Determines how midnight is calculated, which affects the end time of Isha',
             currentSettings: 'Current Settings',
+            changeLocation: 'Ubah Lokasi',
+            locationDescription: 'Cari dan pilih kota Anda secara manual jika deteksi otomatis tidak akurat',
         },
         qiblaPage: {
             title: 'Arah Kiblat',
@@ -315,6 +323,10 @@ export const translations = {
                 ios: 'Unduh untuk iOS',
                 android: 'Unduh untuk Android',
                 copyright: '© 2025 Qalbu. Dibuat dengan kedamaian dan cinta.',
+                ctaTitle: 'Bawa Qalbu bersama Anda.',
+                ctaDescription: 'Unduh aplikasi seluler kami untuk mendapatkan waktu sholat yang akurat, Al-Quran, dan banyak lagi ke mana pun Anda pergi.',
+                newsletterTitle: 'Tetap Terhubung',
+                newsletterDescription: 'Bergabunglah dengan buletin kami untuk pembaruan fitur baru dan wawasan Islam.',
             },
         },
         ramadan: {
@@ -423,6 +435,8 @@ export const translations = {
             midnightMode: 'Mod Pengiraan Tengah Malam',
             midnightDescription: 'Menentukan cara tengah malam dikira, yang mempengaruhi waktu akhir Isyak',
             currentSettings: 'Tetapan Semasa',
+            changeLocation: 'Tukar Lokasi',
+            locationDescription: 'Cari dan pilih bandar anda secara manual jika pengesanan automatik tidak tepat',
         },
         qiblaPage: {
             title: 'Arah Kiblat',
@@ -497,6 +511,10 @@ export const translations = {
                 ios: 'Muat turun untuk iOS',
                 android: 'Muat turun untuk Android',
                 copyright: '© 2025 Qalbu. Dibuat dengan keamanan dan kasih sayang.',
+                ctaTitle: 'Bawa Qalbu bersama anda.',
+                ctaDescription: 'Muat turun aplikasi mudah alih kami untuk mendapatkan waktu solat yang tepat, Al-Quran, dan banyak lagi ke mana sahaja anda pergi.',
+                newsletterTitle: 'Kekal Terhubung',
+                newsletterDescription: 'Sertai surat berita kami untuk kemas kini mengenai ciri baharu dan pandangan Islam.',
             },
         },
         ramadan: {

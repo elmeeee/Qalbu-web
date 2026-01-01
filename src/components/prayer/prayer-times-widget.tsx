@@ -14,7 +14,7 @@ import { PrayerSettingsDialog } from './prayer-settings-dialog'
 const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']
 
 export function PrayerTimesWidget({ variant = 'default' }: { variant?: 'default' | 'horizontal' }) {
-    const { prayerTimes, isLoading, error, coordinates, locationName, settings, updateSettings } = usePrayerTimes()
+    const { prayerTimes, isLoading, error, coordinates, locationName, settings, updateSettings, setLocation } = usePrayerTimes()
     const [currentTime, setCurrentTime] = useState(new Date())
     const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string } | null>(null)
     const { t, language } = useLanguage()
@@ -168,7 +168,12 @@ export function PrayerTimesWidget({ variant = 'default' }: { variant?: 'default'
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <PrayerSettingsDialog settings={settings} onSettingsChange={updateSettings} variant="button" />
+                        <PrayerSettingsDialog
+                            settings={settings}
+                            onSettingsChange={updateSettings}
+                            onLocationChange={setLocation}
+                            variant="button"
+                        />
                     </div>
                 </div>
                 <div className="mt-4 space-y-1">

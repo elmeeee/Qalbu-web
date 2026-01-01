@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button'
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { useLanguage } from '@/contexts/language-context'
-import { DailyHadithWidget } from '@/components/hadith/daily-hadith-widget'
-import { DailyDuaWidget } from '@/components/dua/daily-dua-widget'
+
+
 import { IslamicHolidaysWidget } from '@/components/islamic/islamic-holidays-widget'
 import { PrayerSettingsDialog } from '@/components/prayer/prayer-settings-dialog'
 import { usePrayerTimes } from '@/hooks/use-prayer-times'
 import { useInstallPrompt } from '@/hooks/use-install-prompt'
+import { WebFooter } from '@/components/home/web-footer'
 
 // Animation variants
 const fadeInUp = {
@@ -155,25 +156,9 @@ export default function WebHome() {
                     <PrayerTimesWidget variant="horizontal" />
                 </motion.div>
 
-                {/* Daily Hadith Widget */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="mb-8"
-                >
-                    <DailyHadithWidget />
-                </motion.div>
 
-                {/* Daily Dua Widget */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="mb-8"
-                >
-                    <DailyDuaWidget />
-                </motion.div>
+
+
 
                 {/* Islamic Holidays Widget */}
                 <motion.div
@@ -302,19 +287,7 @@ export default function WebHome() {
                             </motion.div>
                         </Link>
 
-                        {/* Daily Doas */}
-                        <Link href="/doa">
-                            <motion.div
-                                whileHover={{ y: -5 }}
-                                className="group h-full rounded-2xl border border-border/50 bg-card p-4 shadow-sm transition-all hover:shadow-md"
-                            >
-                                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/30">
-                                    <Heart className="h-5 w-5" />
-                                </div>
-                                <h3 className="mb-1 text-base font-bold">{t.doas.title}</h3>
-                                <p className="text-xs text-muted-foreground line-clamp-2">{t.doas.subtitle}</p>
-                            </motion.div>
-                        </Link>
+
 
                         {/* Prophets Stories */}
                         <Link href="/prophets">
@@ -394,23 +367,7 @@ export default function WebHome() {
                     </div>
 
                     {/* Main Footer */}
-                    <div id="download-section" className="rounded-[3rem] bg-black text-white p-12 md:p-24 text-center scroll-mt-20">
-                        <h2 className="text-4xl md:text-5xl font-bold mb-6">Qalbu</h2>
-                        <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-                            {t.home.footer.description}
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                            <Button className="h-12 rounded-full bg-white text-black hover:bg-gray-200 px-8">
-                                {t.home.footer.ios}
-                            </Button>
-                            <Button variant="outline" className="h-12 rounded-full border-gray-700 text-white hover:bg-gray-900 px-8 bg-transparent">
-                                {t.home.footer.android}
-                            </Button>
-                        </div>
-                        <p className="text-sm text-gray-500">
-                            {t.home.footer.copyright}
-                        </p>
-                    </div>
+                    <WebFooter />
                 </div>
             </div>
         </main>

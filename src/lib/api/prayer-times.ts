@@ -252,6 +252,36 @@ export async function getReverseGeocoding(coordinates: Coordinates): Promise<Loc
     }
 }
 
+export async function searchCity(query: string): Promise<(LocationData & Coordinates)[]> {
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&accept-language=id`,
+            {
+                headers: {
+                    'User-Agent': 'MuslimPrayerApp/1.0',
+                }
+            }
+        )
+
+        if (response.ok) {
+            const data = await response.json()
+            return data.map((item: any) => ({
+                city: item.address.city || item.address.town || item.address.village || item.address.county || item.name,
+                region: item.address.state || item.address.region,
+                country: item.address.country,
+                countryCode: item.address.country_code?.toUpperCase(),
+                formatted: item.display_name,
+                latitude: parseFloat(item.lat),
+                longitude: parseFloat(item.lon)
+            }))
+        }
+    } catch (e) {
+        console.error('Search failed:', e)
+    }
+
+    return []
+}
+
 export async function getPrayerTimes(
     coordinates: Coordinates,
     settings?: Partial<PrayerSettings>,
