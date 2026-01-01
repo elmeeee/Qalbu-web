@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, forwardRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search } from 'lucide-react'
+import { Play, Pause, Volume2, VolumeX, Heart, Share2, BookOpen, Loader2, MoreVertical, X, Search, Check } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 import { useAudio } from '@/contexts/audio-context'
 import { useSearchParams } from 'next/navigation'
@@ -167,9 +167,10 @@ Scroller.displayName = 'Scroller'
 
 export function QuranReels() {
     const { t, language } = useLanguage()
-    const { isMuted: contextMuted, setIsMuted: setContextMuted } = useAudio()
+    const { isMuted: contextMuted, setIsMuted: setContextMuted, selectedReciter } = useAudio()
     const searchParams = useSearchParams()
     const virtuosoRef = useRef<VirtuosoHandle>(null)
+    const isProgrammaticScroll = useRef(false)
 
     // State
     const [isLoading, setIsLoading] = useState(false)
@@ -189,10 +190,10 @@ export function QuranReels() {
 
     // Settings State
     const [fontSize, setFontSize] = useState(2.5)
-    const [showTranslation, setShowTranslation] = useState(true)
+    const [showTranslation, setShowTranslation] = useState(false)
     const [showTransliteration, setShowTransliteration] = useState(true)
     const [autoPlay, setAutoPlay] = useState(true)
-    const [selectedReciter, setSelectedReciter] = useState('ar.alafasy')
+    // const [selectedReciter, setSelectedReciter] = useState('ar.alafasy') // Removed local state
 
     const audioRef = useRef<HTMLAudioElement | null>(null)
     const [isMuted, setIsMuted] = useState(false)
@@ -280,117 +281,127 @@ export function QuranReels() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedReciter])
 
-    // Auto-play audio when ayah changes
+    // Refs to latest state to avoid closure staleness
+    const stateRef = useRef({
+        ayahs,
+        currentIndex,
+        autoPlay,
+        isPlaying,
+        isMuted
+    })
+
+    // Update ref whenever state changes
     useEffect(() => {
-        if (ayahs[currentIndex] && audioRef.current) {
-            const audio = audioRef.current
-            const currentAudioSrc = ayahs[currentIndex].audio
+        stateRef.current = { ayahs, currentIndex, autoPlay, isPlaying, isMuted }
+    }, [ayahs, currentIndex, autoPlay, isPlaying, isMuted])
 
-            // Check if source changed to avoid restarting on data fetch
-            if (audio.src !== currentAudioSrc) {
-                // IMPORTANT: Completely stop and reset previous audio
-                audio.pause()
-                audio.currentTime = 0
-                // Remove all previous event listeners to prevent multiple triggers
-                audio.onended = null
-                audio.oncanplaythrough = null
+    // Main Audio Effect
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
 
-                // Set new source
-                audio.src = currentAudioSrc
-                audio.load()
+        const currentAyahData = ayahs[currentIndex]
+        if (!currentAyahData) return
 
-                console.log(`🎵 Loading audio for ayah ${ayahs[currentIndex].numberInSurah}`)
+        const currentAudioSrc = currentAyahData.audio
+
+        // Handle Audio End
+        const onAudioEnded = () => {
+            const state = stateRef.current
+
+            const currentAyah = state.ayahs[state.currentIndex]
+            const currentSurahData = SURAHS.find(s => s.number === currentAyah?.surah?.number)
+
+            // Check if last ayah
+            if (currentSurahData && currentAyah?.numberInSurah === currentSurahData.verses) {
+                setIsPlaying(false)
+                setShowEndSurahAlert(true)
+                return
             }
 
-            // Only auto-play if enabled
-            if (autoPlay) {
-                // Update ended listener even if src didn't change (closure capture)
-                const handleAudioEnd = () => {
-                    console.log(`✅ Audio ended for ayah ${ayahs[currentIndex].numberInSurah}`)
-                    const currentAyahData = ayahs[currentIndex]
-                    const currentSurahData = SURAHS.find(s => s.number === currentAyahData.surah?.number)
-
-                    // Check if this is the last ayah of the surah
-                    if (currentSurahData && currentAyahData.numberInSurah === currentSurahData.verses) {
-                        setIsPlaying(false)
-                        setShowEndSurahAlert(true)
-                        return
-                    }
-
-                    // Move to next ayah - this will trigger currentIndex change via onScroll
-                    if (currentIndex < ayahs.length - 1) {
-                        console.log(`⏭️  Moving to next ayah: ${currentIndex + 1}`)
-                        virtuosoRef.current?.scrollToIndex({
-                            index: currentIndex + 1,
-                            align: 'start',
-                            behavior: 'smooth'
-                        })
-                    }
-                }
-
-                const handleCanPlay = () => {
-                    if (!isMuted) {
-                        console.log(`▶️  Playing audio for ayah ${ayahs[currentIndex].numberInSurah}`)
-                        // Ensure we are playing the right thing
-                        if (audio.src === currentAudioSrc) {
-                            audio.play().catch(err => {
-                                if (err.name !== 'AbortError') {
-                                    console.error('Audio play error:', err)
-                                }
-                            })
-                            setIsPlaying(true)
-                        }
-                    } else {
-                        setIsPlaying(false)
-                    }
-                }
-
-                // Always re-attach ended to capture latest closures (like ayahs/currentIndex)
-                // Note: using 'once' or removing manually is tricky if we want to update it.
-                // Best to remove old and add new.
-                // However, since we are inside useEffect with [currentIndex], 
-                // every time index changes, we get here. 
-                // BUT, if 'ayahs' changed (fetch more), we also get here.
-
-                // If src didn't change, we might not want to interrupt playback unless we need to update 'ended'.
-                // 'ended' needs 'ayahs' and 'currentIndex'.
-                // If 'ayahs' changed, we definitely need to update 'ended' listener because 'ayahs' closure changed?
-                // Yes.
-
-                // Clean up previous listeners if we are essentially re-running the effect on same ayah
-                const onEndedWrapper = () => handleAudioEnd()
-                audio.addEventListener('ended', onEndedWrapper)
-
-                // If it's a new load (src changed), wait for canplay
-                if (audio.src !== currentAudioSrc || audio.paused) {
-                    if (audio.readyState >= 3) {
-                        handleCanPlay()
-                    } else {
-                        audio.addEventListener('canplaythrough', handleCanPlay, { once: true })
-                    }
-                } else if (isPlaying && !audio.paused) {
-                    // Already playing correct src, ensure state reflects it
-                    setIsPlaying(true)
-                }
-
-                return () => {
-                    audio.removeEventListener('ended', onEndedWrapper)
-                    audio.removeEventListener('canplaythrough', handleCanPlay)
-                }
+            // Move to next ayah
+            if (state.autoPlay && state.currentIndex < state.ayahs.length - 1) {
+                // Ensure scroll lock is active BEFORE changing index
+                isProgrammaticScroll.current = true
+                setCurrentIndex(prev => prev + 1)
             } else {
                 setIsPlaying(false)
-                audio.pause()
             }
         }
 
-        // Cleanup function for when component unmounts or severe change
-        return () => {
-            // We generally don't want to stop audio just because effect re-ran if src is same
-            // But if we navigate away (component unmount), we should.
-            // Rely on parent useEffect cleanup? 
-            // Actually, if we change currentIndex, we DO want to pause old track (handled by src check logic above technically)
+        // Clean up old listener
+        audio.onended = onAudioEnded
+
+        // Load and Play Logic
+        const playAudio = async () => {
+            try {
+                if (stateRef.current.autoPlay && !stateRef.current.isMuted) {
+                    await audio.play()
+                    setIsPlaying(true)
+                }
+            } catch (err: any) {
+                if (err.name !== 'AbortError') {
+                    console.error('Audio play error:', err)
+                }
+            }
         }
-    }, [currentIndex, ayahs, isMuted, autoPlay]) // eslint-disable-next-line react-hooks/exhaustive-deps
+
+        if (audio.src !== currentAudioSrc) {
+            // New Track
+            audio.src = currentAudioSrc
+            audio.load()
+            playAudio()
+        } else {
+            // Same Track (resumed or rerender)
+            if (stateRef.current.isPlaying && audio.paused && !stateRef.current.isMuted) {
+                playAudio()
+            } else if (!stateRef.current.isPlaying && !audio.paused) {
+                audio.pause()
+            }
+        }
+    }, [currentIndex, ayahs, selectedReciter])
+
+    // Separate effect for Play/Pause toggle to avoid reloading audio
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
+
+        if (isPlaying && audio.paused && audio.src) {
+            audio.play().catch(err => {
+                if (err.name !== 'AbortError') console.error(err)
+            })
+        } else if (!isPlaying && !audio.paused) {
+            audio.pause()
+        }
+    }, [isPlaying])
+
+    // Separate effect for Mute
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = isMuted
+        }
+    }, [isMuted])
+
+    // Sync Scroll with Current Index
+    useEffect(() => {
+        if (virtuosoRef.current) {
+            // Re-assert lock to be safe
+            isProgrammaticScroll.current = true
+
+            virtuosoRef.current.scrollToIndex({
+                index: currentIndex,
+                align: 'start',
+                behavior: 'smooth'
+            })
+
+            // Release lock after scroll animation
+            const timer = setTimeout(() => {
+                isProgrammaticScroll.current = false
+            }, 1000)
+
+            return () => clearTimeout(timer)
+        }
+    }, [currentIndex])
 
     const handleTap = () => {
         if (!audioRef.current) return
@@ -630,6 +641,9 @@ export function QuranReels() {
                     }
                 }}
                 onScroll={(e) => {
+                    // Ignore onScroll updates if we are scrolling programmatically
+                    if (isProgrammaticScroll.current) return
+
                     const target = e.target as HTMLElement
                     const height = target.clientHeight
                     if (height > 0) {
@@ -650,34 +664,42 @@ export function QuranReels() {
             {/* End of Surah Alert */}
             <AnimatePresence>
                 {showEndSurahAlert && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        className="fixed bottom-10 left-6 right-6 z-50 p-6 bg-slate-900/95 backdrop-blur-md border border-emerald-500/30 rounded-2xl shadow-xl shadow-emerald-900/40"
-                    >
-                        <div className="flex flex-col gap-4 text-center">
-                            <h3 className="text-xl font-bold text-white">End of Surah</h3>
-                            <p className="text-slate-300">
-                                You have completed Surah {ayahs[currentIndex]?.surah?.englishName}.
-                                Continue to the next Surah?
-                            </p>
-                            <div className="flex gap-3 mt-2">
-                                <button
-                                    onClick={() => setShowEndSurahAlert(false)}
-                                    className="flex-1 py-3 px-4 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition"
-                                >
-                                    Stay Here
-                                </button>
-                                <button
-                                    onClick={handleNextSurah}
-                                    className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition shadow-lg shadow-emerald-600/20"
-                                >
-                                    Next Surah
-                                </button>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 px-10 bg-black/60 backdrop-blur-[2px]">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: "spring", duration: 0.5 }}
+                            className="relative w-full max-w-sm bg-slate-900/95 border border-emerald-500/30 rounded-3xl shadow-2xl p-8"
+                        >
+                            <div className="flex flex-col gap-6 text-center">
+                                <div className="mx-auto w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-2">
+                                    <Check className="w-8 h-8 text-emerald-500" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-2xl font-bold text-white">End of Surah</h3>
+                                    <p className="text-slate-300 text-sm leading-relaxed">
+                                        You have recently completed reading details for Surah <span className="text-emerald-400 font-medium">{ayahs[currentIndex]?.surah?.englishName}</span>.
+                                        Would you like to continue?
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-3 mt-2">
+                                    <button
+                                        onClick={handleNextSurah}
+                                        className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition shadow-lg shadow-emerald-600/20"
+                                    >
+                                        Next Surah
+                                    </button>
+                                    <button
+                                        onClick={() => setShowEndSurahAlert(false)}
+                                        className="w-full py-3.5 px-4 rounded-xl bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition"
+                                    >
+                                        Stay Here
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
 
