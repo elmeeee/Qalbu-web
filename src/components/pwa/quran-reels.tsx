@@ -200,7 +200,7 @@ export function QuranReels() {
     // Sync with global audio context (initially)
     useEffect(() => {
         setIsMuted(contextMuted)
-    }, [])
+    }, []) // eslint-disable-next-line react-hooks/exhaustive-deps
 
     const toggleMute = () => {
         if (audioRef.current) {
@@ -233,7 +233,7 @@ export function QuranReels() {
 
         try {
             // Fetch batch of ayahs (e.g. 10 at a time)
-            const response = await fetch(`/api/quran/ayahs?surah=${surahCheck}&start=${ayahStart}&limit=10&reciter=${selectedReciter}`)
+            const response = await fetch(`/api/quran/ayahs?surah=${surahCheck}&startAyah=${ayahStart}&count=10&audioEdition=${selectedReciter}`)
             const data = await response.json()
 
             if (data.ayahs && data.ayahs.length > 0) {
@@ -390,7 +390,7 @@ export function QuranReels() {
             // Rely on parent useEffect cleanup? 
             // Actually, if we change currentIndex, we DO want to pause old track (handled by src check logic above technically)
         }
-    }, [currentIndex, ayahs, isMuted, autoPlay])
+    }, [currentIndex, ayahs, isMuted, autoPlay]) // eslint-disable-next-line react-hooks/exhaustive-deps
 
     const handleTap = () => {
         if (!audioRef.current) return
